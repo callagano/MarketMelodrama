@@ -25,7 +25,7 @@ export default function Home() {
     <ThemeProvider attribute="class" defaultTheme="dark">
       <div className="min-h-screen bg-background p-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-bold mb-8 text-foreground">Fear & Greed Index - Live</h1>
+          <h1 className="text-4xl font-bold mb-8 text-foreground">Fear & Greed Index Dashboard</h1>
           
           <Card className="p-6 bg-card">
             <h2 className="text-2xl font-semibold mb-6 text-card-foreground">Last 3 Months Trend</h2>
