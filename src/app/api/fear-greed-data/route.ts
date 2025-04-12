@@ -46,12 +46,29 @@ const generateMockData = (days: number = 1825) => {
 
 async function fetchFearGreedData() {
   try {
-    const scriptsDir = path.join(process.cwd(), 'src', 'scripts');
-    const csvPath = path.join(scriptsDir, 'fear_greed_index.csv');
+    // Try to read from public/data directory
+    const publicDataDir = path.join(process.cwd(), 'public', 'data');
+    const csvPath = path.join(publicDataDir, 'fear_greed_index.csv');
     
     if (fs.existsSync(csvPath)) {
-      console.log('Using fear_greed_index.csv data');
+      console.log('Using fear_greed_index.csv data from public/data directory');
       const csvData = readCsvFile(csvPath);
+      return csvData.map((row: any) => ({
+        date: row.date,
+        momentum: parseFloat(row.momentum),
+        strength: parseFloat(row.strength),
+        safe_haven: parseFloat(row.safe_haven),
+        Fear_Greed_Index: parseFloat(row.Fear_Greed_Index)
+      }));
+    }
+    
+    // Fallback to scripts directory
+    const scriptsDir = path.join(process.cwd(), 'src', 'scripts');
+    const scriptsCsvPath = path.join(scriptsDir, 'fear_greed_index.csv');
+    
+    if (fs.existsSync(scriptsCsvPath)) {
+      console.log('Using fear_greed_index.csv data from scripts directory');
+      const csvData = readCsvFile(scriptsCsvPath);
       return csvData.map((row: any) => ({
         date: row.date,
         momentum: parseFloat(row.momentum),

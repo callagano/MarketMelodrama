@@ -40,6 +40,7 @@ __pycache__/
 *.py[cod]
 *.csv
 !src/scripts/fear_greed_index.csv
+!public/data/fear_greed_index.csv
 
 # Virtual Environment
 venv/
