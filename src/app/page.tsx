@@ -1,9 +1,10 @@
 'use client';
 
-import { ThemeProvider } from "next-themes";
-import { FearGreedCharts } from "@/components/charts/FearGreedCharts";
-import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useEffect, useState } from 'react';
+import FearGreedCharts from '@/components/charts/FearGreedCharts';
+import IndexWidget from '@/components/IndexWidget';
+import { TimeframeProvider } from '@/context/TimeframeContext';
+import styles from './page.module.css';
 
 interface ChartData {
   date: string;
@@ -16,103 +17,67 @@ interface ChartData {
 export default function Home() {
   const [data, setData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/fear-greed-data')
-      .then(res => res.json())
-      .then(data => {
-        setData(data);
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/fear-greed-data');
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const jsonData = await response.json();
+        setData(jsonData);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
         setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const currentData = data.length > 0 ? data[data.length - 1] : null;
-  const sentimentType = currentData && currentData.Fear_Greed_Index > 50 ? 'GREED' : 'FEAR';
-  const sentimentColor = currentData && currentData.Fear_Greed_Index > 50 ? 'text-green-500' : 'text-red-500';
+  if (loading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <p className={styles.loadingText}>Loading data...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.errorContainer}>
+        <p className={styles.errorText}>Error: {error}</p>
+      </div>
+    );
+  }
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark">
-      <div className="min-h-screen bg-background">
-        <div className="mx-auto max-w-[700px] p-4">
-          <div className="flex flex-col space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Fear & Greed Index</CardTitle>
-                <CardDescription>Live market sentiment analysis and tracking</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <div className="flex h-[200px] items-center justify-center rounded-lg border border-dashed">
-                    <div className="flex flex-col items-center space-y-2 text-center">
-                      <div className="text-sm text-muted-foreground">Loading market data...</div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-8">
-                    {/* Main Sentiment Card */}
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">CURRENT SENTIMENT</p>
-                        <div className="flex items-center space-x-2">
-                          <h2 className="text-3xl font-bold">
-                            {currentData?.Fear_Greed_Index.toFixed(2)}
-                          </h2>
-                          <span className={`text-sm font-medium ${sentimentColor}`}>
-                            {sentimentType}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-muted-foreground">Last Updated</p>
-                        <p className="text-sm font-medium">
-                          {currentData && new Date(currentData.date).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Charts */}
-                    <div className="space-y-4">
-                      <FearGreedCharts data={data} />
-                    </div>
-
-                    {/* Indicators Grid */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <Card>
-                        <CardHeader className="p-4">
-                          <CardTitle className="text-sm font-medium">Market Momentum</CardTitle>
-                          <div className="text-2xl font-bold">{currentData?.momentum.toFixed(2)}</div>
-                        </CardHeader>
-                      </Card>
-                      <Card>
-                        <CardHeader className="p-4">
-                          <CardTitle className="text-sm font-medium">Stock Strength</CardTitle>
-                          <div className="text-2xl font-bold">{currentData?.strength.toFixed(2)}</div>
-                        </CardHeader>
-                      </Card>
-                      <Card>
-                        <CardHeader className="p-4">
-                          <CardTitle className="text-sm font-medium">Safe Haven Demand</CardTitle>
-                          <div className="text-2xl font-bold">{currentData?.safe_haven.toFixed(2)}</div>
-                        </CardHeader>
-                      </Card>
-                      <Card>
-                        <CardHeader className="p-4">
-                          <CardTitle className="text-sm font-medium">Overall Trend</CardTitle>
-                          <div className={`text-2xl font-bold ${sentimentColor}`}>{sentimentType}</div>
-                        </CardHeader>
-                      </Card>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+    <TimeframeProvider>
+      <main className={styles.mainContainer}>
+        <div className={styles.headerCard}>
+          <h1 className={styles.title}>Market Melodrama</h1>
+          <p className={styles.subtitle}>Because the S&P doesn't always make sense, and neither do people.</p>
         </div>
-      </div>
-    </ThemeProvider>
+        
+        {data.length > 0 ? (
+          <IndexWidget data={data} />
+        ) : (
+          <div className={styles.noDataCard}>
+            <p className={styles.noDataText}>No data available</p>
+          </div>
+        )}
+        
+        {data.length > 0 ? (
+          <FearGreedCharts data={data} />
+        ) : (
+          <div className={styles.noDataCard}>
+            <p className={styles.noDataText}>No data available</p>
+          </div>
+        )}
+      </main>
+    </TimeframeProvider>
   );
 }

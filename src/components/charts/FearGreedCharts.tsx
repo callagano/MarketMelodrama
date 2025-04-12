@@ -1,7 +1,8 @@
 'use client';
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { format } from "date-fns";
+import { useTimeframe } from '@/context/TimeframeContext';
 import styles from './FearGreedCharts.module.css';
 
 interface ChartData {
@@ -17,46 +18,135 @@ interface Props {
 }
 
 export default function FearGreedCharts({ data }: Props) {
-  // Only show last 180 days of data
-  const recentData = data.slice(-180).map((item) => ({
-    date: format(new Date(item.date), "MMM d, yyyy"),
-    "Fear & Greed Index": item.Fear_Greed_Index,
-    "Market Momentum": item.momentum,
-    "Stock Price Strength": item.strength,
-    "Safe Haven Demand": item.safe_haven,
-  }));
+  const { timeframe, setTimeframe } = useTimeframe();
+  
+  // Filter data based on selected timeframe
+  const getFilteredData = () => {
+    const now = new Date();
+    let startDate;
+    
+    switch (timeframe) {
+      case '1M':
+        startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+        break;
+      case '6M':
+        startDate = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate());
+        break;
+      case '3Y':
+        startDate = new Date(now.getFullYear() - 3, now.getMonth(), now.getDate());
+        break;
+      default:
+        startDate = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate());
+    }
+    
+    return data
+      .filter(item => new Date(item.date) >= startDate)
+      .map(item => ({
+        date: format(new Date(item.date), "MMM d, yyyy"),
+        "Market Momentum": item.momentum,
+        "Stock Price Strength": item.strength,
+        "Safe Haven Demand": item.safe_haven,
+      }));
+  };
+
+  // Get the latest data point
+  const filteredData = getFilteredData();
+  const latestData = data[data.length - 1];
+
+  // Function to get the sentiment label based on value
+  const getSentimentLabel = (value: number): string => {
+    if (value >= 80) return "Extreme Greed";
+    if (value >= 60) return "Greed";
+    if (value >= 40) return "Neutral";
+    if (value >= 20) return "Fear";
+    return "Extreme Fear";
+  };
+
+  // Function to get the sentiment color based on value
+  const getSentimentColor = (value: number): string => {
+    if (value >= 80) return "#10b981"; // emerald
+    if (value >= 60) return "#34d399"; // emerald-400
+    if (value >= 40) return "#f59e0b"; // amber
+    if (value >= 20) return "#f87171"; // red-400
+    return "#ef4444"; // red
+  };
 
   const chartConfigs = [
-    {
-      title: "Fear & Greed Index",
-      dataKey: "Fear & Greed Index",
-      color: "#6366f1", // indigo
-    },
     {
       title: "Market Momentum",
       dataKey: "Market Momentum",
       color: "#10b981", // emerald
+      description: "Measures the rate of change in market prices. High values indicate strong upward momentum, suggesting investors are confident and actively buying. This can signal potential market bubbles.",
+      currentValue: latestData.momentum,
+      sentimentLabel: getSentimentLabel(latestData.momentum),
+      sentimentColor: getSentimentColor(latestData.momentum)
     },
     {
       title: "Stock Price Strength",
       dataKey: "Stock Price Strength",
       color: "#f59e0b", // amber
+      description: "Tracks the number of stocks hitting 52-week highs vs. lows. High values show broad market strength with many stocks reaching new highs, indicating strong bullish sentiment.",
+      currentValue: latestData.strength,
+      sentimentLabel: getSentimentLabel(latestData.strength),
+      sentimentColor: getSentimentColor(latestData.strength)
     },
     {
       title: "Safe Haven Demand",
       dataKey: "Safe Haven Demand",
       color: "#ec4899", // pink
+      description: "Measures the performance of safe-haven assets like gold and bonds. High values indicate investors are seeking safety, often during market uncertainty or fear periods.",
+      currentValue: latestData.safe_haven,
+      sentimentLabel: getSentimentLabel(latestData.safe_haven),
+      sentimentColor: getSentimentColor(latestData.safe_haven)
     },
   ];
+
+  // Timeframe selector component to be reused
+  const TimeframeSelector = () => (
+    <div className={styles.timeframeSelector}>
+      <button 
+        className={`${styles.timeframeButton} ${timeframe === '1M' ? styles.active : ''}`}
+        onClick={() => setTimeframe('1M')}
+      >
+        1M
+      </button>
+      <button 
+        className={`${styles.timeframeButton} ${timeframe === '6M' ? styles.active : ''}`}
+        onClick={() => setTimeframe('6M')}
+      >
+        6M
+      </button>
+      <button 
+        className={`${styles.timeframeButton} ${timeframe === '3Y' ? styles.active : ''}`}
+        onClick={() => setTimeframe('3Y')}
+      >
+        3Y
+      </button>
+    </div>
+  );
 
   return (
     <div className={styles.chartContainer}>
       {chartConfigs.map((config) => (
         <div key={config.title} className={styles.chartCard}>
-          <h2 className={styles.chartTitle}>{config.title}</h2>
+          <div className={styles.chartHeader}>
+            <h2 className={styles.chartTitle}>{config.title}</h2>
+            <TimeframeSelector />
+            <p className={styles.chartDescription}>{config.description}</p>
+            <div className={styles.currentValueContainer} style={{ borderColor: config.sentimentColor }}>
+              <div className={styles.valueDisplay}>
+                <span className={styles.currentValue} style={{ color: config.sentimentColor }}>
+                  {config.currentValue.toFixed(2)}
+                </span>
+                <span className={styles.sentimentLabel} style={{ color: config.sentimentColor }}>
+                  {config.sentimentLabel}
+                </span>
+              </div>
+            </div>
+          </div>
           <div className={styles.chartWrapper}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={recentData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={filteredData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
                 <XAxis 
                   dataKey="date" 
@@ -87,13 +177,6 @@ export default function FearGreedCharts({ data }: Props) {
                   }}
                   labelStyle={{ color: '#9ca3af', fontSize: '10px' }}
                   itemStyle={{ fontSize: '12px' }}
-                />
-                <Legend 
-                  verticalAlign="top" 
-                  height={20}
-                  iconType="circle"
-                  iconSize={8}
-                  wrapperStyle={{ fontSize: '10px', color: '#9ca3af' }}
                 />
                 <Line
                   type="monotone"

@@ -1,7 +1,11 @@
 .mainContainer {
   padding: 1rem;
-  max-width: 600px;
+  max-width: 1200px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  min-height: 100vh;
 }
 
 @media (min-width: 768px) {
@@ -11,7 +15,6 @@
 }
 
 .headerCard {
-  margin-bottom: 1.5rem;
   padding: 1.5rem;
   border-radius: 1rem;
   background-color: #1e1e22;
@@ -40,13 +43,14 @@
 }
 
 .indexCard {
-  padding: 1.25rem;
-  border-radius: 0.75rem;
-  background-color: #2a2a30;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background-color: #1e1e22;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  min-width: 120px;
   text-align: center;
+  max-width: 200px;
+  margin: 0 auto;
 }
 
 .indexLabel {
@@ -54,11 +58,11 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
 }
 
 .indexValue {
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: 700;
   color: white;
   letter-spacing: -0.025em;
@@ -66,21 +70,23 @@
 
 .loadingContainer {
   display: flex;
-  height: 100vh;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
 }
 
 .loadingText {
-  color: white;
+  color: #9ca3af;
   font-size: 1rem;
 }
 
 .errorContainer {
   display: flex;
-  height: 100vh;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
 }
 
 .errorText {
@@ -93,12 +99,11 @@
   border-radius: 1rem;
   background-color: #1e1e22;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.05);
   text-align: center;
 }
 
 .noDataText {
   color: #9ca3af;
-  font-size: 0.875rem;
+  font-size: 1rem;
 } 
