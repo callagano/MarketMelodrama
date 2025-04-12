@@ -46,14 +46,14 @@ function calculateMetrics(spyData: any[], tltData: any[]) {
         const t = tltData.find(td => td.date === d.date);
         return t ? t.close / d.close : null;
       })
-      .filter((r): r is number => r !== null);
+      .filter(Boolean);
     
     const avg = slice.reduce((sum, r) => sum + r, 0) / slice.length;
     return {
       date: day.date,
       value: 100 - (ratio / avg * 100) // Invert the value
     };
-  }).filter((d): d is { date: string; value: number } => d !== null);
+  }).filter(Boolean);
 
   // Combine all metrics
   const combined = momentum.map(day => {
@@ -70,13 +70,7 @@ function calculateMetrics(spyData: any[], tltData: any[]) {
       safe_haven: sh.value,
       Fear_Greed_Index: fearGreedIndex
     };
-  }).filter((d): d is {
-    date: string;
-    momentum: number;
-    strength: number;
-    safe_haven: number;
-    Fear_Greed_Index: number;
-  } => d !== null);
+  }).filter(Boolean);
 
   return combined;
 }
@@ -96,7 +90,7 @@ export async function GET() {
   } catch (error) {
     console.error('Error:', error);
     return NextResponse.json(
-      { error: 'Failed to load data' },
+      { error: 'Failed to update data' },
       { status: 500 }
     );
   }
