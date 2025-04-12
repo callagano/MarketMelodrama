@@ -15,7 +15,7 @@ A real-time market sentiment analysis dashboard that tracks and visualizes the F
 
 ## Tech Stack
 
-- Next.js 15
+- Next.js 14
 - React
 - TypeScript
 - Recharts
