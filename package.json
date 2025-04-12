@@ -13,7 +13,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "bash vercel-build.sh",
     "start": "next start",
     "lint": "next lint"
   },
