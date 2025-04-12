@@ -39,6 +39,7 @@ next-env.d.ts
 __pycache__/
 *.py[cod]
 *.csv
+!src/scripts/fear_greed_index.csv
 
 # Virtual Environment
 venv/
