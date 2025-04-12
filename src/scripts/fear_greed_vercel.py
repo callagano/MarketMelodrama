@@ -1,80 +1,175 @@
+import os
+import sys
+import requests
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import requests
-import os
 from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
+from dotenv import load_dotenv
 
-API_KEY = 'e42miF33vkeNq9DsB4UZ5270pYg7Tp9W'
-base_url = "https://financialmodelingprep.com/api/v3/historical-price-full"
+# Load environment variables
+load_dotenv()
 
-end_date = datetime.now()
-start_date = end_date - timedelta(days=1825)  # 5 years
+# Get API key from environment variable
+API_KEY = os.getenv('ALPHA_VANTAGE_API_KEY')
+BASE_URL = os.getenv('ALPHA_VANTAGE_BASE_URL', 'https://www.alphavantage.co/query')
 
-# Local CSV database to limit API calls
-def load_or_fetch_data(symbol):
-    filename = f"data_{symbol}.csv"
-    if os.path.exists(filename):
-        print(f"Loading {symbol} from local cache")
-        df = pd.read_csv(filename, parse_dates=['date'], index_col='date')
-    else:
-        print(f"Fetching {symbol} data from API")
-        url = f"{base_url}/{symbol}?from={start_date.date()}&to={end_date.date()}&apikey={API_KEY}"
-        try:
-            response = requests.get(url)
-            response.raise_for_status()
-            json_data = response.json()
-            if 'historical' not in json_data:
-                raise ValueError(f"'historical' key not in response for {symbol}: {json_data}")
-            df = pd.DataFrame(json_data['historical'])
-            df['date'] = pd.to_datetime(df['date'])
-            df.set_index('date', inplace=True)
-            df.sort_index(inplace=True)
-            df.to_csv(filename)
-        except Exception as e:
-            raise RuntimeError(f"Failed to fetch {symbol} from API: {e}")
+def fetch_stock_data(symbol):
+    """Fetch stock data from Alpha Vantage API"""
+    params = {
+        'function': 'TIME_SERIES_DAILY',
+        'symbol': symbol,
+        'apikey': API_KEY,
+        'outputsize': 'compact'
+    }
+    
+    response = requests.get(BASE_URL, params=params)
+    data = response.json()
+    
+    if 'Time Series (Daily)' not in data:
+        print(f"Error fetching data for {symbol}: {data.get('Note', 'Unknown error')}")
+        return None
+    
+    df = pd.DataFrame.from_dict(data['Time Series (Daily)'], orient='index')
+    df.index = pd.to_datetime(df.index)
+    df = df.astype(float)
     return df
 
-spy_df = load_or_fetch_data('SPY')
-tlt_df = load_or_fetch_data('TLT')
+def calculate_market_momentum(spy_data, tlt_data):
+    """Calculate market momentum component"""
+    spy_returns = spy_data['4. close'].pct_change()
+    tlt_returns = tlt_data['4. close'].pct_change()
+    
+    # Calculate 10-day momentum
+    spy_momentum = spy_returns.rolling(window=10).mean()
+    tlt_momentum = tlt_returns.rolling(window=10).mean()
+    
+    # Combine momentum signals
+    momentum = (spy_momentum - tlt_momentum).fillna(0)
+    return momentum
 
-print("Calculating Market Momentum")
-spy_df['momentum'] = spy_df['close'] / spy_df['close'].rolling(window=125, min_periods=1).mean()
+def calculate_stock_price_strength(spy_data):
+    """Calculate stock price strength component"""
+    # Calculate moving averages
+    ma50 = spy_data['4. close'].rolling(window=50).mean()
+    ma200 = spy_data['4. close'].rolling(window=200).mean()
+    
+    # Calculate strength based on moving average relationship
+    strength = ((ma50 / ma200) - 1).fillna(0)
+    return strength
 
-print("Calculating Stock Price Strength")
-spy_df['high_52w'] = spy_df['close'].rolling(window=252, min_periods=1).max()
-spy_df['low_52w'] = spy_df['close'].rolling(window=252, min_periods=1).min()
-spy_df['strength'] = (spy_df['close'] - spy_df['low_52w']) / (spy_df['high_52w'] - spy_df['low_52w'])
+def calculate_safe_haven_demand(tlt_data):
+    """Calculate safe haven demand component"""
+    # Calculate TLT price relative to its 50-day moving average
+    ma50 = tlt_data['4. close'].rolling(window=50).mean()
+    demand = ((tlt_data['4. close'] / ma50) - 1).fillna(0)
+    return demand
 
-print("Calculating Safe Haven Demand")
-safe_haven = (tlt_df['close'] / spy_df['close']).dropna()
-safe_haven_ratio = safe_haven / safe_haven.rolling(window=125, min_periods=1).mean()
+def normalize_component(component):
+    """Normalize component to range [-1, 1]"""
+    return 2 * (component - component.min()) / (component.max() - component.min()) - 1
 
-print("Normalizing Components")
-def normalize(series):
-    return 100 * (series - series.min()) / (series.max() - series.min())
+def calculate_fear_greed_index(spy_data, tlt_data):
+    """Calculate the Fear and Greed Index"""
+    # Calculate components
+    momentum = calculate_market_momentum(spy_data, tlt_data)
+    strength = calculate_stock_price_strength(spy_data)
+    demand = calculate_safe_haven_demand(tlt_data)
+    
+    # Normalize components
+    momentum_norm = normalize_component(momentum)
+    strength_norm = normalize_component(strength)
+    demand_norm = normalize_component(demand)
+    
+    # Calculate weighted index
+    weights = {'momentum': 0.4, 'strength': 0.3, 'demand': 0.3}
+    index = (
+        weights['momentum'] * momentum_norm +
+        weights['strength'] * strength_norm +
+        weights['demand'] * demand_norm
+    )
+    
+    # Scale to 0-100 range
+    index_scaled = 50 * (index + 1)
+    
+    return pd.DataFrame({
+        'date': index_scaled.index,
+        'fear_greed_index': index_scaled.values,
+        'momentum': momentum_norm.values,
+        'strength': strength_norm.values,
+        'demand': demand_norm.values
+    })
 
-components = pd.DataFrame({
-    'momentum': normalize(spy_df['momentum']),
-    'strength': normalize(spy_df['strength']),
-    'safe_haven': 100 - normalize(safe_haven_ratio)
-}).dropna()
+def main():
+    print("Fetching SPY data from API")
+    spy_data = fetch_stock_data('SPY')
+    if spy_data is None:
+        sys.exit(1)
+    
+    print("Fetching TLT data from API")
+    tlt_data = fetch_stock_data('TLT')
+    if tlt_data is None:
+        sys.exit(1)
+    
+    print("Calculating Market Momentum")
+    momentum = calculate_market_momentum(spy_data, tlt_data)
+    
+    print("Calculating Stock Price Strength")
+    strength = calculate_stock_price_strength(spy_data)
+    
+    print("Calculating Safe Haven Demand")
+    demand = calculate_safe_haven_demand(tlt_data)
+    
+    print("Normalizing Components")
+    momentum_norm = normalize_component(momentum)
+    strength_norm = normalize_component(strength)
+    demand_norm = normalize_component(demand)
+    
+    print("Aggregating Weighted Fear and Greed Score")
+    weights = {'momentum': 0.4, 'strength': 0.3, 'demand': 0.3}
+    index = (
+        weights['momentum'] * momentum_norm +
+        weights['strength'] * strength_norm +
+        weights['demand'] * demand_norm
+    )
+    
+    # Scale to 0-100 range
+    index_scaled = 50 * (index + 1)
+    
+    # Create DataFrame with results
+    results = pd.DataFrame({
+        'date': index_scaled.index,
+        'fear_greed_index': index_scaled.values,
+        'momentum': momentum_norm.values,
+        'strength': strength_norm.values,
+        'demand': demand_norm.values
+    })
+    
+    # Save to CSV
+    csv_path = os.path.join(os.getcwd(), 'fear_greed_index.csv')
+    results.to_csv(csv_path, index=False)
+    print(f"Exporting results to CSV: {csv_path}")
+    
+    # Only generate plots if not in Vercel environment
+    if not os.getenv('VERCEL'):
+        print("Generating plots...")
+        plt.figure(figsize=(12, 6))
+        plt.plot(results['date'], results['fear_greed_index'], label='Fear & Greed Index')
+        plt.plot(results['date'], results['momentum'], label='Momentum')
+        plt.plot(results['date'], results['strength'], label='Strength')
+        plt.plot(results['date'], results['demand'], label='Demand')
+        plt.title('Fear & Greed Index Components')
+        plt.xlabel('Date')
+        plt.ylabel('Value')
+        plt.legend()
+        plt.grid(True)
+        
+        # Save plot
+        plot_path = os.path.join(os.getcwd(), 'public', 'fear_greed_plot.png')
+        plt.savefig(plot_path)
+        print(f"Plot saved to: {plot_path}")
+    else:
+        print("Skipping plot generation in Vercel environment")
 
-# Set relative weights (they'll be normalized automatically)
-# To adjust influence of a component, increase or decrease its value
-weights = {
-    'momentum': 1,
-    'strength': 1,
-    'safe_haven': 1
-}
-
-print("Aggregating Weighted Fear and Greed Score")
-weight_total = sum(weights.values())
-normalized_weights = {k: v / weight_total for k, v in weights.items()}
-components['Fear_Greed_Index'] = sum(components[k] * normalized_weights[k] for k in components.columns)
-
-print("Exporting results to CSV")
-components.to_csv('fear_greed_index.csv')
-
-# Don't generate plots in Vercel environment
-print("Skipping plot generation in Vercel environment") 
+if __name__ == "__main__":
+    main() 
