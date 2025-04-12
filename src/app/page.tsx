@@ -34,10 +34,10 @@ export default function Home() {
       <div className="min-h-screen bg-background">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl font-bold p-8 text-center text-foreground">
-            Fear & Greed Index Dashboard
+            Fear & Greed Index - Live Dashboard
           </h1>
           {loading ? (
-            <div className="text-center text-foreground">Loading...</div>
+            <div className="text-center text-foreground">Loading data...</div>
           ) : (
             <FearGreedCharts data={data} />
           )}
