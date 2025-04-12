@@ -5,7 +5,10 @@ import requests
 import os
 from datetime import datetime, timedelta
 
-API_KEY = 'e42miF33vkeNq9DsB4UZ5270pYg7Tp9W'
+API_KEY = os.getenv('FMP_API_KEY')
+if not API_KEY:
+    raise ValueError("FMP_API_KEY environment variable is not set")
+
 base_url = "https://financialmodelingprep.com/api/v3/historical-price-full"
 
 end_date = datetime.now()

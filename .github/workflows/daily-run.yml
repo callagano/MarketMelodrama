@@ -1,0 +1,38 @@
+name: Daily Fear and Greed Index Update
+
+on:
+  schedule:
+    - cron: '0 7 * * *'  # Runs at 7:00 AM UTC daily
+  workflow_dispatch:      # Allows manual trigger
+
+jobs:
+  update-fear-greed:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r src/scripts/requirements.txt
+    
+    - name: Run fear and greed script
+      run: |
+        python src/scripts/fear_greed.py
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+    
+    - name: Commit and push if changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add fear_greed_index.csv
+        git commit -m "Update Fear and Greed Index" || exit 0
+        git push 
