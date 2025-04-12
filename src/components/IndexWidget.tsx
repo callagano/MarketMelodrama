@@ -1,5 +1,8 @@
 'use client';
 
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
 import { format, subDays, subMonths, subYears } from "date-fns";
 import { useTimeframe } from '@/context/TimeframeContext';

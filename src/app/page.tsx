@@ -59,7 +59,9 @@ export default function Home() {
       <main className={styles.mainContainer}>
         <div className={styles.headerCard}>
           <h1 className={styles.title}>Market Melodrama</h1>
-          <p className={styles.subtitle}>Because the S&P doesn't always make sense, and neither do people.</p>
+          <p className={styles.subtitle}>
+            Track market sentiment with CNN&apos;s Fear & Greed Index
+          </p>
         </div>
         
         {data.length > 0 ? (
