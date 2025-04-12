@@ -23,7 +23,7 @@ export default function FearGreedCharts({ data }: Props) {
   // Filter data based on selected timeframe
   const getFilteredData = () => {
     const now = new Date();
-    let startDate;
+    let startDate: Date;
     
     switch (timeframe) {
       case '1M':

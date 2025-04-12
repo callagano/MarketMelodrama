@@ -6,8 +6,7 @@ import fs from 'fs';
 
 const execAsync = promisify(exec);
 
-export const runtime = 'edge';
-export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 // This function will be called by Vercel's cron job
 export async function GET() {
