@@ -1,7 +1,7 @@
 'use client';
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { format } from "date-fns";
+import { format as formatDate } from "date-fns";
 import { useTimeframe } from '@/context/TimeframeContext';
 import styles from './FearGreedCharts.module.css';
 
@@ -42,7 +42,7 @@ export default function FearGreedCharts({ data }: Props) {
     return data
       .filter(item => new Date(item.date) >= startDate)
       .map(item => ({
-        date: format(new Date(item.date), "MMM d, yyyy"),
+        date: formatDate(new Date(item.date), "MMM d, yyyy"),
         "Market Momentum": item.momentum,
         "Stock Price Strength": item.strength,
         "Safe Haven Demand": item.safe_haven,

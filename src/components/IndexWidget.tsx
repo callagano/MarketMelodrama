@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
-import { format, subDays, subMonths, subYears } from "date-fns";
+import { format as formatDate, subDays, subMonths, subYears } from "date-fns";
 import { useTimeframe } from '@/context/TimeframeContext';
 import styles from './IndexWidget.module.css';
 
@@ -91,7 +91,7 @@ export default function IndexWidget({ data }: Props) {
     return data
       .filter(item => new Date(item.date) >= startDate)
       .map(item => ({
-        date: format(new Date(item.date), "MMM d"),
+        date: formatDate(new Date(item.date), "MMM d"),
         value: item.Fear_Greed_Index
       }));
   };

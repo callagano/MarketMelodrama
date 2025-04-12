@@ -22,10 +22,17 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/fear-greed-data');
+        const response = await fetch('/api/fear-greed-data', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
+        
         const jsonData = await response.json();
         setData(jsonData);
       } catch (err) {
@@ -59,9 +66,7 @@ export default function Home() {
       <main className={styles.mainContainer}>
         <div className={styles.headerCard}>
           <h1 className={styles.title}>Market Melodrama</h1>
-          <p className={styles.subtitle}>
-            Track market sentiment with CNN&apos;s Fear & Greed Index
-          </p>
+          <p className={styles.subtitle}>Because the S&P doesn't always make sense, and neither do people.</p>
         </div>
         
         {data.length > 0 ? (

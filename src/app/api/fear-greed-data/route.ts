@@ -1,98 +1,79 @@
 import { NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
+import { parse } from 'csv-parse/sync';
 
-const API_KEY = process.env.API_KEY;
-const BASE_URL = 'https://financialmodelingprep.com/api/v3';
-
-async function fetchHistoricalData(symbol: string, limit: number = 1825) {
-  const url = `${BASE_URL}/historical-price-full/${symbol}?apikey=${API_KEY}&limit=${limit}`;
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${symbol} data`);
+// Function to read and parse CSV files
+function readCsvFile(filePath: string) {
+  try {
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    return parse(fileContent, {
+      columns: true,
+      skip_empty_lines: true
+    });
+  } catch (error) {
+    console.error(`Error reading CSV file ${filePath}:`, error);
+    return [];
   }
-  const data = await response.json();
-  return data.historical;
 }
 
-function calculateMetrics(spyData: any[], tltData: any[]) {
-  // Calculate momentum (125-day moving average)
-  const momentum = spyData.map((day, i) => {
-    const slice = spyData.slice(Math.max(0, i - 124), i + 1);
-    const avg = slice.reduce((sum, d) => sum + d.close, 0) / slice.length;
-    return {
-      date: day.date,
-      value: day.close / avg * 100
-    };
-  });
-
-  // Calculate strength (52-week high/low)
-  const strength = spyData.map((day, i) => {
-    const yearData = spyData.slice(Math.max(0, i - 251), i + 1);
-    const high = Math.max(...yearData.map(d => d.close));
-    const low = Math.min(...yearData.map(d => d.close));
-    return {
-      date: day.date,
-      value: ((day.close - low) / (high - low)) * 100
-    };
-  });
-
-  // Calculate safe haven demand (125-day moving average of TLT/SPY ratio)
-  const safeHaven = spyData.map((day, i) => {
-    const tltDay = tltData.find(d => d.date === day.date);
-    if (!tltDay) return null;
+// Mock data for development when CSV file is not available
+const generateMockData = (days: number = 1825) => {
+  const data = [];
+  const today = new Date();
+  
+  for (let i = 0; i < days; i++) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
     
-    const ratio = tltDay.close / day.close;
-    const slice = spyData.slice(Math.max(0, i - 124), i + 1)
-      .map(d => {
-        const t = tltData.find(td => td.date === d.date);
-        return t ? t.close / d.close : null;
-      })
-      .filter((r): r is number => r !== null);
+    // Generate random values for each metric
+    const momentum = 50 + Math.sin(i / 30) * 30 + (Math.random() - 0.5) * 10;
+    const strength = 50 + Math.sin(i / 45) * 30 + (Math.random() - 0.5) * 10;
+    const safe_haven = 50 + Math.sin(i / 60) * 30 + (Math.random() - 0.5) * 10;
+    const fearGreedIndex = (momentum + strength + safe_haven) / 3;
     
-    const avg = slice.reduce((sum, r) => sum + r, 0) / slice.length;
-    return {
-      date: day.date,
-      value: 100 - (ratio / avg * 100) // Invert the value
-    };
-  }).filter((d): d is { date: string; value: number } => d !== null);
-
-  // Combine all metrics
-  const combined = momentum.map(day => {
-    const s = strength.find(d => d.date === day.date);
-    const sh = safeHaven.find(d => d.date === day.date);
-    if (!s || !sh) return null;
-
-    const fearGreedIndex = (day.value + s.value + sh.value) / 3;
-    
-    return {
-      date: day.date,
-      momentum: day.value,
-      strength: s.value,
-      safe_haven: sh.value,
+    data.push({
+      date: date.toISOString().split('T')[0],
+      momentum,
+      strength,
+      safe_haven,
       Fear_Greed_Index: fearGreedIndex
-    };
-  }).filter((d): d is {
-    date: string;
-    momentum: number;
-    strength: number;
-    safe_haven: number;
-    Fear_Greed_Index: number;
-  } => d !== null);
+    });
+  }
+  
+  return data;
+};
 
-  return combined;
+async function fetchFearGreedData() {
+  try {
+    const scriptsDir = path.join(process.cwd(), 'src', 'scripts');
+    const csvPath = path.join(scriptsDir, 'fear_greed_index.csv');
+    
+    if (fs.existsSync(csvPath)) {
+      console.log('Using fear_greed_index.csv data');
+      const csvData = readCsvFile(csvPath);
+      return csvData.map((row: any) => ({
+        date: row.date,
+        momentum: parseFloat(row.momentum),
+        strength: parseFloat(row.strength),
+        safe_haven: parseFloat(row.safe_haven),
+        Fear_Greed_Index: parseFloat(row.Fear_Greed_Index)
+      }));
+    }
+  } catch (error) {
+    console.error('Error reading fear_greed_index.csv:', error);
+  }
+  
+  // Fallback to mock data if CSV file is not available
+  console.log('Falling back to mock data');
+  return generateMockData();
 }
 
 export async function GET() {
   try {
-    // Fetch historical data for SPY and TLT
-    const [spyData, tltData] = await Promise.all([
-      fetchHistoricalData('SPY'),
-      fetchHistoricalData('TLT')
-    ]);
-
-    // Calculate metrics
-    const metrics = calculateMetrics(spyData, tltData);
-
-    return NextResponse.json(metrics);
+    // Fetch fear and greed index data
+    const data = await fetchFearGreedData();
+    return NextResponse.json(data);
   } catch (error) {
     console.error('Error:', error);
     return NextResponse.json(
