@@ -1,9 +1,13 @@
 {
   "version": 2,
+  "buildCommand": "bash vercel-build.sh",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["iad1"],
   "crons": [
     {
       "path": "/api/cron",
-      "schedule": "0 7 * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 } 
