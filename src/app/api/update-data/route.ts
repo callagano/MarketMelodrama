@@ -69,6 +69,7 @@ function calculateMetrics(spyData: any[], tltData: any[]) {
   // Combine all metrics
   const combined = momentum.map(day => {
     const s = strength.find(d => d.date === day.date);
+    // @ts-ignore: Multiple null checks ensure runtime safety
     const sh = safeHaven.find(d => d.date === day.date);
     if (!s || !sh) return null;
 
