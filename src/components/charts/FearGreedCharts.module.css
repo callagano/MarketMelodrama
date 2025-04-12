@@ -1,0 +1,25 @@
+.chartContainer {
+  margin-top: 1.5rem;
+}
+
+.chartCard {
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 1rem;
+  background-color: #1e1e22;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chartTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.025em;
+}
+
+.chartWrapper {
+  height: 16rem;
+} 
