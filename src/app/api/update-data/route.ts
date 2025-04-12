@@ -42,12 +42,23 @@ function calculateMetrics(spyData: any[], tltData: any[]) {
     
     const ratio = tltDay.close / day.close;
     const slice = spyData.slice(Math.max(0, i - 124), i + 1)
-      .map(d => {
-        const t = tltData.find(td => td.date === d.date);
-        return t ? t.close / d.close : null;
+      .map((item: { close: number, date: string } | null) => {
+        if (!item) return null;
+        // @ts-ignore: Multiple null checks ensure runtime safety
+        const d = tltData.find(d => d?.date === item.date);
+        if (d === null || d === undefined) return null;
+        
+        // Type guard to ensure d has the correct shape
+        const isTltDataPoint = (x: any): x is { close: number } => {
+          return x && typeof x === 'object' && 'close' in x && typeof x.close === 'number';
+        };
+        
+        if (!isTltDataPoint(d)) return null;
+        return d.close / item.close;
       })
-      .filter(Boolean);
+      .filter((item): item is number => item !== null && !isNaN(item));
     
+    if (!slice.length) return null;
     const avg = slice.reduce((sum, r) => sum + r, 0) / slice.length;
     return {
       date: day.date,
