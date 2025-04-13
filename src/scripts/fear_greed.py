@@ -5,21 +5,35 @@ import requests
 import os
 from datetime import datetime, timedelta
 
-API_KEY = os.getenv('FMP_API_KEY')
-if not API_KEY:
-    raise ValueError("FMP_API_KEY environment variable is not set")
-
+API_KEY = 'e42miF33vkeNq9DsB4UZ5270pYg7Tp9W'
 base_url = "https://financialmodelingprep.com/api/v3/historical-price-full"
 
 end_date = datetime.now()
 start_date = end_date - timedelta(days=1825)  # 5 years
 
-# Local CSV database to limit API calls
+# Local CSV database to limit API calls and update if stale
 def load_or_fetch_data(symbol):
     filename = f"data_{symbol}.csv"
     if os.path.exists(filename):
-        print(f"Loading {symbol} from local cache")
+        print(f"Checking for updates to {symbol} cache")
         df = pd.read_csv(filename, parse_dates=['date'], index_col='date')
+        last_date = df.index.max().date()
+        if last_date < end_date.date():
+            print(f"Updating {symbol} data from {last_date + timedelta(days=1)} to {end_date.date()}")
+            url = f"{base_url}/{symbol}?from={last_date + timedelta(days=1)}&to={end_date.date()}&apikey={API_KEY}"
+            try:
+                response = requests.get(url)
+                response.raise_for_status()
+                json_data = response.json()
+                if 'historical' in json_data:
+                    new_df = pd.DataFrame(json_data['historical'])
+                    new_df['date'] = pd.to_datetime(new_df['date'])
+                    new_df.set_index('date', inplace=True)
+                    df = pd.concat([df, new_df])
+                    df = df[~df.index.duplicated(keep='last')].sort_index()
+                    df.to_csv(filename)
+            except Exception as e:
+                print(f"Warning: could not update {symbol}: {e}")
     else:
         print(f"Fetching {symbol} data from API")
         url = f"{base_url}/{symbol}?from={start_date.date()}&to={end_date.date()}&apikey={API_KEY}"
@@ -78,18 +92,3 @@ components['Fear_Greed_Index'] = sum(components[k] * normalized_weights[k] for k
 
 print("Exporting results to CSV")
 components.to_csv('fear_greed_index.csv')
-
-print("Plotting Fear and Greed Index")
-components['Fear_Greed_Index'].plot(figsize=(12, 6), title='Fear and Greed Index')
-plt.ylabel('Index (0: Extreme Fear, 100: Extreme Greed)')
-plt.grid(True)
-plt.show()
-
-print("Plotting All Components")
-components[['momentum', 'strength', 'safe_haven',
-            'Fear_Greed_Index']].plot(figsize=(14, 7), alpha=0.7)
-plt.title('Fear and Greed Components and Final Index')
-plt.ylabel('Normalized Scores (0 to 100)')
-plt.grid(True)
-plt.legend(loc='upper left')
-plt.show()
