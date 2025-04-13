@@ -19,8 +19,17 @@ jobs:
 
       - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install pandas numpy matplotlib requests
 
       - name: Run script
+        working-directory: src/scripts
         run: |
-          python Fear\ Greed\ Script.py
+          python fear_greed.py
+
+      - name: Commit and push if changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add fear_greed_index.csv
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update fear and greed index data" && git push)
