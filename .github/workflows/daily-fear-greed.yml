@@ -32,7 +32,13 @@ jobs:
 
       - name: Commit and push if changes
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add fear_greed_index.csv
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update fear and greed index data" && git push origin main)
+          cd src/scripts
+          if [ -f fear_greed_index.csv ]; then
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add fear_greed_index.csv
+            git diff --quiet && git diff --staged --quiet || (git commit -m "Update fear and greed index data" && git push origin main)
+          else
+            echo "No fear_greed_index.csv file was generated"
+            exit 1
+          fi
