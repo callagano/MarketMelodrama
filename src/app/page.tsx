@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import FearGreedCharts from '@/components/charts/FearGreedCharts';
-import IndexWidget from '@/components/IndexWidget';
 import { TimeframeProvider } from '@/context/TimeframeContext';
 import styles from './page.module.css';
 
@@ -66,16 +65,8 @@ export default function Home() {
       <main className={styles.mainContainer}>
         <div className={styles.headerCard}>
           <h1 className={styles.title}>Market Melodrama</h1>
-          <p className={styles.subtitle}>S&P isn’t always rational. People either.</p>
+          <p className={styles.subtitle}>S&P isn't always rational. People either.</p>
         </div>
-        
-        {data.length > 0 ? (
-          <IndexWidget data={data} />
-        ) : (
-          <div className={styles.noDataCard}>
-            <p className={styles.noDataText}>No data available</p>
-          </div>
-        )}
         
         {data.length > 0 ? (
           <FearGreedCharts data={data} />
