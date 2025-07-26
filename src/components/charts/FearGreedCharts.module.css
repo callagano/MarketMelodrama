@@ -68,6 +68,13 @@
   color: #fff;
 }
 
+.timeframeSelectorWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin: 0.5rem 0 0.2rem 0;
+}
+
 .currentValueContainer {
   display: flex;
   flex-direction: column;
