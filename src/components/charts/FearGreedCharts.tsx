@@ -152,7 +152,7 @@ export default function FearGreedCharts({ data }: Props) {
 
   // Timeframe selector component to be reused
   const TimeframeSelector = () => (
-    <div className={styles.timeframeSelector}>
+    <div className={styles.timeframeSelectorInline}>
       <button 
         className={`${styles.timeframeButton} ${timeframe === '1M' ? styles.active : ''}`}
         onClick={() => setTimeframe('1M')}
@@ -300,7 +300,6 @@ export default function FearGreedCharts({ data }: Props) {
               <div key={config.title} className={styles.chartCard}>
                 <div className={styles.chartHeader}>
                   <h2 className={styles.chartTitle}>{config.title}</h2>
-                  <TimeframeSelector />
                   <p className={styles.chartDescription}>{config.description}</p>
                   <div className={styles.currentValueContainer} style={{ borderColor: config.sentimentColor }}>
                     <div className={styles.valueDisplay}>

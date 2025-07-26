@@ -47,6 +47,14 @@
   border-radius: 0.5rem;
 }
 
+.timeframeSelectorInline {
+  display: flex;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+}
+
 .timeframeButton {
   padding: 0.35rem 0.75rem;
   border: none;
@@ -72,7 +80,8 @@
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  margin: 0.5rem 0 0.2rem 0;
+  margin: 1rem 0 0.5rem 0;
+  padding: 0.5rem 0;
 }
 
 .currentValueContainer {
@@ -285,6 +294,7 @@
   position: absolute;
   width: 12px;
   height: 12px;
+  bottom: 30%;
   border-radius: 50%;
   z-index: 10;
   background-color: white;
@@ -293,8 +303,8 @@
 /* Responsive adjustments for slider */
 @media (max-width: 768px) {
   .sliderChartWrapper {
-    height: 100px;
-    margin: 0.2rem 0;
+    height: 60px;
+    margin: 0.3rem 0;
   }
   
   .sliderTrack {
@@ -317,8 +327,8 @@
 
 @media (max-width: 480px) {
   .sliderChartWrapper {
-    height: 80px;
-    margin: 0.15rem 0;
+    height: 60px;
+    margin: 0.3rem 0;
   }
   
   .sliderTrack {
@@ -341,8 +351,8 @@
 
 @media (max-width: 360px) {
   .sliderChartWrapper {
-    height: 70px;
-    margin: 0.1rem 0;
+    height: 50px;
+    margin: 0.3rem 0;
   }
   
   .sliderTrack {
