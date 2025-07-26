@@ -56,6 +56,50 @@ export default function FearGreedCharts({ data }: Props) {
   const filteredData = getFilteredData();
   const latestData = data[data.length - 1];
 
+  // Helper to get the closest data point to a given date
+  function getClosestIndex(targetDate: Date) {
+    let closestIdx = 0;
+    let minDiff = Infinity;
+    for (let i = 0; i < data.length; i++) {
+      const diff = Math.abs(new Date(data[i].date).getTime() - targetDate.getTime());
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIdx = i;
+      }
+    }
+    return closestIdx;
+  }
+
+  // Get historical values
+  const now = new Date(latestData.date);
+  const weekAgoIdx = getClosestIndex(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7));
+  const monthAgoIdx = getClosestIndex(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
+  const sixMonthsAgoIdx = getClosestIndex(new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()));
+  const yearAgoIdx = getClosestIndex(new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()));
+
+  const historicals = [
+    {
+      label: '1 Week Ago',
+      value: data[weekAgoIdx]?.Fear_Greed_Index,
+      change: ((latestData.Fear_Greed_Index - data[weekAgoIdx]?.Fear_Greed_Index) / data[weekAgoIdx]?.Fear_Greed_Index) * 100,
+    },
+    {
+      label: '1 Month Ago',
+      value: data[monthAgoIdx]?.Fear_Greed_Index,
+      change: ((latestData.Fear_Greed_Index - data[monthAgoIdx]?.Fear_Greed_Index) / data[monthAgoIdx]?.Fear_Greed_Index) * 100,
+    },
+    {
+      label: '6 Months Ago',
+      value: data[sixMonthsAgoIdx]?.Fear_Greed_Index,
+      change: ((latestData.Fear_Greed_Index - data[sixMonthsAgoIdx]?.Fear_Greed_Index) / data[sixMonthsAgoIdx]?.Fear_Greed_Index) * 100,
+    },
+    {
+      label: '1 Year Ago',
+      value: data[yearAgoIdx]?.Fear_Greed_Index,
+      change: ((latestData.Fear_Greed_Index - data[yearAgoIdx]?.Fear_Greed_Index) / data[yearAgoIdx]?.Fear_Greed_Index) * 100,
+    },
+  ];
+
   // Function to get the sentiment label based on value
   const getSentimentLabel = (value: number): string => {
     if (value >= 80) return "Extreme Greed";
@@ -154,26 +198,15 @@ export default function FearGreedCharts({ data }: Props) {
         
         {/* Historical Comparison Cards */}
         <div className={styles.historicalCards}>
-          <div className={styles.historicalCard}>
-            <span className={styles.historicalTitle}>1 Week Ago</span>
-            <span className={styles.historicalValue}>86.26</span>
-            <span className={styles.historicalChange}>+2.36%</span>
-          </div>
-          <div className={styles.historicalCard}>
-            <span className={styles.historicalTitle}>1 Month Ago</span>
-            <span className={styles.historicalValue}>81.79</span>
-            <span className={styles.historicalChange}>+7.95%</span>
-          </div>
-          <div className={styles.historicalCard}>
-            <span className={styles.historicalTitle}>6 Months Ago</span>
-            <span className={styles.historicalValue}>78.81</span>
-            <span className={styles.historicalChange}>+12.03%</span>
-          </div>
-          <div className={styles.historicalCard}>
-            <span className={styles.historicalTitle}>1 Year Ago</span>
-            <span className={styles.historicalValue}>72.59</span>
-            <span className={styles.historicalChange}>+21.64%</span>
-          </div>
+          {historicals.map((h) => (
+            <div className={styles.historicalCard} key={h.label}>
+              <span className={styles.historicalTitle}>{h.label}</span>
+              <span className={styles.historicalValue}>{h.value?.toFixed(2) ?? '--'}</span>
+              <span className={styles.historicalChange} style={{color: h.change >= 0 ? '#10b981' : '#ef4444'}}>
+                {h.change >= 0 ? '+' : ''}{h.value ? h.change.toFixed(2) : '--'}%
+              </span>
+            </div>
+          ))}
         </div>
         
         {/* Horizontal Slider Chart */}
