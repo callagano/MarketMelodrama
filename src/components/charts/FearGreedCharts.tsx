@@ -132,10 +132,11 @@ export default function FearGreedCharts({ data }: Props) {
 
   return (
     <div className={styles.chartContainer}>
-      {/* Fear & Greed Index Card with Horizontal Slider */}
+      {/* Top-level Fear & Greed Index Card with TimeframeSelector and Horizontal Slider */}
       <div className={styles.chartCard}>
         <div className={styles.chartHeader}>
           <h2 className={styles.chartTitle}>Fear & Greed Index</h2>
+          <TimeframeSelector />
           <p className={styles.chartDescription}>
             A comprehensive indicator that measures market sentiment by analyzing various factors including volatility, momentum, and safe-haven demand.
           </p>
@@ -150,7 +151,6 @@ export default function FearGreedCharts({ data }: Props) {
             </div>
           </div>
         </div>
-        
         {/* Horizontal Slider Chart */}
         <div className={styles.sliderChartWrapper}>
           <div className={styles.sliderTrack}>
@@ -170,7 +170,6 @@ export default function FearGreedCharts({ data }: Props) {
               <span className={styles.segmentLabel}>Extreme Greed</span>
             </div>
           </div>
-          
           {/* Current Value Indicator */}
           <div 
             className={styles.valueIndicator}
@@ -181,7 +180,6 @@ export default function FearGreedCharts({ data }: Props) {
           >
             <div className={styles.indicatorValue}>{latestData.Fear_Greed_Index.toFixed(0)}</div>
           </div>
-          
           {/* Scale markers */}
           <div className={styles.scaleMarkers}>
             <span>0</span>
@@ -191,7 +189,6 @@ export default function FearGreedCharts({ data }: Props) {
             <span>100</span>
           </div>
         </div>
-
         {/* Line Chart for Fear & Greed Index */}
         <div className={styles.chartWrapper}>
           <ResponsiveContainer width="100%" height={300}>
@@ -239,7 +236,6 @@ export default function FearGreedCharts({ data }: Props) {
           </ResponsiveContainer>
         </div>
       </div>
-
       {/* Expansion Panel for Metric Cards */}
       <div className={styles.expansionPanel}>
         <button 
@@ -251,7 +247,6 @@ export default function FearGreedCharts({ data }: Props) {
             ▼
           </span>
         </button>
-        
         <div className={`${styles.expansionContent} ${isExpanded ? styles.expanded : ''}`}>
           {chartConfigs.map((config) => (
             <div key={config.title} className={styles.chartCard}>
