@@ -151,6 +151,31 @@ export default function FearGreedCharts({ data }: Props) {
             </div>
           </div>
         </div>
+        
+        {/* Historical Comparison Cards */}
+        <div className={styles.historicalCards}>
+          <div className={styles.historicalCard}>
+            <span className={styles.historicalTitle}>1 Week Ago</span>
+            <span className={styles.historicalValue}>86.26</span>
+            <span className={styles.historicalChange}>+2.36%</span>
+          </div>
+          <div className={styles.historicalCard}>
+            <span className={styles.historicalTitle}>1 Month Ago</span>
+            <span className={styles.historicalValue}>81.79</span>
+            <span className={styles.historicalChange}>+7.95%</span>
+          </div>
+          <div className={styles.historicalCard}>
+            <span className={styles.historicalTitle}>6 Months Ago</span>
+            <span className={styles.historicalValue}>78.81</span>
+            <span className={styles.historicalChange}>+12.03%</span>
+          </div>
+          <div className={styles.historicalCard}>
+            <span className={styles.historicalTitle}>1 Year Ago</span>
+            <span className={styles.historicalValue}>72.59</span>
+            <span className={styles.historicalChange}>+21.64%</span>
+          </div>
+        </div>
+        
         {/* Horizontal Slider Chart */}
         <div className={styles.sliderChartWrapper}>
           <div className={styles.sliderTrack}>
