@@ -209,15 +209,6 @@ export default function FearGreedCharts({ data }: Props) {
                 backgroundColor: getSentimentColor(latestData.Fear_Greed_Index)
               }}
             >
-              <div className={styles.indicatorValue}>{latestData.Fear_Greed_Index.toFixed(0)}</div>
-            </div>
-            {/* Scale markers */}
-            <div className={styles.scaleMarkers}>
-              <span>0</span>
-              <span>25</span>
-              <span>50</span>
-              <span>75</span>
-              <span>100</span>
             </div>
           </div>
           <div className={styles.currentValueContainer} style={{ borderColor: getSentimentColor(latestData.Fear_Greed_Index) }}>

@@ -271,50 +271,27 @@
   font-size: clamp(0.6rem, 1.5vw, 0.75rem);
   font-weight: 600;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  white-space: nowrap;
   text-align: center;
   padding: 0 0.25rem;
   line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
 }
 
-/* Enhanced cursor with better visibility */
+/* Simplified cursor */
 .valueIndicator {
   position: absolute;
-  top: 20px;
-  transform: translateX(-50%);
-  width: 6px;
-  height: 50px;
-  border-radius: 3px;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
   z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  border: 2px solid rgba(255, 255, 255, 0.8);
-}
-
-.indicatorValue {
-  position: absolute;
-  top: -35px;
-  background: #18181c;
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: clamp(0.6rem, 1.5vw, 0.75rem);
-  font-weight: 600;
-  white-space: nowrap;
+  background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.scaleMarkers {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0 0.5rem;
-  color: #9ca3af;
-  font-size: clamp(0.6rem, 1.5vw, 0.75rem);
-  font-weight: 500;
+  border: 2px solid rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive adjustments for slider */
@@ -331,25 +308,14 @@
   }
   
   .valueIndicator {
-    height: 45px;
-    width: 8px;
-    border-radius: 4px;
-    top: 17.5px;
-  }
-  
-  .indicatorValue {
-    top: -32px;
-    font-size: 0.7rem;
-    padding: 0.3rem 0.6rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
   }
   
   .segmentLabel {
     font-size: 0.65rem;
     line-height: 1.1;
-  }
-  
-  .scaleMarkers {
-    font-size: 0.65rem;
   }
 }
 
@@ -366,25 +332,14 @@
   }
   
   .valueIndicator {
-    height: 40px;
-    width: 10px;
-    border-radius: 5px;
-    top: 15px;
-  }
-  
-  .indicatorValue {
-    top: -28px;
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
   }
   
   .segmentLabel {
     font-size: 0.6rem;
     line-height: 1.0;
-  }
-  
-  .scaleMarkers {
-    font-size: 0.6rem;
   }
 }
 
@@ -400,24 +355,13 @@
   }
   
   .valueIndicator {
-    height: 35px;
-    width: 12px;
-    border-radius: 6px;
-    top: 12.5px;
-  }
-  
-  .indicatorValue {
-    top: -25px;
-    font-size: 0.7rem;
-    padding: 0.2rem 0.4rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
   }
   
   .segmentLabel {
     font-size: 0.55rem;
     line-height: 0.9;
-  }
-  
-  .scaleMarkers {
-    font-size: 0.55rem;
   }
 } 
