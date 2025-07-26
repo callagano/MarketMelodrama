@@ -320,22 +320,25 @@
 /* Responsive adjustments for slider */
 @media (max-width: 768px) {
   .sliderChartWrapper {
-    height: 140px;
+    height: 100px;
+    margin: 0.75rem 0;
   }
   
   .sliderTrack {
-    height: 45px;
-    border-radius: 22.5px;
+    height: 35px;
+    border-radius: 17.5px;
+    min-width: 250px;
   }
   
   .valueIndicator {
-    height: 55px;
+    height: 45px;
     width: 8px;
     border-radius: 4px;
+    top: 17.5px;
   }
   
   .indicatorValue {
-    top: -40px;
+    top: -32px;
     font-size: 0.7rem;
     padding: 0.3rem 0.6rem;
   }
@@ -344,32 +347,77 @@
     font-size: 0.65rem;
     line-height: 1.1;
   }
+  
+  .scaleMarkers {
+    font-size: 0.65rem;
+  }
 }
 
 @media (max-width: 480px) {
   .sliderChartWrapper {
-    height: 160px;
+    height: 80px;
+    margin: 0.5rem 0;
   }
   
   .sliderTrack {
-    height: 50px;
-    border-radius: 25px;
+    height: 30px;
+    border-radius: 15px;
+    min-width: 200px;
   }
   
   .valueIndicator {
-    height: 60px;
+    height: 40px;
     width: 10px;
     border-radius: 5px;
+    top: 15px;
   }
   
   .indicatorValue {
-    top: -45px;
+    top: -28px;
     font-size: 0.75rem;
-    padding: 0.35rem 0.7rem;
+    padding: 0.25rem 0.5rem;
   }
   
   .segmentLabel {
     font-size: 0.6rem;
     line-height: 1.0;
+  }
+  
+  .scaleMarkers {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .sliderChartWrapper {
+    height: 70px;
+  }
+  
+  .sliderTrack {
+    height: 25px;
+    border-radius: 12.5px;
+    min-width: 180px;
+  }
+  
+  .valueIndicator {
+    height: 35px;
+    width: 12px;
+    border-radius: 6px;
+    top: 12.5px;
+  }
+  
+  .indicatorValue {
+    top: -25px;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  .segmentLabel {
+    font-size: 0.55rem;
+    line-height: 0.9;
+  }
+  
+  .scaleMarkers {
+    font-size: 0.55rem;
   }
 } 

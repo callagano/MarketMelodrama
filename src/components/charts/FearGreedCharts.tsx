@@ -182,6 +182,44 @@ export default function FearGreedCharts({ data }: Props) {
           <p className={styles.chartDescription}>
             A comprehensive indicator that measures market sentiment by analyzing various factors including volatility, momentum, and safe-haven demand.
           </p>
+          {/* Horizontal Slider Chart - moved here */}
+          <div className={styles.sliderChartWrapper}>
+            <div className={styles.sliderTrack}>
+              <div className={styles.sliderSegment}>
+                <span className={styles.segmentLabel}>Extreme Fear</span>
+              </div>
+              <div className={styles.sliderSegment}>
+                <span className={styles.segmentLabel}>Fear</span>
+              </div>
+              <div className={styles.sliderSegment}>
+                <span className={styles.segmentLabel}>Neutral</span>
+              </div>
+              <div className={styles.sliderSegment}>
+                <span className={styles.segmentLabel}>Greed</span>
+              </div>
+              <div className={styles.sliderSegment}>
+                <span className={styles.segmentLabel}>Extreme Greed</span>
+              </div>
+            </div>
+            {/* Current Value Indicator */}
+            <div 
+              className={styles.valueIndicator}
+              style={{ 
+                left: `${latestData.Fear_Greed_Index}%`,
+                backgroundColor: getSentimentColor(latestData.Fear_Greed_Index)
+              }}
+            >
+              <div className={styles.indicatorValue}>{latestData.Fear_Greed_Index.toFixed(0)}</div>
+            </div>
+            {/* Scale markers */}
+            <div className={styles.scaleMarkers}>
+              <span>0</span>
+              <span>25</span>
+              <span>50</span>
+              <span>75</span>
+              <span>100</span>
+            </div>
+          </div>
           <div className={styles.currentValueContainer} style={{ borderColor: getSentimentColor(latestData.Fear_Greed_Index) }}>
             <div className={styles.valueDisplay}>
               <span className={styles.currentValue} style={{ color: getSentimentColor(latestData.Fear_Greed_Index) }}>
@@ -191,44 +229,6 @@ export default function FearGreedCharts({ data }: Props) {
                 {getSentimentLabel(latestData.Fear_Greed_Index)}
               </span>
             </div>
-          </div>
-        </div>
-        {/* Horizontal Slider Chart */}
-        <div className={styles.sliderChartWrapper}>
-          <div className={styles.sliderTrack}>
-            <div className={styles.sliderSegment}>
-              <span className={styles.segmentLabel}>Extreme Fear</span>
-            </div>
-            <div className={styles.sliderSegment}>
-              <span className={styles.segmentLabel}>Fear</span>
-            </div>
-            <div className={styles.sliderSegment}>
-              <span className={styles.segmentLabel}>Neutral</span>
-            </div>
-            <div className={styles.sliderSegment}>
-              <span className={styles.segmentLabel}>Greed</span>
-            </div>
-            <div className={styles.sliderSegment}>
-              <span className={styles.segmentLabel}>Extreme Greed</span>
-            </div>
-          </div>
-          {/* Current Value Indicator */}
-          <div 
-            className={styles.valueIndicator}
-            style={{ 
-              left: `${latestData.Fear_Greed_Index}%`,
-              backgroundColor: getSentimentColor(latestData.Fear_Greed_Index)
-            }}
-          >
-            <div className={styles.indicatorValue}>{latestData.Fear_Greed_Index.toFixed(0)}</div>
-          </div>
-          {/* Scale markers */}
-          <div className={styles.scaleMarkers}>
-            <span>0</span>
-            <span>25</span>
-            <span>50</span>
-            <span>75</span>
-            <span>100</span>
           </div>
         </div>
         {/* Historical Comparison Cards */}
