@@ -196,19 +196,19 @@ export default function FearGreedCharts({ data }: Props) {
         {/* Horizontal Slider Chart */}
         <div className={styles.sliderChartWrapper}>
           <div className={styles.sliderTrack}>
-            <div className={styles.sliderSegment} style={{ backgroundColor: '#ef4444', width: '20%' }}>
+            <div className={styles.sliderSegment}>
               <span className={styles.segmentLabel}>Extreme Fear</span>
             </div>
-            <div className={styles.sliderSegment} style={{ backgroundColor: '#f87171', width: '20%' }}>
+            <div className={styles.sliderSegment}>
               <span className={styles.segmentLabel}>Fear</span>
             </div>
-            <div className={styles.sliderSegment} style={{ backgroundColor: '#f59e0b', width: '20%' }}>
+            <div className={styles.sliderSegment}>
               <span className={styles.segmentLabel}>Neutral</span>
             </div>
-            <div className={styles.sliderSegment} style={{ backgroundColor: '#34d399', width: '20%' }}>
+            <div className={styles.sliderSegment}>
               <span className={styles.segmentLabel}>Greed</span>
             </div>
-            <div className={styles.sliderSegment} style={{ backgroundColor: '#10b981', width: '20%' }}>
+            <div className={styles.sliderSegment}>
               <span className={styles.segmentLabel}>Extreme Greed</span>
             </div>
           </div>
