@@ -162,7 +162,7 @@
   position: relative;
   width: 100%;
   height: 120px;
-  margin-top: 1rem;
+  margin: 1rem 0;
 }
 
 .sliderTrack {
@@ -172,6 +172,7 @@
   border-radius: 20px;
   overflow: hidden;
   margin-bottom: 1rem;
+  min-width: 300px;
 }
 
 .sliderSegment {
@@ -180,6 +181,7 @@
   justify-content: center;
   position: relative;
   transition: all 0.2s ease-in-out;
+  flex: 1;
 }
 
 .sliderSegment:hover {
@@ -188,10 +190,12 @@
 
 .segmentLabel {
   color: white;
-  font-size: 0.75rem;
+  font-size: clamp(0.6rem, 1.5vw, 0.75rem);
   font-weight: 600;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   white-space: nowrap;
+  text-align: center;
+  padding: 0 0.25rem;
 }
 
 .valueIndicator {
@@ -215,7 +219,7 @@
   color: white;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
-  font-size: 0.75rem;
+  font-size: clamp(0.6rem, 1.5vw, 0.75rem);
   font-weight: 600;
   white-space: nowrap;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -227,6 +231,63 @@
   width: 100%;
   padding: 0 0.5rem;
   color: #9ca3af;
-  font-size: 0.75rem;
+  font-size: clamp(0.6rem, 1.5vw, 0.75rem);
   font-weight: 500;
+}
+
+/* Responsive adjustments for slider */
+@media (max-width: 768px) {
+  .sliderChartWrapper {
+    height: 100px;
+  }
+  
+  .sliderTrack {
+    height: 32px;
+    min-width: 250px;
+  }
+  
+  .valueIndicator {
+    top: 16px;
+    height: 32px;
+  }
+  
+  .indicatorValue {
+    top: -25px;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  .segmentLabel {
+    font-size: 0.6rem;
+    padding: 0 0.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sliderChartWrapper {
+    height: 80px;
+  }
+  
+  .sliderTrack {
+    height: 28px;
+    min-width: 200px;
+  }
+  
+  .valueIndicator {
+    top: 14px;
+    height: 28px;
+  }
+  
+  .indicatorValue {
+    top: -22px;
+    padding: 0.15rem 0.3rem;
+  }
+  
+  .segmentLabel {
+    font-size: 0.5rem;
+    padding: 0;
+  }
+  
+  .scaleMarkers {
+    font-size: 0.6rem;
+  }
 } 

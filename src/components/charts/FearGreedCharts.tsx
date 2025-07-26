@@ -48,6 +48,7 @@ export default function FearGreedCharts({ data }: Props) {
         "Market Momentum": item.momentum,
         "Stock Price Strength": item.strength,
         "Safe Haven Demand": item.safe_haven,
+        "Fear & Greed Index": item.Fear_Greed_Index,
       }));
   };
 
@@ -189,6 +190,53 @@ export default function FearGreedCharts({ data }: Props) {
             <span>75</span>
             <span>100</span>
           </div>
+        </div>
+
+        {/* Line Chart for Fear & Greed Index */}
+        <div className={styles.chartWrapper}>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={filteredData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
+              <XAxis 
+                dataKey="date" 
+                stroke="#9ca3af"
+                tick={{ fill: '#9ca3af', fontSize: 10 }}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) => {
+                  // Only show month and day for cleaner display
+                  return value.split(',')[0];
+                }}
+              />
+              <YAxis 
+                stroke="#9ca3af"
+                tick={{ fill: '#9ca3af', fontSize: 10 }}
+                tickLine={false}
+                axisLine={false}
+                width={30}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1e1e22',
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  borderRadius: '0.5rem',
+                  color: '#fff',
+                  fontSize: '12px',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                }}
+                labelStyle={{ color: '#9ca3af', fontSize: '10px' }}
+                itemStyle={{ fontSize: '12px' }}
+              />
+              <Line
+                type="monotone"
+                dataKey="Fear & Greed Index"
+                stroke={getSentimentColor(latestData.Fear_Greed_Index)}
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 4, strokeWidth: 0 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
