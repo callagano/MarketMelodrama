@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Fear and Greed index",
+  title: "Market Melodrama",
   description: "Market sentiment analysis based on multiple indicators",
 };
 

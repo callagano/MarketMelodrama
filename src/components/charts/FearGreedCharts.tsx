@@ -176,9 +176,11 @@ export default function FearGreedCharts({ data }: Props) {
 
   return (
     <div className={styles.chartContainer}>
+      {/* Top-level Fear & Greed Index Card with TimeframeSelector and Horizontal Slider */}
       <div className={styles.chartCard}>
         <div className={styles.chartHeader}>
           <h2 className={styles.chartTitle}>Fear & Greed Index</h2>
+          <TimeframeSelector />
           <p className={styles.chartDescription}>
             A comprehensive indicator that measures market sentiment by analyzing various factors including volatility, momentum, and safe-haven demand.
           </p>
@@ -193,113 +195,14 @@ export default function FearGreedCharts({ data }: Props) {
             </div>
           </div>
         </div>
-        {/* Horizontal Slider Chart */}
-        <div className={styles.sliderChartWrapper}>
-          <div className={styles.sliderTrack}>
-            <div className={styles.sliderSegment} style={{ backgroundColor: '#ef4444', width: '20%' }}>
-              <span className={styles.segmentLabel}>Extreme Fear</span>
-            </div>
-            <div className={styles.sliderSegment} style={{ backgroundColor: '#f87171', width: '20%' }}>
-              <span className={styles.segmentLabel}>Fear</span>
-            </div>
-            <div className={styles.sliderSegment} style={{ backgroundColor: '#f59e0b', width: '20%' }}>
-              <span className={styles.segmentLabel}>Neutral</span>
-            </div>
-            <div className={styles.sliderSegment} style={{ backgroundColor: '#34d399', width: '20%' }}>
-              <span className={styles.segmentLabel}>Greed</span>
-            </div>
-            <div className={styles.sliderSegment} style={{ backgroundColor: '#10b981', width: '20%' }}>
-              <span className={styles.segmentLabel}>Extreme Greed</span>
-            </div>
-          </div>
-          {/* Current Value Indicator */}
-          <div 
-            className={styles.valueIndicator}
-            style={{ 
-              left: `${latestData.Fear_Greed_Index}%`,
-              backgroundColor: getSentimentColor(latestData.Fear_Greed_Index)
-            }}
-          >
-            <div className={styles.indicatorValue}>{latestData.Fear_Greed_Index.toFixed(0)}</div>
-          </div>
-          {/* Scale markers */}
-          <div className={styles.scaleMarkers}>
-            <span>0</span>
-            <span>25</span>
-            <span>50</span>
-            <span>75</span>
-            <span>100</span>
-          </div>
-        </div>
-        {/* Timeframe Selector (moved here) */}
-        <div className={styles.timeframeSelectorWrapper}>
-          <TimeframeSelector />
-        </div>
-        {/* Line Chart for Fear & Greed Index */}
-        <div className={styles.chartWrapper}>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={filteredData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
-              <XAxis 
-                dataKey="date" 
-                stroke="#9ca3af"
-                tick={{ fill: '#9ca3af', fontSize: 10 }}
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(value) => {
-                  // Only show month and day for cleaner display
-                  return value.split(',')[0];
-                }}
-              />
-              <YAxis 
-                stroke="#9ca3af"
-                tick={false}
-                tickLine={false}
-                axisLine={false}
-                width={0}
-              />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1e1e22',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  borderRadius: '0.5rem',
-                  color: '#fff',
-                  fontSize: '12px',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                }}
-                labelStyle={{ color: '#9ca3af', fontSize: '10px' }}
-                itemStyle={{ fontSize: '12px' }}
-              />
-              <Line
-                type="monotone"
-                dataKey="Fear & Greed Index"
-                stroke={getSentimentColor(latestData.Fear_Greed_Index)}
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4, strokeWidth: 0 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-        {/* Historical Comparison Cards */}
-        <div className={styles.historicalCards}>
-          {historicals.map((h) => (
-            <div className={styles.historicalCard} key={h.label}>
-              <span className={styles.historicalTitle}>{h.label}</span>
-              <span className={styles.historicalValue}>{h.value?.toFixed(2) ?? '--'}</span>
-              <span className={styles.historicalChange} style={{color: h.change >= 0 ? '#10b981' : '#ef4444'}}>
-                {h.change >= 0 ? '+' : ''}{h.value ? h.change.toFixed(2) : '--'}%
-              </span>
-            </div>
-          ))}
-        </div>
-        {/* Expansion Panel for Fear & Greed Index components */}
-        <div className={styles.expansionPanelLighter}>
+        
+        {/* Expansion Panel for Metric Cards */}
+        <div className={styles.expansionPanel}>
           <button 
-            className={styles.expansionButtonLighter}
+            className={styles.expansionButton}
             onClick={() => setIsExpanded(!isExpanded)}
           >
-            <span>Fear & Greed Index components</span>
+            <span>Market Metrics</span>
             <span className={`${styles.expansionIcon} ${isExpanded ? styles.expanded : ''}`}>
               ▼
             </span>
@@ -370,6 +273,102 @@ export default function FearGreedCharts({ data }: Props) {
               </div>
             ))}
           </div>
+        </div>
+        {/* Horizontal Slider Chart */}
+        <div className={styles.sliderChartWrapper}>
+          <div className={styles.sliderTrack}>
+            <div className={styles.sliderSegment} style={{ backgroundColor: '#ef4444', width: '20%' }}>
+              <span className={styles.segmentLabel}>Extreme Fear</span>
+            </div>
+            <div className={styles.sliderSegment} style={{ backgroundColor: '#f87171', width: '20%' }}>
+              <span className={styles.segmentLabel}>Fear</span>
+            </div>
+            <div className={styles.sliderSegment} style={{ backgroundColor: '#f59e0b', width: '20%' }}>
+              <span className={styles.segmentLabel}>Neutral</span>
+            </div>
+            <div className={styles.sliderSegment} style={{ backgroundColor: '#34d399', width: '20%' }}>
+              <span className={styles.segmentLabel}>Greed</span>
+            </div>
+            <div className={styles.sliderSegment} style={{ backgroundColor: '#10b981', width: '20%' }}>
+              <span className={styles.segmentLabel}>Extreme Greed</span>
+            </div>
+          </div>
+          {/* Current Value Indicator */}
+          <div 
+            className={styles.valueIndicator}
+            style={{ 
+              left: `${latestData.Fear_Greed_Index}%`,
+              backgroundColor: getSentimentColor(latestData.Fear_Greed_Index)
+            }}
+          >
+            <div className={styles.indicatorValue}>{latestData.Fear_Greed_Index.toFixed(0)}</div>
+          </div>
+          {/* Scale markers */}
+          <div className={styles.scaleMarkers}>
+            <span>0</span>
+            <span>25</span>
+            <span>50</span>
+            <span>75</span>
+            <span>100</span>
+          </div>
+        </div>
+        {/* Line Chart for Fear & Greed Index */}
+        <div className={styles.chartWrapper}>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={filteredData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
+              <XAxis 
+                dataKey="date" 
+                stroke="#9ca3af"
+                tick={{ fill: '#9ca3af', fontSize: 10 }}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) => {
+                  // Only show month and day for cleaner display
+                  return value.split(',')[0];
+                }}
+              />
+              <YAxis 
+                stroke="#9ca3af"
+                tick={false}
+                tickLine={false}
+                axisLine={false}
+                width={0}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1e1e22',
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  borderRadius: '0.5rem',
+                  color: '#fff',
+                  fontSize: '12px',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                }}
+                labelStyle={{ color: '#9ca3af', fontSize: '10px' }}
+                itemStyle={{ fontSize: '12px' }}
+              />
+              <Line
+                type="monotone"
+                dataKey="Fear & Greed Index"
+                stroke={getSentimentColor(latestData.Fear_Greed_Index)}
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 4, strokeWidth: 0 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+        {/* Historical Comparison Cards */}
+        <div className={styles.historicalCards}>
+          {historicals.map((h) => (
+            <div className={styles.historicalCard} key={h.label}>
+              <span className={styles.historicalTitle}>{h.label}</span>
+              <span className={styles.historicalValue}>{h.value?.toFixed(2) ?? '--'}</span>
+              <span className={styles.historicalChange} style={{color: h.change >= 0 ? '#10b981' : '#ef4444'}}>
+                {h.change >= 0 ? '+' : ''}{h.value ? h.change.toFixed(2) : '--'}%
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
