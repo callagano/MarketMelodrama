@@ -196,19 +196,84 @@ export default function FearGreedCharts({ data }: Props) {
           </div>
         </div>
         
-        {/* Historical Comparison Cards */}
-        <div className={styles.historicalCards}>
-          {historicals.map((h) => (
-            <div className={styles.historicalCard} key={h.label}>
-              <span className={styles.historicalTitle}>{h.label}</span>
-              <span className={styles.historicalValue}>{h.value?.toFixed(2) ?? '--'}</span>
-              <span className={styles.historicalChange} style={{color: h.change >= 0 ? '#10b981' : '#ef4444'}}>
-                {h.change >= 0 ? '+' : ''}{h.value ? h.change.toFixed(2) : '--'}%
-              </span>
-            </div>
-          ))}
+        {/* Expansion Panel for Metric Cards */}
+        <div className={styles.expansionPanel}>
+          <button 
+            className={styles.expansionButton}
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            <span>Market Metrics</span>
+            <span className={`${styles.expansionIcon} ${isExpanded ? styles.expanded : ''}`}>
+              ▼
+            </span>
+          </button>
+          <div className={`${styles.expansionContent} ${isExpanded ? styles.expanded : ''}`}>
+            {chartConfigs.map((config) => (
+              <div key={config.title} className={styles.chartCard}>
+                <div className={styles.chartHeader}>
+                  <h2 className={styles.chartTitle}>{config.title}</h2>
+                  <TimeframeSelector />
+                  <p className={styles.chartDescription}>{config.description}</p>
+                  <div className={styles.currentValueContainer} style={{ borderColor: config.sentimentColor }}>
+                    <div className={styles.valueDisplay}>
+                      <span className={styles.currentValue} style={{ color: config.sentimentColor }}>
+                        {config.currentValue.toFixed(2)}
+                      </span>
+                      <span className={styles.sentimentLabel} style={{ color: config.sentimentColor }}>
+                        {config.sentimentLabel}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.chartWrapper}>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={filteredData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
+                      <XAxis 
+                        dataKey="date" 
+                        stroke="#9ca3af"
+                        tick={{ fill: '#9ca3af', fontSize: 10 }}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => {
+                          // Only show month and day for cleaner display
+                          return value.split(',')[0];
+                        }}
+                      />
+                      <YAxis 
+                        stroke="#9ca3af"
+                        tick={{ fill: '#9ca3af', fontSize: 10 }}
+                        tickLine={false}
+                        axisLine={false}
+                        width={30}
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#1e1e22',
+                          border: '1px solid rgba(255, 255, 255, 0.05)',
+                          borderRadius: '0.5rem',
+                          color: '#fff',
+                          fontSize: '12px',
+                          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                        }}
+                        labelStyle={{ color: '#9ca3af', fontSize: '10px' }}
+                        itemStyle={{ fontSize: '12px' }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey={config.dataKey}
+                        stroke={config.color}
+                        strokeWidth={2}
+                        dot={false}
+                        activeDot={{ r: 4, strokeWidth: 0 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-        
         {/* Horizontal Slider Chart */}
         <div className={styles.sliderChartWrapper}>
           <div className={styles.sliderTrack}>
@@ -265,10 +330,10 @@ export default function FearGreedCharts({ data }: Props) {
               />
               <YAxis 
                 stroke="#9ca3af"
-                tick={{ fill: '#9ca3af', fontSize: 10 }}
+                tick={false}
                 tickLine={false}
                 axisLine={false}
-                width={30}
+                width={0}
               />
               <Tooltip 
                 contentStyle={{ 
@@ -293,81 +358,15 @@ export default function FearGreedCharts({ data }: Props) {
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </div>
-      {/* Expansion Panel for Metric Cards */}
-      <div className={styles.expansionPanel}>
-        <button 
-          className={styles.expansionButton}
-          onClick={() => setIsExpanded(!isExpanded)}
-        >
-          <span>Market Metrics</span>
-          <span className={`${styles.expansionIcon} ${isExpanded ? styles.expanded : ''}`}>
-            ▼
-          </span>
-        </button>
-        <div className={`${styles.expansionContent} ${isExpanded ? styles.expanded : ''}`}>
-          {chartConfigs.map((config) => (
-            <div key={config.title} className={styles.chartCard}>
-              <div className={styles.chartHeader}>
-                <h2 className={styles.chartTitle}>{config.title}</h2>
-                <TimeframeSelector />
-                <p className={styles.chartDescription}>{config.description}</p>
-                <div className={styles.currentValueContainer} style={{ borderColor: config.sentimentColor }}>
-                  <div className={styles.valueDisplay}>
-                    <span className={styles.currentValue} style={{ color: config.sentimentColor }}>
-                      {config.currentValue.toFixed(2)}
-                    </span>
-                    <span className={styles.sentimentLabel} style={{ color: config.sentimentColor }}>
-                      {config.sentimentLabel}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.chartWrapper}>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={filteredData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="#9ca3af"
-                      tick={{ fill: '#9ca3af', fontSize: 10 }}
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(value) => {
-                        // Only show month and day for cleaner display
-                        return value.split(',')[0];
-                      }}
-                    />
-                    <YAxis 
-                      stroke="#9ca3af"
-                      tick={{ fill: '#9ca3af', fontSize: 10 }}
-                      tickLine={false}
-                      axisLine={false}
-                      width={30}
-                    />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: '#1e1e22',
-                        border: '1px solid rgba(255, 255, 255, 0.05)',
-                        borderRadius: '0.5rem',
-                        color: '#fff',
-                        fontSize: '12px',
-                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                      }}
-                      labelStyle={{ color: '#9ca3af', fontSize: '10px' }}
-                      itemStyle={{ fontSize: '12px' }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey={config.dataKey}
-                      stroke={config.color}
-                      strokeWidth={2}
-                      dot={false}
-                      activeDot={{ r: 4, strokeWidth: 0 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
+        {/* Historical Comparison Cards */}
+        <div className={styles.historicalCards}>
+          {historicals.map((h) => (
+            <div className={styles.historicalCard} key={h.label}>
+              <span className={styles.historicalTitle}>{h.label}</span>
+              <span className={styles.historicalValue}>{h.value?.toFixed(2) ?? '--'}</span>
+              <span className={styles.historicalChange} style={{color: h.change >= 0 ? '#10b981' : '#ef4444'}}>
+                {h.change >= 0 ? '+' : ''}{h.value ? h.change.toFixed(2) : '--'}%
+              </span>
             </div>
           ))}
         </div>
