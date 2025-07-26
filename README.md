@@ -1,6 +1,6 @@
-# Fear & Greed Index Dashboard
+# Market Melodrama
 
-A real-time market sentiment analysis dashboard that tracks and visualizes the Fear & Greed Index along with its underlying components. Built with Next.js and React.
+The human side of the Financial markets.
 
 ## Features
 
@@ -26,8 +26,8 @@ A real-time market sentiment analysis dashboard that tracks and visualizes the F
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/fear-greed-index.git
-cd fear-greed-index
+git clone https://github.com/yourusername/market-melodrama.git
+cd market-melodrama
 ```
 
 2. Install dependencies:

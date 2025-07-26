@@ -66,7 +66,7 @@ export default function Home() {
       <main className={styles.mainContainer}>
         <div className={styles.headerCard}>
           <h1 className={styles.title}>Market Melodrama</h1>
-          <p className={styles.subtitle}>Because the S&P doesn't always make sense, and neither do people.</p>
+          <p className={styles.subtitle}>S&P isn’t always rational. People either.</p>
         </div>
         
         {data.length > 0 ? (

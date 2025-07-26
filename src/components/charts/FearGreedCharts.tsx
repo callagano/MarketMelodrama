@@ -3,6 +3,7 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { format as formatDate } from "date-fns";
 import { useTimeframe } from '@/context/TimeframeContext';
+import { useState } from 'react';
 import styles from './FearGreedCharts.module.css';
 
 interface ChartData {
@@ -19,6 +20,7 @@ interface Props {
 
 export default function FearGreedCharts({ data }: Props) {
   const { timeframe, setTimeframe } = useTimeframe();
+  const [isExpanded, setIsExpanded] = useState(false);
   
   // Filter data based on selected timeframe
   const getFilteredData = () => {
@@ -70,6 +72,8 @@ export default function FearGreedCharts({ data }: Props) {
     if (value >= 20) return "#f87171"; // red-400
     return "#ef4444"; // red
   };
+
+
 
   const chartConfigs = [
     {
@@ -127,70 +131,146 @@ export default function FearGreedCharts({ data }: Props) {
 
   return (
     <div className={styles.chartContainer}>
-      {chartConfigs.map((config) => (
-        <div key={config.title} className={styles.chartCard}>
-          <div className={styles.chartHeader}>
-            <h2 className={styles.chartTitle}>{config.title}</h2>
-            <TimeframeSelector />
-            <p className={styles.chartDescription}>{config.description}</p>
-            <div className={styles.currentValueContainer} style={{ borderColor: config.sentimentColor }}>
-              <div className={styles.valueDisplay}>
-                <span className={styles.currentValue} style={{ color: config.sentimentColor }}>
-                  {config.currentValue.toFixed(2)}
-                </span>
-                <span className={styles.sentimentLabel} style={{ color: config.sentimentColor }}>
-                  {config.sentimentLabel}
-                </span>
-              </div>
+      {/* Fear & Greed Index Card with Horizontal Slider */}
+      <div className={styles.chartCard}>
+        <div className={styles.chartHeader}>
+          <h2 className={styles.chartTitle}>Fear & Greed Index</h2>
+          <p className={styles.chartDescription}>
+            A comprehensive indicator that measures market sentiment by analyzing various factors including volatility, momentum, and safe-haven demand.
+          </p>
+          <div className={styles.currentValueContainer} style={{ borderColor: getSentimentColor(latestData.Fear_Greed_Index) }}>
+            <div className={styles.valueDisplay}>
+              <span className={styles.currentValue} style={{ color: getSentimentColor(latestData.Fear_Greed_Index) }}>
+                {latestData.Fear_Greed_Index.toFixed(2)}
+              </span>
+              <span className={styles.sentimentLabel} style={{ color: getSentimentColor(latestData.Fear_Greed_Index) }}>
+                {getSentimentLabel(latestData.Fear_Greed_Index)}
+              </span>
             </div>
           </div>
-          <div className={styles.chartWrapper}>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={filteredData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
-                <XAxis 
-                  dataKey="date" 
-                  stroke="#9ca3af"
-                  tick={{ fill: '#9ca3af', fontSize: 10 }}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => {
-                    // Only show month and day for cleaner display
-                    return value.split(',')[0];
-                  }}
-                />
-                <YAxis 
-                  stroke="#9ca3af"
-                  tick={{ fill: '#9ca3af', fontSize: 10 }}
-                  tickLine={false}
-                  axisLine={false}
-                  width={30}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1e1e22',
-                    border: '1px solid rgba(255, 255, 255, 0.05)',
-                    borderRadius: '0.5rem',
-                    color: '#fff',
-                    fontSize: '12px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                  }}
-                  labelStyle={{ color: '#9ca3af', fontSize: '10px' }}
-                  itemStyle={{ fontSize: '12px' }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey={config.dataKey}
-                  stroke={config.color}
-                  strokeWidth={2}
-                  dot={false}
-                  activeDot={{ r: 4, strokeWidth: 0 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+        </div>
+        
+        {/* Horizontal Slider Chart */}
+        <div className={styles.sliderChartWrapper}>
+          <div className={styles.sliderTrack}>
+            <div className={styles.sliderSegment} style={{ backgroundColor: '#ef4444', width: '20%' }}>
+              <span className={styles.segmentLabel}>Extreme Fear</span>
+            </div>
+            <div className={styles.sliderSegment} style={{ backgroundColor: '#f87171', width: '20%' }}>
+              <span className={styles.segmentLabel}>Fear</span>
+            </div>
+            <div className={styles.sliderSegment} style={{ backgroundColor: '#f59e0b', width: '20%' }}>
+              <span className={styles.segmentLabel}>Neutral</span>
+            </div>
+            <div className={styles.sliderSegment} style={{ backgroundColor: '#34d399', width: '20%' }}>
+              <span className={styles.segmentLabel}>Greed</span>
+            </div>
+            <div className={styles.sliderSegment} style={{ backgroundColor: '#10b981', width: '20%' }}>
+              <span className={styles.segmentLabel}>Extreme Greed</span>
+            </div>
+          </div>
+          
+          {/* Current Value Indicator */}
+          <div 
+            className={styles.valueIndicator}
+            style={{ 
+              left: `${latestData.Fear_Greed_Index}%`,
+              backgroundColor: getSentimentColor(latestData.Fear_Greed_Index)
+            }}
+          >
+            <div className={styles.indicatorValue}>{latestData.Fear_Greed_Index.toFixed(0)}</div>
+          </div>
+          
+          {/* Scale markers */}
+          <div className={styles.scaleMarkers}>
+            <span>0</span>
+            <span>25</span>
+            <span>50</span>
+            <span>75</span>
+            <span>100</span>
           </div>
         </div>
-      ))}
+      </div>
+
+      {/* Expansion Panel for Metric Cards */}
+      <div className={styles.expansionPanel}>
+        <button 
+          className={styles.expansionButton}
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <span>Market Metrics</span>
+          <span className={`${styles.expansionIcon} ${isExpanded ? styles.expanded : ''}`}>
+            ▼
+          </span>
+        </button>
+        
+        <div className={`${styles.expansionContent} ${isExpanded ? styles.expanded : ''}`}>
+          {chartConfigs.map((config) => (
+            <div key={config.title} className={styles.chartCard}>
+              <div className={styles.chartHeader}>
+                <h2 className={styles.chartTitle}>{config.title}</h2>
+                <TimeframeSelector />
+                <p className={styles.chartDescription}>{config.description}</p>
+                <div className={styles.currentValueContainer} style={{ borderColor: config.sentimentColor }}>
+                  <div className={styles.valueDisplay}>
+                    <span className={styles.currentValue} style={{ color: config.sentimentColor }}>
+                      {config.currentValue.toFixed(2)}
+                    </span>
+                    <span className={styles.sentimentLabel} style={{ color: config.sentimentColor }}>
+                      {config.sentimentLabel}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.chartWrapper}>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={filteredData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="#9ca3af"
+                      tick={{ fill: '#9ca3af', fontSize: 10 }}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => {
+                        // Only show month and day for cleaner display
+                        return value.split(',')[0];
+                      }}
+                    />
+                    <YAxis 
+                      stroke="#9ca3af"
+                      tick={{ fill: '#9ca3af', fontSize: 10 }}
+                      tickLine={false}
+                      axisLine={false}
+                      width={30}
+                    />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#1e1e22',
+                        border: '1px solid rgba(255, 255, 255, 0.05)',
+                        borderRadius: '0.5rem',
+                        color: '#fff',
+                        fontSize: '12px',
+                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                      }}
+                      labelStyle={{ color: '#9ca3af', fontSize: '10px' }}
+                      itemStyle={{ fontSize: '12px' }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey={config.dataKey}
+                      stroke={config.color}
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 4, strokeWidth: 0 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 } 
