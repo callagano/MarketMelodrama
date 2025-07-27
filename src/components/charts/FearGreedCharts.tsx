@@ -104,17 +104,17 @@ export default function FearGreedCharts({ data }: Props) {
     {
       label: '1 Month Ago',
       value: Number((data[monthAgoIdx]?.Fear_Greed_Index || 0).toFixed(2)),
-      change: ((latestData.Fear_Greed_Index - data[monthAgoIdx]?.Fear_Greed_Index) / data[monthAgoIdx]?.Fear_Greed_Index) * 100,
+      change: Number(((latestData.Fear_Greed_Index - (data[monthAgoIdx]?.Fear_Greed_Index || 0)) / (data[monthAgoIdx]?.Fear_Greed_Index || 1)) * 100).toFixed(2)),
     },
     {
       label: '6 Months Ago',
       value: Number((data[sixMonthsAgoIdx]?.Fear_Greed_Index || 0).toFixed(2)),
-      change: ((latestData.Fear_Greed_Index - data[sixMonthsAgoIdx]?.Fear_Greed_Index) / data[sixMonthsAgoIdx]?.Fear_Greed_Index) * 100,
+      change: Number(((latestData.Fear_Greed_Index - (data[sixMonthsAgoIdx]?.Fear_Greed_Index || 0)) / (data[sixMonthsAgoIdx]?.Fear_Greed_Index || 1)) * 100).toFixed(2)),
     },
     {
       label: '1 Year Ago',
       value: Number((data[yearAgoIdx]?.Fear_Greed_Index || 0).toFixed(2)),
-      change: ((latestData.Fear_Greed_Index - data[yearAgoIdx]?.Fear_Greed_Index) / data[yearAgoIdx]?.Fear_Greed_Index) * 100,
+      change: Number(((latestData.Fear_Greed_Index - (data[yearAgoIdx]?.Fear_Greed_Index || 0)) / (data[yearAgoIdx]?.Fear_Greed_Index || 1)) * 100).toFixed(2)),
     },
   ];
 
