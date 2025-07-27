@@ -106,6 +106,7 @@ export default function IndexWidget({ data }: Props) {
         
         return {
           date: formatDate(new Date(item.date), dateFormat),
+          originalDate: item.date, // Keep original date for tickFormatter
           value: item.Fear_Greed_Index
         };
       });
@@ -178,19 +179,21 @@ export default function IndexWidget({ data }: Props) {
               tick={{ fill: '#9ca3af', fontSize: 10 }}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(value) => {
+              tickFormatter={(value, index) => {
+                // Get the original date from the data
+                const dataPoint = filteredData[index];
+                if (!dataPoint || !dataPoint.originalDate) return '';
+                
+                const date = new Date(dataPoint.originalDate);
+                const day = date.getDate();
+                const month = date.getMonth();
+                
                 // For 1M: show every few days
                 if (timeframe === '1M') {
-                  const date = new Date(value);
-                  const day = date.getDate();
                   return day % 5 === 0 ? value : ''; // Show every 5th day
                 }
                 
                 // For 6M and 3Y: show first day of each month
-                const date = new Date(value);
-                const day = date.getDate();
-                const month = date.getMonth();
-                
                 if (day === 1) return value;
                 
                 // For 3Y, also show every 3 months
