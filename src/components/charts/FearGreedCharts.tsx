@@ -59,14 +59,14 @@ export default function FearGreedCharts({ data }: Props) {
             dateFormat = "MMM yy"; // "Jan 24"
         }
         
-        return {
-          date: formatDate(new Date(item.date), dateFormat),
-          originalDate: item.date, // Keep original date for tickFormatter
-                              "Market Momentum": Number(item.momentum.toFixed(2)),
-                    "Stock Price Strength": Number(item.strength.toFixed(2)),
-                    "Safe Haven Demand": Number(item.safe_haven.toFixed(2)),
-                    "Fear & Greed Index": Number(item.Fear_Greed_Index.toFixed(2)),
-        };
+                          return {
+                    date: formatDate(new Date(item.date), dateFormat),
+                    originalDate: item.date, // Keep original date for tickFormatter
+                    "Market Momentum": item.momentum,
+                    "Stock Price Strength": item.strength,
+                    "Safe Haven Demand": item.safe_haven,
+                    "Fear & Greed Index": item.Fear_Greed_Index,
+                  };
       });
   };
 
@@ -98,23 +98,23 @@ export default function FearGreedCharts({ data }: Props) {
   const historicals = [
     {
       label: '1 Week Ago',
-      value: Number((data[weekAgoIdx]?.Fear_Greed_Index || 0).toFixed(2)),
-      change: Number(((latestData.Fear_Greed_Index - (data[weekAgoIdx]?.Fear_Greed_Index || 0)) / (data[weekAgoIdx]?.Fear_Greed_Index || 1)) * 100).toFixed(2)),
+      value: data[weekAgoIdx]?.Fear_Greed_Index,
+      change: ((latestData.Fear_Greed_Index - data[weekAgoIdx]?.Fear_Greed_Index) / data[weekAgoIdx]?.Fear_Greed_Index) * 100,
     },
     {
       label: '1 Month Ago',
-      value: Number((data[monthAgoIdx]?.Fear_Greed_Index || 0).toFixed(2)),
-      change: Number(((latestData.Fear_Greed_Index - (data[monthAgoIdx]?.Fear_Greed_Index || 0)) / (data[monthAgoIdx]?.Fear_Greed_Index || 1)) * 100).toFixed(2)),
+      value: data[monthAgoIdx]?.Fear_Greed_Index,
+      change: ((latestData.Fear_Greed_Index - data[monthAgoIdx]?.Fear_Greed_Index) / data[monthAgoIdx]?.Fear_Greed_Index) * 100,
     },
     {
       label: '6 Months Ago',
-      value: Number((data[sixMonthsAgoIdx]?.Fear_Greed_Index || 0).toFixed(2)),
-      change: Number(((latestData.Fear_Greed_Index - (data[sixMonthsAgoIdx]?.Fear_Greed_Index || 0)) / (data[sixMonthsAgoIdx]?.Fear_Greed_Index || 1)) * 100).toFixed(2)),
+      value: data[sixMonthsAgoIdx]?.Fear_Greed_Index,
+      change: ((latestData.Fear_Greed_Index - data[sixMonthsAgoIdx]?.Fear_Greed_Index) / data[sixMonthsAgoIdx]?.Fear_Greed_Index) * 100,
     },
     {
       label: '1 Year Ago',
-      value: Number((data[yearAgoIdx]?.Fear_Greed_Index || 0).toFixed(2)),
-      change: Number(((latestData.Fear_Greed_Index - (data[yearAgoIdx]?.Fear_Greed_Index || 0)) / (data[yearAgoIdx]?.Fear_Greed_Index || 1)) * 100).toFixed(2)),
+      value: data[yearAgoIdx]?.Fear_Greed_Index,
+      change: ((latestData.Fear_Greed_Index - data[yearAgoIdx]?.Fear_Greed_Index) / data[yearAgoIdx]?.Fear_Greed_Index) * 100,
     },
   ];
 
@@ -144,7 +144,7 @@ export default function FearGreedCharts({ data }: Props) {
       dataKey: "Market Momentum",
       color: "#10b981", // emerald
       description: "Measures the rate of change in market prices. High values indicate strong upward momentum, suggesting investors are confident and actively buying. This can signal potential market bubbles.",
-      currentValue: Number(latestData.momentum.toFixed(2)),
+      currentValue: latestData.momentum,
       sentimentLabel: getSentimentLabel(latestData.momentum),
       sentimentColor: getSentimentColor(latestData.momentum)
     },
@@ -153,7 +153,7 @@ export default function FearGreedCharts({ data }: Props) {
       dataKey: "Stock Price Strength",
       color: "#f59e0b", // amber
       description: "Tracks the number of stocks hitting 52-week highs vs. lows. High values show broad market strength with many stocks reaching new highs, indicating strong bullish sentiment.",
-      currentValue: Number(latestData.strength.toFixed(2)),
+      currentValue: latestData.strength,
       sentimentLabel: getSentimentLabel(latestData.strength),
       sentimentColor: getSentimentColor(latestData.strength)
     },
@@ -162,7 +162,7 @@ export default function FearGreedCharts({ data }: Props) {
       dataKey: "Safe Haven Demand",
       color: "#ec4899", // pink
       description: "Measures the performance of safe-haven assets like gold and bonds. High values indicate investors are seeking safety, often during market uncertainty or fear periods.",
-      currentValue: Number(latestData.safe_haven.toFixed(2)),
+      currentValue: latestData.safe_haven,
       sentimentLabel: getSentimentLabel(latestData.safe_haven),
       sentimentColor: getSentimentColor(latestData.safe_haven)
     },

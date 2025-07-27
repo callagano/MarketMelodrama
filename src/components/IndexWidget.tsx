@@ -25,7 +25,7 @@ export default function IndexWidget({ data }: Props) {
   
   // Get the latest data point
   const latestData = data[data.length - 1];
-  const currentValue = Number(latestData.Fear_Greed_Index.toFixed(2));
+  const currentValue = latestData.Fear_Greed_Index;
   
   // Get historical values
   const oneWeekAgo = subDays(new Date(), 7);
@@ -109,7 +109,7 @@ export default function IndexWidget({ data }: Props) {
                           return {
                     date: formatDate(new Date(item.date), dateFormat),
                     originalDate: item.date, // Keep original date for tickFormatter
-                    value: Number(item.Fear_Greed_Index.toFixed(2))
+                    value: item.Fear_Greed_Index
                   };
       });
   };
