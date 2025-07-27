@@ -43,13 +43,28 @@ export default function FearGreedCharts({ data }: Props) {
     
     return data
       .filter(item => new Date(item.date) >= startDate)
-      .map(item => ({
-        date: formatDate(new Date(item.date), "MMM yyyy"),
-        "Market Momentum": item.momentum,
-        "Stock Price Strength": item.strength,
-        "Safe Haven Demand": item.safe_haven,
-        "Fear & Greed Index": item.Fear_Greed_Index,
-      }));
+      .map(item => {
+        let dateFormat;
+        switch (timeframe) {
+          case '1M':
+            dateFormat = "EEE d"; // "Mon 15"
+            break;
+          case '6M':
+          case '3Y':
+            dateFormat = "MMM yy"; // "Jan 24"
+            break;
+          default:
+            dateFormat = "MMM yy"; // "Jan 24"
+        }
+        
+        return {
+          date: formatDate(new Date(item.date), dateFormat),
+          "Market Momentum": item.momentum,
+          "Stock Price Strength": item.strength,
+          "Safe Haven Demand": item.safe_haven,
+          "Fear & Greed Index": item.Fear_Greed_Index,
+        };
+      });
   };
 
   // Get the latest data point
@@ -250,16 +265,21 @@ export default function FearGreedCharts({ data }: Props) {
                         tickLine={false}
                         axisLine={false}
                         tickFormatter={(value) => {
-                          // Show labels only for the first day of each month or every 3 months
+                          // For 1M: show every few days
+                          if (timeframe === '1M') {
+                            const date = new Date(value);
+                            const day = date.getDate();
+                            return day % 5 === 0 ? value : ''; // Show every 5th day
+                          }
+                          
+                          // For 6M and 3Y: show first day of each month
                           const date = new Date(value);
                           const day = date.getDate();
                           const month = date.getMonth();
-                          const year = date.getFullYear();
                           
-                          // Show first day of each month
                           if (day === 1) return value;
                           
-                          // For longer timeframes, show every 3 months
+                          // For 3Y, also show every 3 months
                           if (timeframe === '3Y' && day <= 7 && month % 3 === 0) return value;
                           
                           return '';
@@ -334,16 +354,21 @@ export default function FearGreedCharts({ data }: Props) {
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(value) => {
-                  // Show labels only for the first day of each month or every 3 months
+                  // For 1M: show every few days
+                  if (timeframe === '1M') {
+                    const date = new Date(value);
+                    const day = date.getDate();
+                    return day % 5 === 0 ? value : ''; // Show every 5th day
+                  }
+                  
+                  // For 6M and 3Y: show first day of each month
                   const date = new Date(value);
                   const day = date.getDate();
                   const month = date.getMonth();
-                  const year = date.getFullYear();
                   
-                  // Show first day of each month
                   if (day === 1) return value;
                   
-                  // For longer timeframes, show every 3 months
+                  // For 3Y, also show every 3 months
                   if (timeframe === '3Y' && day <= 7 && month % 3 === 0) return value;
                   
                   return '';
