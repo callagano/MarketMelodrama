@@ -182,24 +182,28 @@ export default function IndexWidget({ data }: Props) {
               tickLine={false}
               axisLine={false}
               tickFormatter={(value, index) => {
-                // For 3Y: show labels for actual years in the data
+                // For 3Y: show only one label per year with proper spacing
                 if (timeframe === '3Y') {
                   const dataPoint = filteredData[index];
                   if (!dataPoint || !dataPoint.originalDate) return '';
                   
                   const date = new Date(dataPoint.originalDate);
                   const year = date.getFullYear();
-                  const month = date.getMonth();
                   
-                  // Show label for January of each year, or first occurrence of each year
-                  if (month === 0) return value;
+                  // Get all unique years in the data
+                  const uniqueYears = [...new Set(filteredData.map(item => 
+                    new Date(item.originalDate).getFullYear()
+                  ))].sort();
                   
-                  // If no January data, show first occurrence of each year
-                  const currentYear = year;
-                  const isFirstOccurrenceOfYear = index === 0 || 
-                    (index > 0 && new Date(filteredData[index - 1].originalDate).getFullYear() !== currentYear);
+                  // Find the middle data point for each year
+                  const yearDataPoints = filteredData.filter(item => 
+                    new Date(item.originalDate).getFullYear() === year
+                  );
                   
-                  return isFirstOccurrenceOfYear ? value : '';
+                  const middleIndex = Math.floor(yearDataPoints.length / 2);
+                  const isMiddlePoint = yearDataPoints[middleIndex] === dataPoint;
+                  
+                  return isMiddlePoint ? value : '';
                 }
                 
                 // For 1M and 6M: uniform distribution
