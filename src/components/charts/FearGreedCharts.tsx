@@ -44,7 +44,7 @@ export default function FearGreedCharts({ data }: Props) {
     return data
       .filter(item => new Date(item.date) >= startDate)
       .map(item => ({
-        date: formatDate(new Date(item.date), "dd.MM"),
+        date: formatDate(new Date(item.date), "MMM yyyy"),
         "Market Momentum": item.momentum,
         "Stock Price Strength": item.strength,
         "Safe Haven Demand": item.safe_haven,
@@ -249,6 +249,12 @@ export default function FearGreedCharts({ data }: Props) {
                         tick={{ fill: '#9ca3af', fontSize: 10 }}
                         tickLine={false}
                         axisLine={false}
+                        tickFormatter={(value) => {
+                          // Only show labels for the first occurrence of each month
+                          const date = new Date(value);
+                          const day = date.getDate();
+                          return day <= 7 ? value : '';
+                        }}
                       />
               <YAxis 
                 stroke="#9ca3af"
@@ -318,6 +324,12 @@ export default function FearGreedCharts({ data }: Props) {
                 tick={{ fill: '#9ca3af', fontSize: 10 }}
                 tickLine={false}
                 axisLine={false}
+                tickFormatter={(value) => {
+                  // Only show labels for the first occurrence of each month
+                  const date = new Date(value);
+                  const day = date.getDate();
+                  return day <= 7 ? value : '';
+                }}
               />
                       <YAxis 
                         stroke="#9ca3af"
