@@ -144,7 +144,7 @@ export default function FearGreedCharts({ data }: Props) {
       dataKey: "Market Momentum",
       color: "#10b981", // emerald
       description: "Measures the rate of change in market prices. High values indicate strong upward momentum, suggesting investors are confident and actively buying. This can signal potential market bubbles.",
-      currentValue: latestData.momentum,
+      currentValue: Number(latestData.momentum.toFixed(2)),
       sentimentLabel: getSentimentLabel(latestData.momentum),
       sentimentColor: getSentimentColor(latestData.momentum)
     },
@@ -153,7 +153,7 @@ export default function FearGreedCharts({ data }: Props) {
       dataKey: "Stock Price Strength",
       color: "#f59e0b", // amber
       description: "Tracks the number of stocks hitting 52-week highs vs. lows. High values show broad market strength with many stocks reaching new highs, indicating strong bullish sentiment.",
-      currentValue: latestData.strength,
+      currentValue: Number(latestData.strength.toFixed(2)),
       sentimentLabel: getSentimentLabel(latestData.strength),
       sentimentColor: getSentimentColor(latestData.strength)
     },
@@ -162,7 +162,7 @@ export default function FearGreedCharts({ data }: Props) {
       dataKey: "Safe Haven Demand",
       color: "#ec4899", // pink
       description: "Measures the performance of safe-haven assets like gold and bonds. High values indicate investors are seeking safety, often during market uncertainty or fear periods.",
-      currentValue: latestData.safe_haven,
+      currentValue: Number(latestData.safe_haven.toFixed(2)),
       sentimentLabel: getSentimentLabel(latestData.safe_haven),
       sentimentColor: getSentimentColor(latestData.safe_haven)
     },
@@ -337,7 +337,7 @@ export default function FearGreedCharts({ data }: Props) {
             className={styles.expansionButton}
             onClick={() => setIsExpanded(!isExpanded)}
           >
-            <span>Market Metrics</span>
+                            <span>Index Components</span>
             <span className={`${styles.expansionIcon} ${isExpanded ? styles.expanded : ''}`}>
               ▼
             </span>
@@ -403,13 +403,7 @@ export default function FearGreedCharts({ data }: Props) {
                   return index % interval === 0 ? value : '';
                 }}
               />
-                      <YAxis 
-                        stroke="#9ca3af"
-                        tick={{ fill: '#9ca3af', fontSize: 10 }}
-                        tickLine={false}
-                        axisLine={false}
-                        width={30}
-                      />
+
                       <Tooltip 
                         contentStyle={{ 
                           backgroundColor: '#1e1e22',
