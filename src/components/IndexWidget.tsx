@@ -182,17 +182,14 @@ export default function IndexWidget({ data }: Props) {
               tickLine={false}
               axisLine={false}
               tickFormatter={(value, index) => {
-                // For 3Y: show only year labels (first occurrence of each year)
+                // For 3Y: uniform distribution of year labels
                 if (timeframe === '3Y') {
-                  const dataPoint = filteredData[index];
-                  if (!dataPoint || !dataPoint.originalDate) return '';
+                  const totalPoints = filteredData.length;
+                  const maxLabels = 4; // Show up to 4 year labels
+                  const interval = Math.max(1, Math.floor(totalPoints / maxLabels));
                   
-                  const date = new Date(dataPoint.originalDate);
-                  const year = date.getFullYear();
-                  const month = date.getMonth();
-                  
-                  // Show only January of each year
-                  return month === 0 ? value : '';
+                  // Show labels at regular intervals
+                  return index % interval === 0 ? value : '';
                 }
                 
                 // For 1M and 6M: uniform distribution
