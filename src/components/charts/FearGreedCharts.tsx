@@ -266,26 +266,13 @@ export default function FearGreedCharts({ data }: Props) {
                         tickLine={false}
                         axisLine={false}
                         tickFormatter={(value, index) => {
-                          // Get the original date from the data
-                          const dataPoint = filteredData[index];
-                          if (!dataPoint || !dataPoint.originalDate) return '';
+                          // Calculate uniform distribution based on data length
+                          const totalPoints = filteredData.length;
+                          const maxLabels = timeframe === '1M' ? 6 : timeframe === '6M' ? 4 : 6; // Max labels to show
+                          const interval = Math.max(1, Math.floor(totalPoints / maxLabels));
                           
-                          const date = new Date(dataPoint.originalDate);
-                          const day = date.getDate();
-                          const month = date.getMonth();
-                          
-                          // For 1M: show every few days
-                          if (timeframe === '1M') {
-                            return day % 5 === 0 ? value : ''; // Show every 5th day
-                          }
-                          
-                          // For 6M and 3Y: show first day of each month
-                          if (day === 1) return value;
-                          
-                          // For 3Y, also show every 3 months
-                          if (timeframe === '3Y' && day <= 7 && month % 3 === 0) return value;
-                          
-                          return '';
+                          // Show labels at regular intervals
+                          return index % interval === 0 ? value : '';
                         }}
                       />
               <YAxis 
@@ -357,26 +344,13 @@ export default function FearGreedCharts({ data }: Props) {
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(value, index) => {
-                  // Get the original date from the data
-                  const dataPoint = filteredData[index];
-                  if (!dataPoint || !dataPoint.originalDate) return '';
+                  // Calculate uniform distribution based on data length
+                  const totalPoints = filteredData.length;
+                  const maxLabels = timeframe === '1M' ? 6 : timeframe === '6M' ? 4 : 6; // Max labels to show
+                  const interval = Math.max(1, Math.floor(totalPoints / maxLabels));
                   
-                  const date = new Date(dataPoint.originalDate);
-                  const day = date.getDate();
-                  const month = date.getMonth();
-                  
-                  // For 1M: show every few days
-                  if (timeframe === '1M') {
-                    return day % 5 === 0 ? value : ''; // Show every 5th day
-                  }
-                  
-                  // For 6M and 3Y: show first day of each month
-                  if (day === 1) return value;
-                  
-                  // For 3Y, also show every 3 months
-                  if (timeframe === '3Y' && day <= 7 && month % 3 === 0) return value;
-                  
-                  return '';
+                  // Show labels at regular intervals
+                  return index % interval === 0 ? value : '';
                 }}
               />
                       <YAxis 
