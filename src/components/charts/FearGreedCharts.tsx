@@ -250,10 +250,19 @@ export default function FearGreedCharts({ data }: Props) {
                         tickLine={false}
                         axisLine={false}
                         tickFormatter={(value) => {
-                          // Only show labels for the first occurrence of each month
+                          // Show labels only for the first day of each month or every 3 months
                           const date = new Date(value);
                           const day = date.getDate();
-                          return day <= 7 ? value : '';
+                          const month = date.getMonth();
+                          const year = date.getFullYear();
+                          
+                          // Show first day of each month
+                          if (day === 1) return value;
+                          
+                          // For longer timeframes, show every 3 months
+                          if (timeframe === '3Y' && day <= 7 && month % 3 === 0) return value;
+                          
+                          return '';
                         }}
                       />
               <YAxis 
@@ -325,10 +334,19 @@ export default function FearGreedCharts({ data }: Props) {
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(value) => {
-                  // Only show labels for the first occurrence of each month
+                  // Show labels only for the first day of each month or every 3 months
                   const date = new Date(value);
                   const day = date.getDate();
-                  return day <= 7 ? value : '';
+                  const month = date.getMonth();
+                  const year = date.getFullYear();
+                  
+                  // Show first day of each month
+                  if (day === 1) return value;
+                  
+                  // For longer timeframes, show every 3 months
+                  if (timeframe === '3Y' && day <= 7 && month % 3 === 0) return value;
+                  
+                  return '';
                 }}
               />
                       <YAxis 
