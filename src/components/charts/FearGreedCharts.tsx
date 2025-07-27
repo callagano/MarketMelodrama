@@ -44,7 +44,7 @@ export default function FearGreedCharts({ data }: Props) {
     return data
       .filter(item => new Date(item.date) >= startDate)
       .map(item => ({
-        date: formatDate(new Date(item.date), "MMM d, yyyy"),
+        date: formatDate(new Date(item.date), "dd.MM"),
         "Market Momentum": item.momentum,
         "Stock Price Strength": item.strength,
         "Safe Haven Demand": item.safe_haven,
@@ -243,17 +243,13 @@ export default function FearGreedCharts({ data }: Props) {
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={filteredData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
-              <XAxis 
-                dataKey="date" 
-                stroke="#9ca3af"
-                tick={{ fill: '#9ca3af', fontSize: 10 }}
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(value) => {
-                  // Only show month and day for cleaner display
-                  return value.split(',')[0];
-                }}
-              />
+                                    <XAxis 
+                        dataKey="date" 
+                        stroke="#9ca3af"
+                        tick={{ fill: '#9ca3af', fontSize: 10 }}
+                        tickLine={false}
+                        axisLine={false}
+                      />
               <YAxis 
                 stroke="#9ca3af"
                 tick={false}
@@ -316,17 +312,13 @@ export default function FearGreedCharts({ data }: Props) {
                   <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={filteredData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
-                      <XAxis 
-                        dataKey="date" 
-                        stroke="#9ca3af"
-                        tick={{ fill: '#9ca3af', fontSize: 10 }}
-                        tickLine={false}
-                        axisLine={false}
-                        tickFormatter={(value) => {
-                          // Only show month and day for cleaner display
-                          return value.split(',')[0];
-                        }}
-                      />
+                                    <XAxis 
+                dataKey="date" 
+                stroke="#9ca3af"
+                tick={{ fill: '#9ca3af', fontSize: 10 }}
+                tickLine={false}
+                axisLine={false}
+              />
                       <YAxis 
                         stroke="#9ca3af"
                         tick={{ fill: '#9ca3af', fontSize: 10 }}

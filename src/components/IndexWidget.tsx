@@ -91,7 +91,7 @@ export default function IndexWidget({ data }: Props) {
     return data
       .filter(item => new Date(item.date) >= startDate)
       .map(item => ({
-        date: formatDate(new Date(item.date), "MMM d"),
+        date: formatDate(new Date(item.date), "dd.MM"),
         value: item.Fear_Greed_Index
       }));
   };
