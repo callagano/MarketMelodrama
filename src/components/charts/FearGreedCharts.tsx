@@ -268,14 +268,24 @@ export default function FearGreedCharts({ data }: Props) {
                         tickLine={false}
                         axisLine={false}
                         tickFormatter={(value, index) => {
-                          // For 3Y: uniform distribution of year labels
+                          // For 3Y: show labels for actual years in the data
                           if (timeframe === '3Y') {
-                            const totalPoints = filteredData.length;
-                            const maxLabels = 4; // Show up to 4 year labels
-                            const interval = Math.max(1, Math.floor(totalPoints / maxLabels));
+                            const dataPoint = filteredData[index];
+                            if (!dataPoint || !dataPoint.originalDate) return '';
                             
-                            // Show labels at regular intervals
-                            return index % interval === 0 ? value : '';
+                            const date = new Date(dataPoint.originalDate);
+                            const year = date.getFullYear();
+                            const month = date.getMonth();
+                            
+                            // Show label for January of each year, or first occurrence of each year
+                            if (month === 0) return value;
+                            
+                            // If no January data, show first occurrence of each year
+                            const currentYear = year;
+                            const isFirstOccurrenceOfYear = index === 0 || 
+                              (index > 0 && new Date(filteredData[index - 1].originalDate).getFullYear() !== currentYear);
+                            
+                            return isFirstOccurrenceOfYear ? value : '';
                           }
                           
                           // For 1M and 6M: uniform distribution
@@ -356,14 +366,24 @@ export default function FearGreedCharts({ data }: Props) {
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(value, index) => {
-                  // For 3Y: uniform distribution of year labels
+                  // For 3Y: show labels for actual years in the data
                   if (timeframe === '3Y') {
-                    const totalPoints = filteredData.length;
-                    const maxLabels = 4; // Show up to 4 year labels
-                    const interval = Math.max(1, Math.floor(totalPoints / maxLabels));
+                    const dataPoint = filteredData[index];
+                    if (!dataPoint || !dataPoint.originalDate) return '';
                     
-                    // Show labels at regular intervals
-                    return index % interval === 0 ? value : '';
+                    const date = new Date(dataPoint.originalDate);
+                    const year = date.getFullYear();
+                    const month = date.getMonth();
+                    
+                    // Show label for January of each year, or first occurrence of each year
+                    if (month === 0) return value;
+                    
+                    // If no January data, show first occurrence of each year
+                    const currentYear = year;
+                    const isFirstOccurrenceOfYear = index === 0 || 
+                      (index > 0 && new Date(filteredData[index - 1].originalDate).getFullYear() !== currentYear);
+                    
+                    return isFirstOccurrenceOfYear ? value : '';
                   }
                   
                   // For 1M and 6M: uniform distribution
