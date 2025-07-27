@@ -62,10 +62,10 @@ export default function FearGreedCharts({ data }: Props) {
         return {
           date: formatDate(new Date(item.date), dateFormat),
           originalDate: item.date, // Keep original date for tickFormatter
-          "Market Momentum": item.momentum,
-          "Stock Price Strength": item.strength,
-          "Safe Haven Demand": item.safe_haven,
-          "Fear & Greed Index": item.Fear_Greed_Index,
+                              "Market Momentum": Number(item.momentum.toFixed(2)),
+                    "Stock Price Strength": Number(item.strength.toFixed(2)),
+                    "Safe Haven Demand": Number(item.safe_haven.toFixed(2)),
+                    "Fear & Greed Index": Number(item.Fear_Greed_Index.toFixed(2)),
         };
       });
   };
@@ -98,22 +98,22 @@ export default function FearGreedCharts({ data }: Props) {
   const historicals = [
     {
       label: '1 Week Ago',
-      value: data[weekAgoIdx]?.Fear_Greed_Index,
+      value: Number((data[weekAgoIdx]?.Fear_Greed_Index || 0).toFixed(2)),
       change: ((latestData.Fear_Greed_Index - data[weekAgoIdx]?.Fear_Greed_Index) / data[weekAgoIdx]?.Fear_Greed_Index) * 100,
     },
     {
       label: '1 Month Ago',
-      value: data[monthAgoIdx]?.Fear_Greed_Index,
+      value: Number((data[monthAgoIdx]?.Fear_Greed_Index || 0).toFixed(2)),
       change: ((latestData.Fear_Greed_Index - data[monthAgoIdx]?.Fear_Greed_Index) / data[monthAgoIdx]?.Fear_Greed_Index) * 100,
     },
     {
       label: '6 Months Ago',
-      value: data[sixMonthsAgoIdx]?.Fear_Greed_Index,
+      value: Number((data[sixMonthsAgoIdx]?.Fear_Greed_Index || 0).toFixed(2)),
       change: ((latestData.Fear_Greed_Index - data[sixMonthsAgoIdx]?.Fear_Greed_Index) / data[sixMonthsAgoIdx]?.Fear_Greed_Index) * 100,
     },
     {
       label: '1 Year Ago',
-      value: data[yearAgoIdx]?.Fear_Greed_Index,
+      value: Number((data[yearAgoIdx]?.Fear_Greed_Index || 0).toFixed(2)),
       change: ((latestData.Fear_Greed_Index - data[yearAgoIdx]?.Fear_Greed_Index) / data[yearAgoIdx]?.Fear_Greed_Index) * 100,
     },
   ];
