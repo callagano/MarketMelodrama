@@ -99,7 +99,7 @@ export default function FearGreedCharts({ data }: Props) {
     {
       label: '1 Week Ago',
       value: Number((data[weekAgoIdx]?.Fear_Greed_Index || 0).toFixed(2)),
-      change: ((latestData.Fear_Greed_Index - data[weekAgoIdx]?.Fear_Greed_Index) / data[weekAgoIdx]?.Fear_Greed_Index) * 100,
+      change: Number(((latestData.Fear_Greed_Index - (data[weekAgoIdx]?.Fear_Greed_Index || 0)) / (data[weekAgoIdx]?.Fear_Greed_Index || 1)) * 100).toFixed(2)),
     },
     {
       label: '1 Month Ago',
