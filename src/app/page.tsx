@@ -66,7 +66,7 @@ export default function Home() {
         <div className={styles.headerCard}>
           <div className={styles.headerContainer}>
             <img 
-              src="/logo.svg" 
+              src="/logo.png" 
               alt="Market Melodrama Logo" 
               className={styles.logo}
             />

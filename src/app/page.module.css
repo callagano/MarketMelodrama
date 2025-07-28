@@ -46,15 +46,15 @@
 .textContainer {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0rem;
 }
 
 .logo {
-  width: 2rem;
-  height: 2rem;
+  width: 3.5rem;
+  height: 3.5rem;
   transition: transform 0.2s ease-in-out;
   display: block;
-  margin-bottom: 0.5rem;
+  margin-top: 0rem;
 }
 
 .logo:hover {
@@ -63,8 +63,9 @@
 
 @media (min-width: 768px) {
   .logo {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-top: 0.5rem;
   }
   
   .title {
