@@ -18,6 +18,8 @@ export default function TrendingStocks() {
   const [stocks, setStocks] = useState<TrendingStock[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const stocksPerPage = 20;
 
   useEffect(() => {
     const fetchTrendingStocks = async () => {
@@ -65,6 +67,16 @@ export default function TrendingStocks() {
     );
   }
 
+  // Calculate pagination
+  const totalPages = Math.min(5, Math.ceil(stocks.length / stocksPerPage)); // Max 5 pages (100 stocks)
+  const startIndex = (currentPage - 1) * stocksPerPage;
+  const endIndex = startIndex + stocksPerPage;
+  const currentStocks = stocks.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -85,7 +97,7 @@ export default function TrendingStocks() {
             </tr>
           </thead>
           <tbody>
-            {stocks.map((stock) => (
+            {currentStocks.map((stock) => (
               <tr key={stock.symbol} className={styles.row}>
                 <td className={styles.rank}>
                   <div className={styles.rankContainer}>
@@ -113,6 +125,38 @@ export default function TrendingStocks() {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button
+            className={`${styles.pageButton} ${currentPage === 1 ? styles.disabled : ''}`}
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          
+          <div className={styles.pageNumbers}>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                className={`${styles.pageButton} ${currentPage === page ? styles.active : ''}`}
+                onClick={() => handlePageChange(page)}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+          
+          <button
+            className={`${styles.pageButton} ${currentPage === totalPages ? styles.disabled : ''}`}
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 } 

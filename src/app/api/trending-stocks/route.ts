@@ -55,7 +55,7 @@ export async function GET() {
 
     // Convert ApeWisdom data to our format
     const trendingStocks: TrendingStock[] = data.results
-      .slice(0, 20) // Get top 20
+      .slice(0, 100) // Get top 100
       .map((stock: ApeWisdomStock, index: number) => {
         // Calculate real rank change
         const rankChange = stock.rank_24h_ago && stock.rank 
