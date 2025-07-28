@@ -112,7 +112,7 @@ export default function TrendingStocks() {
                                      <td className={styles.stockInfo}>
                        <div className={styles.stockName}>
                          <a 
-                           href={`https://finance.yahoo.com/quote/${stock.symbol}`}
+                           href={`https://www.google.com/finance/quote/${stock.symbol}`}
                            target="_blank"
                            rel="noopener noreferrer"
                            className={styles.stockLink}
