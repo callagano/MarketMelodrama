@@ -62,11 +62,11 @@
 }
 
 .table td {
-  padding: 0.75rem;
+  padding: 0.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   color: white;
   vertical-align: middle;
-  height: 60px;
+  height: 45px;
 }
 
 .row:hover {
