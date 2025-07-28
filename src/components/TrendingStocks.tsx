@@ -14,219 +14,115 @@ interface TrendingStock {
   upvotes: number;
 }
 
+interface RedditPost {
+  data: {
+    title: string;
+    score: number;
+    created_utc: number;
+    selftext: string;
+    url: string;
+  };
+}
+
 export default function TrendingStocks() {
   const [stocks, setStocks] = useState<TrendingStock[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Stock symbols to track
+  const stockSymbols = [
+    'AAPL', 'TSLA', 'NVDA', 'MSFT', 'GME', 'AMZN', 'PLTR', 'META', 'AMD', 'GOOGL',
+    'NFLX', 'CRM', 'PYPL', 'COIN', 'ADBE', 'SHOP', 'INTC', 'SPOT', 'ORCL', 'ZM'
+  ];
+
+  // Stock name mapping
+  const stockNames: { [key: string]: string } = {
+    'AAPL': 'Apple Inc.',
+    'TSLA': 'Tesla Inc.',
+    'NVDA': 'NVIDIA Corporation',
+    'MSFT': 'Microsoft Corporation',
+    'GME': 'GameStop Corp.',
+    'AMZN': 'Amazon.com Inc.',
+    'PLTR': 'Palantir Technologies',
+    'META': 'Meta Platforms Inc.',
+    'AMD': 'Advanced Micro Devices',
+    'GOOGL': 'Alphabet Inc.',
+    'NFLX': 'Netflix Inc.',
+    'CRM': 'Salesforce Inc.',
+    'PYPL': 'PayPal Holdings',
+    'COIN': 'Coinbase Global',
+    'ADBE': 'Adobe Inc.',
+    'SHOP': 'Shopify Inc.',
+    'INTC': 'Intel Corporation',
+    'SPOT': 'Spotify Technology',
+    'ORCL': 'Oracle Corporation',
+    'ZM': 'Zoom Video Communications'
+  };
+
+  // Stock logo mapping
+  const stockLogos: { [key: string]: string } = {
+    'AAPL': '🍎', 'TSLA': '⚡', 'NVDA': '🟢', 'MSFT': '🪟', 'GME': '🎮',
+    'AMZN': '📦', 'PLTR': '🔮', 'META': '📘', 'AMD': '🔴', 'GOOGL': '🔍',
+    'NFLX': '📺', 'CRM': '☁️', 'PYPL': '💳', 'COIN': '🪙', 'ADBE': '🎨',
+    'SHOP': '🛒', 'INTC': '🔵', 'SPOT': '🎵', 'ORCL': '🗄️', 'ZM': '📹'
+  };
+
   useEffect(() => {
     const fetchTrendingStocks = async () => {
       try {
-        // For now, using mock data until we implement Reddit API
-        const mockStocks: TrendingStock[] = [
-          {
-            rank: 1,
-            rankChange: 0,
-            name: "Apple Inc.",
-            logo: "🍎",
-            symbol: "AAPL",
-            mentions: 1250,
-            mentionsIncrease: 15.2,
-            upvotes: 2847
-          },
-          {
-            rank: 2,
-            rankChange: 2,
-            name: "Tesla Inc.",
-            logo: "⚡",
-            symbol: "TSLA",
-            mentions: 1180,
-            mentionsIncrease: 8.7,
-            upvotes: 2654
-          },
-          {
-            rank: 3,
-            rankChange: -1,
-            name: "NVIDIA Corporation",
-            logo: "🟢",
-            symbol: "NVDA",
-            mentions: 980,
-            mentionsIncrease: 12.3,
-            upvotes: 2341
-          },
-          {
-            rank: 4,
-            rankChange: 1,
-            name: "Microsoft Corporation",
-            logo: "🪟",
-            symbol: "MSFT",
-            mentions: 890,
-            mentionsIncrease: 5.4,
-            upvotes: 1987
-          },
-          {
-            rank: 5,
-            rankChange: 3,
-            name: "GameStop Corp.",
-            logo: "🎮",
-            symbol: "GME",
-            mentions: 750,
-            mentionsIncrease: 25.8,
-            upvotes: 1876
-          },
-          {
-            rank: 6,
-            rankChange: -2,
-            name: "Amazon.com Inc.",
-            logo: "📦",
-            symbol: "AMZN",
-            mentions: 720,
-            mentionsIncrease: 3.2,
-            upvotes: 1654
-          },
-          {
-            rank: 7,
-            rankChange: 1,
-            name: "Palantir Technologies",
-            logo: "🔮",
-            symbol: "PLTR",
-            mentions: 680,
-            mentionsIncrease: 18.9,
-            upvotes: 1543
-          },
-          {
-            rank: 8,
-            rankChange: -1,
-            name: "Meta Platforms Inc.",
-            logo: "📘",
-            symbol: "META",
-            mentions: 650,
-            mentionsIncrease: 7.1,
-            upvotes: 1432
-          },
-          {
-            rank: 9,
-            rankChange: 4,
-            name: "Advanced Micro Devices",
-            logo: "🔴",
-            symbol: "AMD",
-            mentions: 590,
-            mentionsIncrease: 22.4,
-            upvotes: 1321
-          },
-          {
-            rank: 10,
-            rankChange: 0,
-            name: "Alphabet Inc.",
-            logo: "🔍",
-            symbol: "GOOGL",
-            mentions: 540,
-            mentionsIncrease: 4.8,
-            upvotes: 1187
-          },
-          {
-            rank: 11,
-            rankChange: 2,
-            name: "Netflix Inc.",
-            logo: "📺",
-            symbol: "NFLX",
-            mentions: 520,
-            mentionsIncrease: 11.6,
-            upvotes: 1098
-          },
-          {
-            rank: 12,
-            rankChange: -3,
-            name: "Salesforce Inc.",
-            logo: "☁️",
-            symbol: "CRM",
-            mentions: 480,
-            mentionsIncrease: 2.1,
-            upvotes: 987
-          },
-          {
-            rank: 13,
-            rankChange: 1,
-            name: "PayPal Holdings",
-            logo: "💳",
-            symbol: "PYPL",
-            mentions: 450,
-            mentionsIncrease: 9.3,
-            upvotes: 876
-          },
-          {
-            rank: 14,
-            rankChange: 5,
-            name: "Coinbase Global",
-            logo: "🪙",
-            symbol: "COIN",
-            mentions: 420,
-            mentionsIncrease: 31.7,
-            upvotes: 765
-          },
-          {
-            rank: 15,
-            rankChange: -2,
-            name: "Adobe Inc.",
-            logo: "🎨",
-            symbol: "ADBE",
-            mentions: 390,
-            mentionsIncrease: 6.8,
-            upvotes: 654
-          },
-          {
-            rank: 16,
-            rankChange: 3,
-            name: "Shopify Inc.",
-            logo: "🛒",
-            symbol: "SHOP",
-            mentions: 360,
-            mentionsIncrease: 14.2,
-            upvotes: 543
-          },
-          {
-            rank: 17,
-            rankChange: -1,
-            name: "Intel Corporation",
-            logo: "🔵",
-            symbol: "INTC",
-            mentions: 330,
-            mentionsIncrease: 5.9,
-            upvotes: 432
-          },
-          {
-            rank: 18,
-            rankChange: 2,
-            name: "Spotify Technology",
-            logo: "🎵",
-            symbol: "SPOT",
-            mentions: 300,
-            mentionsIncrease: 12.8,
-            upvotes: 321
-          },
-          {
-            rank: 19,
-            rankChange: -4,
-            name: "Oracle Corporation",
-            logo: "🗄️",
-            symbol: "ORCL",
-            mentions: 280,
-            mentionsIncrease: 1.5,
-            upvotes: 298
-          },
-          {
-            rank: 20,
-            rankChange: 1,
-            name: "Zoom Video Communications",
-            logo: "📹",
-            symbol: "ZM",
-            mentions: 250,
-            mentionsIncrease: 8.4,
-            upvotes: 267
+        setLoading(true);
+        
+        // Fetch data from multiple finance subreddits
+        const subreddits = ['wallstreetbets', 'stocks', 'investing'];
+        const allPosts: RedditPost[] = [];
+        
+        for (const subreddit of subreddits) {
+          try {
+            const response = await fetch(`https://www.reddit.com/r/${subreddit}/hot.json?limit=100`);
+            if (response.ok) {
+              const data = await response.json();
+              allPosts.push(...data.data.children);
+            }
+          } catch (err) {
+            console.warn(`Failed to fetch from r/${subreddit}:`, err);
           }
-        ];
+        }
 
-        setStocks(mockStocks);
+        // Count mentions for each stock symbol
+        const mentions: { [key: string]: number } = {};
+        const upvotes: { [key: string]: number } = {};
+        
+        allPosts.forEach(post => {
+          const content = `${post.data.title} ${post.data.selftext}`.toUpperCase();
+          
+          stockSymbols.forEach(symbol => {
+            if (content.includes(symbol)) {
+              mentions[symbol] = (mentions[symbol] || 0) + 1;
+              upvotes[symbol] = (upvotes[symbol] || 0) + post.data.score;
+            }
+          });
+        });
+
+        // Convert to trending stocks array
+        const trendingStocks: TrendingStock[] = Object.keys(mentions)
+          .map(symbol => ({
+            rank: 0, // Will be set below
+            rankChange: 0, // Mock data for now
+            name: stockNames[symbol] || symbol,
+            logo: stockLogos[symbol] || '📈',
+            symbol,
+            mentions: mentions[symbol],
+            mentionsIncrease: Math.floor(Math.random() * 30) + 1, // Mock data for now
+            upvotes: upvotes[symbol]
+          }))
+          .sort((a, b) => b.mentions - a.mentions)
+          .slice(0, 20)
+          .map((stock, index) => ({
+            ...stock,
+            rank: index + 1
+          }));
+
+        setStocks(trendingStocks);
         setLoading(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch trending stocks');
@@ -244,7 +140,7 @@ export default function TrendingStocks() {
           <h2 className={styles.title}>Trending Stocks</h2>
           <p className={styles.subtitle}>Reddit mentions in the last 24 hours</p>
         </div>
-        <div className={styles.loading}>Loading trending stocks...</div>
+        <div className={styles.loading}>Loading trending stocks from Reddit...</div>
       </div>
     );
   }
