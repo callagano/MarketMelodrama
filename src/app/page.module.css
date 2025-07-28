@@ -37,6 +37,35 @@
   letter-spacing: -0.025em;
 }
 
+.titleContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.logo {
+  width: 2rem;
+  height: 2rem;
+  filter: brightness(0) invert(1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.logo:hover {
+  transform: scale(1.1);
+}
+
+@media (min-width: 768px) {
+  .logo {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+}
+
 .subtitle {
   color: #9ca3af;
   font-size: 0.875rem;
