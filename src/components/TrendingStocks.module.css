@@ -51,6 +51,16 @@
   letter-spacing: 0.05em;
 }
 
+.table th:first-child {
+  text-align: center;
+}
+
+.table th:nth-child(4),
+.table th:nth-child(5),
+.table th:nth-child(6) {
+  text-align: right;
+}
+
 .table td {
   padding: 0.75rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -64,6 +74,7 @@
 .rank {
   width: 80px;
   text-align: center;
+  vertical-align: top;
 }
 
 .rankNumber {
@@ -71,10 +82,13 @@
   font-size: 1rem;
   color: #f59e0b;
   margin-bottom: 0.25rem;
+  display: block;
 }
 
 .rankChange {
   margin-top: 0.25rem;
+  display: flex;
+  justify-content: center;
 }
 
 .change {
@@ -116,6 +130,7 @@
   color: #f59e0b;
   font-family: 'Courier New', monospace;
   letter-spacing: 0.05em;
+  min-width: 60px;
 }
 
 .mentions {
