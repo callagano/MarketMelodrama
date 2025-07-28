@@ -79,6 +79,12 @@
   margin: 0;
 }
 
+@media (max-width: 480px) {
+  .subtitle {
+    font-size: 0.75rem;
+  }
+}
+
 .indexCard {
   padding: 1.5rem;
   border-radius: 1rem;
