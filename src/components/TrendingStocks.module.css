@@ -3,6 +3,7 @@
   border-radius: 1rem;
   background-color: #1e1e22;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.05);
   margin-bottom: 2rem;
 }
@@ -28,7 +29,8 @@
 .tableContainer {
   overflow-x: auto;
   border-radius: 0.5rem;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .table {
@@ -38,12 +40,12 @@
 }
 
 .table th {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.03);
   color: #9ca3af;
   font-weight: 600;
   text-align: left;
   padding: 1rem 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
@@ -56,7 +58,7 @@
 }
 
 .row:hover {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: rgba(255, 255, 255, 0.015);
 }
 
 .rank {
