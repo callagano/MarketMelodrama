@@ -79,7 +79,12 @@ export async function GET() {
         };
       });
 
-    return NextResponse.json(trendingStocks);
+    return NextResponse.json(trendingStocks, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+        'Last-Modified': new Date().toUTCString(),
+      },
+    });
   } catch (error) {
     console.error('Error fetching trending stocks from ApeWisdom:', error);
     return NextResponse.json(

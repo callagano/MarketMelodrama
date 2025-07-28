@@ -87,8 +87,8 @@
 
 .rankNumber {
   font-weight: 700;
-  font-size: 1rem;
-  color: #f59e0b;
+  font-size: 0.75rem;
+  color: #9ca3af;
 }
 
 .rankChange {
@@ -133,7 +133,7 @@
 
 .symbol {
   font-weight: 700;
-  color: #f59e0b;
+  color: #9ca3af;
   font-family: 'Courier New', monospace;
   letter-spacing: 0.05em;
   min-width: 60px;
@@ -225,9 +225,9 @@
 }
 
 .pageButton.active {
-  background-color: #f59e0b;
+  background-color: #9ca3af;
   color: white;
-  border-color: #f59e0b;
+  border-color: #ffffff;
 }
 
 .pageButton.disabled {

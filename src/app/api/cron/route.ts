@@ -1,46 +1,39 @@
 import { NextResponse } from 'next/server';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import path from 'path';
-import fs from 'fs';
 
-const execAsync = promisify(exec);
-
-export const runtime = 'nodejs';
-
-// This function will be called by Vercel's cron job
 export async function GET() {
   try {
-    console.log('Starting cron job at:', new Date().toISOString());
-    
-    // Execute the Python script
-    const scriptPath = path.join(process.cwd(), 'src', 'scripts', 'fear_greed_vercel.py');
-    const { stdout, stderr } = await execAsync(`python3 ${scriptPath}`);
-    
-    console.log('Python script output:', stdout);
-    if (stderr) {
-      console.error('Python script errors:', stderr);
+    // Call the trending stocks API to refresh data
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/trending-stocks`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to refresh trending stocks: ${response.status}`);
     }
+
+    const data = await response.json();
     
-    // Copy the generated CSV file to the public directory
-    const sourceFile = path.join(process.cwd(), 'fear_greed_index.csv');
-    const destDir = path.join(process.cwd(), 'public', 'data');
-    const destFile = path.join(destDir, 'fear_greed_index.csv');
+    console.log(`[${new Date().toISOString()}] Cron job executed successfully. Refreshed ${data.length} trending stocks.`);
     
-    // Ensure the destination directory exists
-    if (!fs.existsSync(destDir)) {
-      fs.mkdirSync(destDir, { recursive: true });
-    }
-    
-    // Copy the file
-    fs.copyFileSync(sourceFile, destFile);
-    console.log('CSV file copied to public directory');
-    
-    return NextResponse.json({ success: true, message: 'Data updated successfully' });
+    return NextResponse.json({
+      success: true,
+      message: 'Trending stocks refreshed successfully',
+      timestamp: new Date().toISOString(),
+      stocksCount: data.length
+    });
   } catch (error) {
-    console.error('Error in cron job:', error);
+    console.error(`[${new Date().toISOString()}] Cron job failed:`, error);
+    
     return NextResponse.json(
-      { success: false, error: 'Failed to update data' },
+      {
+        success: false,
+        message: 'Failed to refresh trending stocks',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      },
       { status: 500 }
     );
   }
