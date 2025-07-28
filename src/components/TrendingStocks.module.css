@@ -1,0 +1,206 @@
+.container {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background-color: #1e1e22;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 2rem;
+}
+
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.025em;
+}
+
+.subtitle {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.tableContainer {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table th {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #9ca3af;
+  font-weight: 600;
+  text-align: left;
+  padding: 1rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.row:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.rank {
+  width: 60px;
+  text-align: center;
+}
+
+.rankNumber {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #f59e0b;
+}
+
+.rankChange {
+  width: 80px;
+  text-align: center;
+}
+
+.change {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.change.positive {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.change.negative {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.change.neutral {
+  background-color: rgba(156, 163, 175, 0.2);
+  color: #9ca3af;
+}
+
+.stockInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 200px;
+}
+
+.stockLogo {
+  font-size: 1.5rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+}
+
+.stockName {
+  font-weight: 600;
+  color: white;
+  flex: 1;
+}
+
+.symbol {
+  font-weight: 700;
+  color: #f59e0b;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.05em;
+}
+
+.mentions {
+  text-align: right;
+  font-weight: 600;
+  color: #d1d5db;
+}
+
+.mentionsIncrease {
+  text-align: right;
+}
+
+.percentage {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.percentage.positive {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.percentage.negative {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.percentage.neutral {
+  background-color: rgba(156, 163, 175, 0.2);
+  color: #9ca3af;
+}
+
+.upvotes {
+  text-align: right;
+  font-weight: 600;
+  color: #d1d5db;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 2rem;
+  color: #9ca3af;
+  font-size: 1rem;
+}
+
+.error {
+  color: #ef4444;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .table {
+    font-size: 0.75rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .stockInfo {
+    min-width: 150px;
+  }
+  
+  .stockName {
+    font-size: 0.75rem;
+  }
+  
+  .symbol {
+    font-size: 0.75rem;
+  }
+} 

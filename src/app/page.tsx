@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import FearGreedCharts from '@/components/charts/FearGreedCharts';
+import TrendingStocks from '@/components/TrendingStocks';
 import { TimeframeProvider } from '@/context/TimeframeContext';
 import styles from './page.module.css';
 
@@ -78,7 +79,10 @@ export default function Home() {
         </div>
         
         {data.length > 0 ? (
-          <FearGreedCharts data={data} />
+          <>
+            <FearGreedCharts data={data} />
+            <TrendingStocks />
+          </>
         ) : (
           <div className={styles.noDataCard}>
             <p className={styles.noDataText}>No data available</p>
