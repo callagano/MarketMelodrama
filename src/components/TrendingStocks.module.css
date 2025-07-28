@@ -62,7 +62,7 @@
 }
 
 .rank {
-  width: 60px;
+  width: 80px;
   text-align: center;
 }
 
@@ -70,11 +70,11 @@
   font-weight: 700;
   font-size: 1rem;
   color: #f59e0b;
+  margin-bottom: 0.25rem;
 }
 
 .rankChange {
-  width: 80px;
-  text-align: center;
+  margin-top: 0.25rem;
 }
 
 .change {
@@ -102,19 +102,7 @@
 .stockInfo {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
   min-width: 200px;
-}
-
-.stockLogo {
-  font-size: 1.5rem;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 0.5rem;
 }
 
 .stockName {

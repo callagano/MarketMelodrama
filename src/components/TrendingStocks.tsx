@@ -77,7 +77,6 @@ export default function TrendingStocks() {
           <thead>
             <tr>
               <th>Rank</th>
-              <th>Change</th>
               <th>Stock</th>
               <th>Symbol</th>
               <th>Mentions</th>
@@ -89,15 +88,14 @@ export default function TrendingStocks() {
             {stocks.map((stock) => (
               <tr key={stock.symbol} className={styles.row}>
                 <td className={styles.rank}>
-                  <span className={styles.rankNumber}>{stock.rank}</span>
-                </td>
-                <td className={styles.rankChange}>
-                  <span className={`${styles.change} ${stock.rankChange > 0 ? styles.positive : stock.rankChange < 0 ? styles.negative : styles.neutral}`}>
-                    {stock.rankChange > 0 ? '+' : ''}{stock.rankChange}
-                  </span>
+                  <div className={styles.rankNumber}>#{stock.rank}</div>
+                  <div className={styles.rankChange}>
+                    <span className={`${styles.change} ${stock.rankChange > 0 ? styles.positive : stock.rankChange < 0 ? styles.negative : styles.neutral}`}>
+                      {stock.rankChange > 0 ? '+' : ''}{stock.rankChange}
+                    </span>
+                  </div>
                 </td>
                 <td className={styles.stockInfo}>
-                  <div className={styles.stockLogo}>{stock.logo}</div>
                   <div className={styles.stockName}>{stock.name}</div>
                 </td>
                 <td className={styles.symbol}>{stock.symbol}</td>
