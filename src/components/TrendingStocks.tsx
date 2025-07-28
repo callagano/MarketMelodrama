@@ -19,7 +19,7 @@ export default function TrendingStocks() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const stocksPerPage = 20;
+  const stocksPerPage = 10;
 
   useEffect(() => {
     const fetchTrendingStocks = async () => {
@@ -68,7 +68,7 @@ export default function TrendingStocks() {
   }
 
   // Calculate pagination
-  const totalPages = Math.min(5, Math.ceil(stocks.length / stocksPerPage)); // Max 5 pages (100 stocks)
+  const totalPages = Math.min(10, Math.ceil(stocks.length / stocksPerPage)); // Max 10 pages (100 stocks)
   const startIndex = (currentPage - 1) * stocksPerPage;
   const endIndex = startIndex + stocksPerPage;
   const currentStocks = stocks.slice(startIndex, endIndex);
