@@ -64,15 +64,17 @@ export default function Home() {
     <TimeframeProvider>
       <main className={styles.mainContainer}>
         <div className={styles.headerCard}>
-          <div className={styles.titleContainer}>
+          <div className={styles.headerContainer}>
             <img 
               src="/logo.svg" 
               alt="Market Melodrama Logo" 
               className={styles.logo}
             />
-            <h1 className={styles.title}>Market Melodrama</h1>
+            <div className={styles.textContainer}>
+              <h1 className={styles.title}>Market Melodrama</h1>
+              <p className={styles.subtitle}>S&P isn't always rational. People either.</p>
+            </div>
           </div>
-          <p className={styles.subtitle}>S&P isn't always rational. People either.</p>
         </div>
         
         {data.length > 0 ? (
