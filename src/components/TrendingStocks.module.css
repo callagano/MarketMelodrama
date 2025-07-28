@@ -52,7 +52,7 @@
 }
 
 .table th:first-child {
-  text-align: center;
+  text-align: left;
 }
 
 .table th:nth-child(4),
@@ -65,6 +65,8 @@
   padding: 0.75rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   color: white;
+  vertical-align: middle;
+  height: 60px;
 }
 
 .row:hover {
@@ -72,23 +74,26 @@
 }
 
 .rank {
-  width: 80px;
-  text-align: center;
-  vertical-align: top;
+  width: 120px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.rankContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .rankNumber {
   font-weight: 700;
   font-size: 1rem;
   color: #f59e0b;
-  margin-bottom: 0.25rem;
-  display: block;
 }
 
 .rankChange {
-  margin-top: 0.25rem;
   display: flex;
-  justify-content: center;
+  align-items: center;
 }
 
 .change {
@@ -117,6 +122,7 @@
   display: flex;
   align-items: center;
   min-width: 200px;
+  height: 100%;
 }
 
 .stockName {
