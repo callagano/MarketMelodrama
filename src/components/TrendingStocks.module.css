@@ -131,6 +131,17 @@
   flex: 1;
 }
 
+.stockLink {
+  color: white;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+.stockLink:hover {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+
 .symbol {
   font-weight: 700;
   color: #9ca3af;

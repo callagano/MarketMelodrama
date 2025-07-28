@@ -109,9 +109,18 @@ export default function TrendingStocks() {
                     </div>
                   </div>
                 </td>
-                <td className={styles.stockInfo}>
-                  <div className={styles.stockName}>{stock.name}</div>
-                </td>
+                                     <td className={styles.stockInfo}>
+                       <div className={styles.stockName}>
+                         <a 
+                           href={`https://finance.yahoo.com/quote/${stock.symbol}`}
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           className={styles.stockLink}
+                         >
+                           {stock.name}
+                         </a>
+                       </div>
+                     </td>
                 <td className={styles.symbol}>{stock.symbol}</td>
                 <td className={styles.mentions}>{stock.mentions.toLocaleString()}</td>
                 <td className={styles.mentionsIncrease}>
