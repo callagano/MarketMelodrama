@@ -3,10 +3,12 @@ import { NextResponse } from 'next/server';
 interface ApeWisdomStock {
   rank: number;
   rank_change: number;
+  rank_24h_ago: number;
   ticker: string;
   name: string;
   mentions: number;
   mentions_change: number;
+  mentions_24h_ago: number;
   upvotes: number;
   sentiment: number;
   sentiment_score: number;
@@ -54,16 +56,28 @@ export async function GET() {
     // Convert ApeWisdom data to our format
     const trendingStocks: TrendingStock[] = data.results
       .slice(0, 20) // Get top 20
-      .map((stock: ApeWisdomStock, index: number) => ({
-        rank: stock.rank || index + 1,
-        rankChange: stock.rank_change || 0,
-        name: stock.name || stock.ticker,
-        logo: stockLogos[stock.ticker] || '📈',
-        symbol: stock.ticker,
-        mentions: stock.mentions || 0,
-        mentionsIncrease: stock.mentions_change || 0,
-        upvotes: stock.upvotes || 0
-      }));
+      .map((stock: ApeWisdomStock, index: number) => {
+        // Calculate real rank change
+        const rankChange = stock.rank_24h_ago && stock.rank 
+          ? stock.rank_24h_ago - stock.rank 
+          : stock.rank_change || 0;
+        
+        // Calculate real mentions percentage change
+        const mentionsIncrease = stock.mentions_24h_ago && stock.mentions
+          ? Math.round(((stock.mentions - stock.mentions_24h_ago) / stock.mentions_24h_ago) * 100)
+          : stock.mentions_change || 0;
+        
+        return {
+          rank: stock.rank || index + 1,
+          rankChange,
+          name: stock.name || stock.ticker,
+          logo: stockLogos[stock.ticker] || '📈',
+          symbol: stock.ticker,
+          mentions: stock.mentions || 0,
+          mentionsIncrease,
+          upvotes: stock.upvotes || 0
+        };
+      });
 
     return NextResponse.json(trendingStocks);
   } catch (error) {
