@@ -14,12 +14,13 @@ interface TrendingStock {
   upvotes: number;
 }
 
+type TabType = 'upvotes' | 'percentage';
+
 export default function TrendingStocks() {
   const [stocks, setStocks] = useState<TrendingStock[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const stocksPerPage = 10;
+  const [activeTab, setActiveTab] = useState<TabType>('upvotes');
 
   useEffect(() => {
     const fetchTrendingStocks = async () => {
@@ -43,14 +44,31 @@ export default function TrendingStocks() {
     fetchTrendingStocks();
   }, []);
 
+  // Sort stocks based on active tab
+  const getSortedStocks = () => {
+    if (activeTab === 'upvotes') {
+      return [...stocks]
+        .sort((a, b) => b.upvotes - a.upvotes)
+        .slice(0, 10)
+        .map((stock, index) => ({ ...stock, displayRank: index + 1 }));
+    } else {
+      return [...stocks]
+        .sort((a, b) => b.mentionsIncrease - a.mentionsIncrease)
+        .slice(0, 10)
+        .map((stock, index) => ({ ...stock, displayRank: index + 1 }));
+    }
+  };
+
+  const currentStocks = getSortedStocks();
+
   if (loading) {
     return (
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Trending Stocks</h2>
-          <p className={styles.subtitle}>Reddit mentions in the last 24 hours</p>
+          <h2 className={styles.title}>Everyone’s talking about</h2>
+          <p className={styles.subtitle}>Trending topics on Reddit over the past 24 hours</p>
         </div>
-        <div className={styles.loading}>Loading trending stocks from Reddit...</div>
+        <div className={styles.loading}>Loading people's picks from Reddit...</div>
       </div>
     );
   }
@@ -59,29 +77,35 @@ export default function TrendingStocks() {
     return (
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Trending Stocks</h2>
-          <p className={styles.subtitle}>Reddit mentions in the last 24 hours</p>
+          <h2 className={styles.title}>Everyone’s talking about</h2>
+          <p className={styles.subtitle}>Trending topics on Reddit over the past 24 hours</p>
         </div>
         <div className={styles.error}>Error: {error}</div>
       </div>
     );
   }
 
-  // Calculate pagination
-  const totalPages = Math.min(10, Math.ceil(stocks.length / stocksPerPage)); // Max 10 pages (100 stocks)
-  const startIndex = (currentPage - 1) * stocksPerPage;
-  const endIndex = startIndex + stocksPerPage;
-  const currentStocks = stocks.slice(startIndex, endIndex);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2 className={styles.title}>Trending Stocks</h2>
-        <p className={styles.subtitle}>Reddit mentions in the last 24 hours</p>
+        <h2 className={styles.title}>Everyone’s talking about</h2>
+        <p className={styles.subtitle}>Trending topics on Reddit over the past 24 hours</p>
+      </div>
+      
+      {/* Tab Navigation */}
+      <div className={styles.tabContainer}>
+        <button
+          className={`${styles.tabButton} ${activeTab === 'upvotes' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('upvotes')}
+        >
+          Most relevant
+        </button>
+        <button
+          className={`${styles.tabButton} ${activeTab === 'percentage' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('percentage')}
+        >
+          Trending Up
+        </button>
       </div>
       
       <div className={styles.tableContainer}>
@@ -92,7 +116,6 @@ export default function TrendingStocks() {
               <th>Stock</th>
               <th>Symbol</th>
               <th>Mentions</th>
-              <th>24h %</th>
               <th>Upvotes</th>
             </tr>
           </thead>
@@ -101,7 +124,7 @@ export default function TrendingStocks() {
               <tr key={stock.symbol} className={styles.row}>
                 <td className={styles.rank}>
                   <div className={styles.rankContainer}>
-                    <div className={styles.rankNumber}>#{stock.rank}</div>
+                    <div className={styles.rankNumber}>#{stock.displayRank}</div>
                     <div className={styles.rankChange}>
                       <span className={`${styles.change} ${stock.rankChange > 0 ? styles.positive : stock.rankChange < 0 ? styles.negative : styles.neutral}`}>
                         {stock.rankChange > 0 ? '+' : ''}{stock.rankChange}
@@ -109,24 +132,26 @@ export default function TrendingStocks() {
                     </div>
                   </div>
                 </td>
-                                     <td className={styles.stockInfo}>
-                       <div className={styles.stockName}>
-                         <a 
-                           href={`https://www.google.com/finance/quote/${stock.symbol}:nasdaq`}
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           className={styles.stockLink}
-                         >
-                           {stock.name}
-                         </a>
-                       </div>
-                     </td>
+                <td className={styles.stockInfo}>
+                  <div className={styles.stockName}>
+                    <a 
+                      href={`https://www.google.com/finance/quote/${stock.symbol}:nasdaq`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.stockLink}
+                    >
+                      {stock.name}
+                    </a>
+                  </div>
+                </td>
                 <td className={styles.symbol}>{stock.symbol}</td>
-                <td className={styles.mentions}>{stock.mentions.toLocaleString()}</td>
-                <td className={styles.mentionsIncrease}>
-                  <span className={`${styles.percentage} ${stock.mentionsIncrease > 0 ? styles.positive : stock.mentionsIncrease < 0 ? styles.negative : styles.neutral}`}>
-                    {stock.mentionsIncrease > 0 ? '+' : ''}{stock.mentionsIncrease}%
-                  </span>
+                <td className={styles.mentions}>
+                  <div className={styles.mentionsContainer}>
+                    <span className={styles.mentionsValue}>{stock.mentions.toLocaleString()}</span>
+                    <span className={`${styles.percentage} ${stock.mentionsIncrease > 0 ? styles.positive : stock.mentionsIncrease < 0 ? styles.negative : styles.neutral}`}>
+                      {stock.mentionsIncrease > 0 ? '+' : ''}{stock.mentionsIncrease}%
+                    </span>
+                  </div>
                 </td>
                 <td className={styles.upvotes}>{stock.upvotes.toLocaleString()}</td>
               </tr>
@@ -134,38 +159,6 @@ export default function TrendingStocks() {
           </tbody>
         </table>
       </div>
-
-      {totalPages > 1 && (
-        <div className={styles.pagination}>
-          <button
-            className={`${styles.pageButton} ${currentPage === 1 ? styles.disabled : ''}`}
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          
-          <div className={styles.pageNumbers}>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                className={`${styles.pageButton} ${currentPage === page ? styles.active : ''}`}
-                onClick={() => handlePageChange(page)}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-          
-          <button
-            className={`${styles.pageButton} ${currentPage === totalPages ? styles.disabled : ''}`}
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
-      )}
     </div>
   );
 } 

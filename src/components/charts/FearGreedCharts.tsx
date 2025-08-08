@@ -196,35 +196,26 @@ export default function FearGreedCharts({ data }: Props) {
     <div className={styles.chartContainer}>
       <div className={styles.chartCard}>
         <div className={styles.chartHeader}>
-          <h2 className={styles.chartTitle}>Fear & Greed Index</h2>
+          <h2 className={styles.chartTitle}>People's mood</h2>
           <p className={styles.chartDescription}>
-            A comprehensive indicator that measures market sentiment by analyzing various factors including volatility, momentum, and safe-haven demand.
+            A Fear and Greed indicator that measures market sentiment by analyzing various factors including volatility, momentum, and safe-haven demand.
           </p>
           {/* Horizontal Slider Chart - moved here */}
           <div className={styles.sliderChartWrapper}>
             <div className={styles.sliderTrack}>
-              <div className={styles.sliderSegment}>
-                <span className={styles.segmentLabel}>Extreme Fear</span>
-              </div>
-              <div className={styles.sliderSegment}>
-                <span className={styles.segmentLabel}>Fear</span>
-              </div>
-              <div className={styles.sliderSegment}>
-                <span className={styles.segmentLabel}>Neutral</span>
-              </div>
-              <div className={styles.sliderSegment}>
-                <span className={styles.segmentLabel}>Greed</span>
-              </div>
-              <div className={styles.sliderSegment}>
-                <span className={styles.segmentLabel}>Extreme Greed</span>
-              </div>
+              {/* Colored track without labels */}
+            </div>
+            {/* Labels below the track */}
+            <div className={styles.sliderLabels}>
+              <span className={styles.sliderLabel}>Extreme Fear</span>
+              <span className={styles.sliderLabel}>Neutral</span>
+              <span className={styles.sliderLabel}>Extreme Greed</span>
             </div>
             {/* Current Value Indicator */}
             <div 
               className={styles.valueIndicator}
               style={{ 
-                left: `${latestData.Fear_Greed_Index}%`,
-                backgroundColor: getSentimentColor(latestData.Fear_Greed_Index)
+                left: `${latestData.Fear_Greed_Index}%`
               }}
             >
             </div>
