@@ -282,7 +282,6 @@
 
 @media (max-width: 480px) {
   .tabContainer {
-    flex-direction: column;
     gap: 0.25rem;
   }
   
