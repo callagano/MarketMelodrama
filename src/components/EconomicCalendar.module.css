@@ -124,21 +124,21 @@
   }
   
   .widgetContainer :global(.tradingview-widget-container) {
-    height: 400px !important;
+    height: 450px !important;
   }
   
   .widgetContainer :global(.tradingview-widget-container__widget) {
-    min-height: 400px !important;
+    min-height: 450px !important;
   }
 }
 
 @media (max-width: 480px) {
   .widgetContainer :global(.tradingview-widget-container) {
-    height: 350px !important;
+    height: 450px !important;
   }
   
   .widgetContainer :global(.tradingview-widget-container__widget) {
-    min-height: 350px !important;
+    min-height: 450px !important;
   }
 }
 
@@ -148,10 +148,10 @@
   }
   
   .widgetContainer :global(.tradingview-widget-container) {
-    height: 300px !important;
+    height: 450px !important;
   }
   
   .widgetContainer :global(.tradingview-widget-container__widget) {
-    min-height: 300px !important;
+    min-height: 450px !important;
   }
 } 
