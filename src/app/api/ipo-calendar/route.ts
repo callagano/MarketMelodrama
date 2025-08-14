@@ -29,68 +29,60 @@ export async function GET(request: Request) {
       }
     }
 
-    // Alpha Vantage API key - using provided key
-    const apiKey = 'WLHZLTATM9PMFVX9';
+    // Finnhub API key
+    const apiKey = 'd2es8spr01qlu2r0k360d2es8spr01qlu2r0k36g';
     
     if (!apiKey) {
       return NextResponse.json({
         success: false,
-        error: 'Alpha Vantage API key not configured.',
+        error: 'Finnhub API key not configured.',
         data: null
       }, { status: 500 });
     }
 
-    // Use Alpha Vantage IPO Calendar endpoint
-    const url = `https://www.alphavantage.co/query?function=IPO_CALENDAR&apikey=${apiKey}`;
+    // Use Finnhub IPO Calendar endpoint
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const sixMonthsAhead = new Date(now.getFullYear(), now.getMonth() + 6, 0);
+    const url = `https://finnhub.io/api/v1/calendar/ipo?from=${today.toISOString().split('T')[0]}&to=${sixMonthsAhead.toISOString().split('T')[0]}&token=${apiKey}`;
     
     const response = await fetch(url);
     
     if (!response.ok) {
-      throw new Error(`Alpha Vantage API error: ${response.status}`);
+      throw new Error(`Finnhub API error: ${response.status}`);
     }
     
-    const data = await response.text();
+    const data = await response.json();
     
-    // Alpha Vantage returns CSV format for IPO calendar
-    const lines = data.trim().split('\n');
-    const headers = lines[0].split(',');
-    const ipos = lines.slice(1).map((line, index) => {
-      const values = line.split(',');
+    // Finnhub returns JSON format for IPO calendar
+    const ipos = data.ipoCalendar.map((ipo: any, index: number) => {
       return {
         id: index + 1,
-        symbol: values[0] || '',
-        company: values[1] || '',
-        date: values[2] || '',
-        priceRangeLow: values[3] || '',
-        priceRangeHigh: values[4] || '',
-        currency: values[5] || 'USD',
-        exchange: values[6] || '',
-        priceRange: values[3] && values[4] ? `$${values[3]}-$${values[4]}` : '',
-        sharesOffered: '', // Alpha Vantage doesn't provide this
-        totalValue: '', // Alpha Vantage doesn't provide this
-        underwriters: '', // Alpha Vantage doesn't provide this
-        status: 'Expected'
+        symbol: ipo.symbol || '',
+        company: ipo.name || '',
+        date: ipo.date || '',
+        priceRangeLow: ipo.price ? ipo.price.split('-')[0] : '',
+        priceRangeHigh: ipo.price && ipo.price.includes('-') ? ipo.price.split('-')[1] : ipo.price || '',
+        currency: 'USD', // Finnhub typically uses USD
+        exchange: ipo.exchange || '',
+        priceRange: ipo.price || '',
+        sharesOffered: ipo.numberOfShares ? `${(ipo.numberOfShares / 1000000).toFixed(1)}M` : '',
+        totalValue: ipo.totalSharesValue ? `$${(ipo.totalSharesValue / 1000000).toFixed(1)}M` : '',
+        underwriters: '', // Finnhub doesn't provide this
+        status: ipo.status || 'Expected'
       };
     });
 
     // Filter for next 6 months, then sort by date
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const sixMonthsAhead = new Date(now.getFullYear(), now.getMonth() + 6, 0);
-    
-    console.log(`IPO Calendar - Today: ${today.toISOString().split('T')[0]}`);
-    console.log(`IPO Calendar - Date Range: ${today.toISOString().split('T')[0]} to ${sixMonthsAhead.toISOString().split('T')[0]}`);
-    console.log(`IPO Calendar - Total IPOs from API: ${ipos.length}`);
-    
     const filteredIPOs = ipos
-      .filter(ipo => {
+      .filter((ipo: any) => {
         if (!ipo.date) return false;
         const ipoDate = new Date(ipo.date);
         const isInRange = ipoDate >= today && ipoDate <= sixMonthsAhead;
         console.log(`IPO ${ipo.symbol} (${ipo.company}) - Date: ${ipo.date}, In Range: ${isInRange}`);
         return isInRange;
       })
-      .sort((a, b) => {
+      .sort((a: any, b: any) => {
         if (!a.date || !b.date) return 0;
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
@@ -107,7 +99,7 @@ export async function GET(request: Request) {
       data: filteredIPOs,
       count: filteredIPOs.length,
       cached: false,
-      message: `Fresh IPO data from Alpha Vantage API (${filteredIPOs.length} IPOs available for next 6 months, limited by API data)`,
+      message: `Fresh IPO data from Finnhub API (${filteredIPOs.length} IPOs available for next 6 months, limited by API data)`,
       lastFetched: new Date().toISOString(),
       nextFetch: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
     });

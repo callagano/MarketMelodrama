@@ -161,7 +161,7 @@ export default function HybridCalendar() {
         <div className={styles.header}>
           <h2 className={styles.title}>Market Calendar</h2>
           <p className={styles.subtitle}>
-            Economic, earnings and IPO information most important events
+            Economic, earnings and IPO most important events
           </p>
         </div>
 
