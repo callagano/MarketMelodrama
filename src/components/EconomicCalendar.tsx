@@ -1,51 +1,68 @@
 'use client';
 
-import { useEffect, useRef, memo } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import styles from './EconomicCalendar.module.css';
 
-function EconomicCalendar() {
-  const container = useRef<HTMLDivElement>(null);
+interface EconomicCalendarProps {
+  className?: string;
+}
+
+export default function EconomicCalendar({ className }: EconomicCalendarProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!container.current) return;
-
-    const script = document.createElement("script");
-    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-events.js";
-    script.type = "text/javascript";
+    // MarketWatch Economic Calendar Widget
+    const script = document.createElement('script');
+    script.src = 'https://www.marketwatch.com/investing/calendar';
     script.async = true;
-    script.innerHTML = `
-      {
-        "colorTheme": "dark",
-        "isTransparent": true,
-        "locale": "en",
-        "countryFilter": "ar,au,br,ca,cn,fr,de,in,id,it,jp,kr,mx,ru,sa,za,tr,gb,us,eu",
-        "importanceFilter": "0,1",
-        "width": "100%",
-        "height": "100%"
-      }`;
-    container.current.appendChild(script);
+    script.setAttribute('data-width', '100%');
+    script.setAttribute('data-height', '600');
+    script.setAttribute('data-theme', 'dark');
+
+    if (containerRef.current) {
+      const widgetContainer = containerRef.current.querySelector('.marketwatch-widget-container');
+      if (widgetContainer) {
+        widgetContainer.appendChild(script);
+      }
+    }
 
     return () => {
-      if (container.current && container.current.contains(script)) {
-        container.current.removeChild(script);
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
       }
     };
   }, []);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h2 className={styles.title}>Events affecting behaviours</h2>
-        <p className={styles.subtitle}>The most important economic events that may affect people's behaviour</p>
-      </div>
-      
-      <div className={styles.widgetContainer}>
-        <div className="tradingview-widget-container" ref={container} style={{ height: '500px' }}>
-          <div className="tradingview-widget-container__widget" style={{ height: '100%' }}></div>
+    <Card className={`${styles.economicCalendar} ${className || ''}`}>
+      <CardContent className={styles.cardContent}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>Economic Calendar</h2>
+          <p className={styles.subtitle}>
+            Track earnings, IPOs, and economic events
+          </p>
         </div>
-      </div>
-    </div>
+        
+        <div className={styles.calendarContainer} ref={containerRef}>
+          <div className="marketwatch-widget-container">
+            <iframe 
+              src="https://www.marketwatch.com/investing/calendar"
+              width="100%"
+              height="600"
+              frameBorder="0"
+              allowFullScreen
+              style={{ backgroundColor: 'transparent' }}
+            />
+          </div>
+        </div>
+
+        <div className={styles.footer}>
+          <p className={styles.disclaimer}>
+            Data provided by MarketWatch. Includes earnings releases, IPO dates, and economic indicators.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
-
-export default memo(EconomicCalendar); 
