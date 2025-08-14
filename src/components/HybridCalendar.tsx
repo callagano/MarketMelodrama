@@ -161,7 +161,7 @@ export default function HybridCalendar() {
         <div className={styles.header}>
           <h2 className={styles.title}>Market Calendar</h2>
           <p className={styles.subtitle}>
-            Economic events, earnings releases, and IPO information
+            Economic, earnings and IPO information most important events
           </p>
         </div>
 
@@ -270,11 +270,7 @@ export default function HybridCalendar() {
           )}
         </div>
 
-        <div className={styles.footer}>
-          <p className={styles.disclaimer}>
-            Economic data by TradingView. Earnings & IPO data by Alpha Vantage API.
-          </p>
-        </div>
+        {/* Footer removed as requested */}
       </CardContent>
     </Card>
   );

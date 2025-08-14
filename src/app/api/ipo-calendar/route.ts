@@ -73,20 +73,20 @@ export async function GET(request: Request) {
       };
     });
 
-    // Filter for current month and next month, then sort by date
+    // Filter for next 6 months, then sort by date
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const nextMonthEnd = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+    const sixMonthsAhead = new Date(now.getFullYear(), now.getMonth() + 6, 0);
     
     console.log(`IPO Calendar - Today: ${today.toISOString().split('T')[0]}`);
-    console.log(`IPO Calendar - Date Range: ${today.toISOString().split('T')[0]} to ${nextMonthEnd.toISOString().split('T')[0]}`);
+    console.log(`IPO Calendar - Date Range: ${today.toISOString().split('T')[0]} to ${sixMonthsAhead.toISOString().split('T')[0]}`);
     console.log(`IPO Calendar - Total IPOs from API: ${ipos.length}`);
     
     const filteredIPOs = ipos
       .filter(ipo => {
         if (!ipo.date) return false;
         const ipoDate = new Date(ipo.date);
-        const isInRange = ipoDate >= today && ipoDate <= nextMonthEnd;
+        const isInRange = ipoDate >= today && ipoDate <= sixMonthsAhead;
         console.log(`IPO ${ipo.symbol} (${ipo.company}) - Date: ${ipo.date}, In Range: ${isInRange}`);
         return isInRange;
       })
@@ -107,7 +107,7 @@ export async function GET(request: Request) {
       data: filteredIPOs,
       count: filteredIPOs.length,
       cached: false,
-      message: `Fresh IPO data from Alpha Vantage API (${filteredIPOs.length} IPOs available for current month + next month, limited by API data)`,
+      message: `Fresh IPO data from Alpha Vantage API (${filteredIPOs.length} IPOs available for next 6 months, limited by API data)`,
       lastFetched: new Date().toISOString(),
       nextFetch: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
     });
