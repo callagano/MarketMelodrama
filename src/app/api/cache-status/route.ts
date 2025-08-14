@@ -16,7 +16,12 @@ export async function GET(request: Request) {
     
     // Get cache info for all known keys
     const cacheKeys = ['earnings-1month', 'ipo-calendar'];
-    const cacheStatus = {};
+    const cacheStatus: Record<string, {
+      exists: boolean;
+      ageHours: number;
+      expiresInHours: number;
+      isExpired: boolean;
+    }> = {};
     
     for (const key of cacheKeys) {
       const info = await cacheManager.getCacheInfo(key);
