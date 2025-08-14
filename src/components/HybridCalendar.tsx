@@ -250,6 +250,7 @@ export default function HybridCalendar() {
                     <div className={styles.dateHeader}>Date</div>
                     <div className={styles.symbolHeader}>Symbol</div>
                     <div className={styles.companyHeader}>Company</div>
+                    <div className={styles.exchangeHeader}>Exchange</div>
                     <div className={styles.priceHeader}>Price Range</div>
                     <div className={styles.sharesHeader}>Shares</div>
                   </div>
@@ -259,6 +260,7 @@ export default function HybridCalendar() {
                         <div className={styles.dateCell}>{formatDate(ipo.date)}</div>
                         <div className={styles.symbolCell}>{ipo.symbol}</div>
                         <div className={styles.companyCell}>{ipo.company}</div>
+                        <div className={styles.exchangeCell}>{ipo.exchange}</div>
                         <div className={styles.priceCell}>{ipo.priceRange}</div>
                         <div className={styles.sharesCell}>{ipo.sharesOffered}</div>
                       </div>

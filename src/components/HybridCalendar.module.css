@@ -95,7 +95,7 @@
 
 .tableHeader {
   display: grid;
-  grid-template-columns: 100px 80px 1fr 120px 120px;
+  grid-template-columns: 100px 80px 1fr 80px 120px 80px;
   background: rgba(255, 255, 255, 0.02);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   padding: 0.75rem 1rem;
@@ -116,7 +116,7 @@
 
 .tableRow {
   display: grid;
-  grid-template-columns: 100px 80px 1fr 120px 120px;
+  grid-template-columns: 100px 80px 1fr 80px 120px 80px;
   padding: 0.5rem 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.02);
   transition: background-color 0.2s ease;
@@ -160,6 +160,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.exchangeCell {
+  color: #10b981;
+  font-weight: 600;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  text-align: center;
 }
 
 .estimateCell,
