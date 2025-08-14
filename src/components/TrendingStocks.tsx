@@ -65,7 +65,7 @@ export default function TrendingStocks() {
     return (
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Everyone’s talking about</h2>
+          <h2 className={styles.title}>Trending stocks</h2>
           <p className={styles.subtitle}>Trending topics on Reddit over the past 24 hours</p>
         </div>
         <div className={styles.loading}>Loading people's picks from Reddit...</div>
@@ -77,7 +77,7 @@ export default function TrendingStocks() {
     return (
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Everyone’s talking about</h2>
+          <h2 className={styles.title}>Trending stocks</h2>
           <p className={styles.subtitle}>Trending topics on Reddit over the past 24 hours</p>
         </div>
         <div className={styles.error}>Error: {error}</div>
@@ -88,7 +88,7 @@ export default function TrendingStocks() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2 className={styles.title}>Everyone’s talking about</h2>
+        <h2 className={styles.title}>Trending stocks</h2>
         <p className={styles.subtitle}>Trending topics on Reddit over the past 24 hours</p>
       </div>
       
