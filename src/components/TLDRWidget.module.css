@@ -1,0 +1,119 @@
+.tldrCard {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.8) 0%, rgba(31, 41, 55, 0.8) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.tldrCard:hover {
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1);
+}
+
+.title {
+  color: #f3f4f6;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sourceInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.source {
+  color: #10b981;
+  font-weight: 500;
+}
+
+.timestamp {
+  color: #6b7280;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.contentContainer {
+  position: relative;
+}
+
+.tldrText {
+  color: #e5e7eb;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+  text-align: justify;
+  font-weight: 400;
+}
+
+.scrapedIndicator {
+  position: absolute;
+  top: -0.5rem;
+  right: 0;
+}
+
+.scrapedBadge {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+  padding: 2rem;
+}
+
+.loadingText {
+  font-size: 1rem;
+  color: #9ca3af;
+  margin: 0;
+  text-align: center;
+}
+
+.errorText {
+  font-size: 1rem;
+  color: #ef4444;
+  margin: 0;
+  text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.25rem;
+  }
+  
+  .tldrText {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  
+  .sourceInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .scrapedIndicator {
+    position: static;
+    margin-top: 1rem;
+    text-align: center;
+  }
+}

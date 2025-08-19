@@ -5,128 +5,45 @@ export async function GET() {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
     const results = [];
 
-    // Refresh trending stocks
-    try {
-      const trendingResponse = await fetch(`${baseUrl}/api/trending-stocks`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+    // Refresh all data sources
+    const endpoints = [
+      'trending-stocks',
+      'earnings-calendar', 
+      'ipo-calendar',
+      'economic-calendar',
+      'tldr-scraper' // Added TLDR scraper
+    ];
 
-      if (trendingResponse.ok) {
-        const trendingData = await trendingResponse.json();
-        results.push({
-          endpoint: 'trending-stocks',
-          success: true,
-          count: trendingData.data?.length || 0
+    for (const endpoint of endpoints) {
+      try {
+        const response = await fetch(`${baseUrl}/api/${endpoint}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         });
-      } else {
+
+        if (response.ok) {
+          const data = await response.json();
+          results.push({
+            endpoint: endpoint,
+            success: true,
+            count: data.data?.length || 0
+          });
+        } else {
+          results.push({
+            endpoint: endpoint,
+            success: false,
+            error: `HTTP ${response.status}`
+          });
+        }
+      } catch (error) {
         results.push({
-          endpoint: 'trending-stocks',
+          endpoint: endpoint,
           success: false,
-          error: `HTTP ${trendingResponse.status}`
+          error: error instanceof Error ? error.message : 'Unknown error'
         });
       }
-    } catch (error) {
-      results.push({
-        endpoint: 'trending-stocks',
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
-
-    // Refresh earnings calendar
-    try {
-      const earningsResponse = await fetch(`${baseUrl}/api/earnings-calendar`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (earningsResponse.ok) {
-        const earningsData = await earningsResponse.json();
-        results.push({
-          endpoint: 'earnings-calendar',
-          success: true,
-          count: earningsData.data?.length || 0
-        });
-      } else {
-        results.push({
-          endpoint: 'earnings-calendar',
-          success: false,
-          error: `HTTP ${earningsResponse.status}`
-        });
-      }
-    } catch (error) {
-      results.push({
-        endpoint: 'earnings-calendar',
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
-
-    // Refresh IPO calendar
-    try {
-      const ipoResponse = await fetch(`${baseUrl}/api/ipo-calendar`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (ipoResponse.ok) {
-        const ipoData = await ipoResponse.json();
-        results.push({
-          endpoint: 'ipo-calendar',
-          success: true,
-          count: ipoData.data?.length || 0
-        });
-      } else {
-        results.push({
-          endpoint: 'ipo-calendar',
-          success: false,
-          error: `HTTP ${ipoResponse.status}`
-        });
-      }
-    } catch (error) {
-      results.push({
-        endpoint: 'ipo-calendar',
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
-
-    // Refresh economic calendar
-    try {
-      const economicResponse = await fetch(`${baseUrl}/api/economic-calendar`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (economicResponse.ok) {
-        const economicData = await economicResponse.json();
-        results.push({
-          endpoint: 'economic-calendar',
-          success: true,
-          count: economicData.data?.length || 0
-        });
-      } else {
-        results.push({
-          endpoint: 'economic-calendar',
-          success: false,
-          error: `HTTP ${economicResponse.status}`
-        });
-      }
-    } catch (error) {
-      results.push({
-        endpoint: 'economic-calendar',
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
     }
 
     const successCount = results.filter(r => r.success).length;

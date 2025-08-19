@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import FearGreedCharts from '@/components/charts/FearGreedCharts';
 import TrendingStocks from '@/components/TrendingStocks';
 import HybridCalendar from '@/components/HybridCalendar';
+import TLDRWidget from '@/components/TLDRWidget';
 import { TimeframeProvider } from '@/context/TimeframeContext';
 import styles from './page.module.css';
 
@@ -84,6 +85,7 @@ export default function Home() {
             <FearGreedCharts data={data} />
             <TrendingStocks />
             <HybridCalendar />
+            <TLDRWidget />
           </>
         ) : (
           <div className={styles.noDataCard}>
