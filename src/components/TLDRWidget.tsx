@@ -96,20 +96,20 @@ export default function TLDRWidget() {
         {tldrData?.today ? (
           <div className={styles.todayUpdate}>
             <p className={styles.text}>
-              {tldrData.today.text.split('. ').map((sentence, index) => (
+              {tldrData.today!.text.split('. ').map((sentence, index) => (
                 <span key={index}>
                   {sentence.trim()}
-                  {index < tldrData.today.text.split('. ').length - 1 ? '. ' : ''}
+                  {index < tldrData.today!.text.split('. ').length - 1 ? '. ' : ''}
                 </span>
               ))}
             </p>
             <div className={styles.meta}>
               <span className={styles.date}>
-                {formatDate(tldrData.today.date)}
+                {formatDate(tldrData.today!.date)}
               </span>
-              {tldrData.today.updatedAt && (
+              {tldrData.today!.updatedAt && (
                 <span className={styles.updated}>
-                  Updated: {new Date(tldrData.today.updatedAt).toLocaleTimeString()}
+                  Updated: {new Date(tldrData.today!.updatedAt).toLocaleTimeString()}
                 </span>
               )}
             </div>
