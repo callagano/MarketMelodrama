@@ -83,9 +83,9 @@ export default function Home() {
         {data.length > 0 ? (
           <>
             <FearGreedCharts data={data} />
+            <TLDRWidget />
             <TrendingStocks />
             <HybridCalendar />
-            <TLDRWidget />
           </>
         ) : (
           <div className={styles.noDataCard}>

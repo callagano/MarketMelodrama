@@ -1,119 +1,181 @@
-.tldrCard {
-  background: linear-gradient(135deg, rgba(17, 24, 39, 0.8) 0%, rgba(31, 41, 55, 0.8) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
+.widget {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 20px;
 }
 
-.tldrCard:hover {
-  border-color: rgba(59, 130, 246, 0.5);
-  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1);
-}
-
-.title {
-  color: #f3f4f6;
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0;
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.sourceInfo {
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 0.5rem;
-  font-size: 0.75rem;
-  color: #9ca3af;
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .source {
-  color: #10b981;
+  font-size: 12px;
+  opacity: 0.8;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+.content {
+  padding: 20px;
+}
+
+.loading {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.error {
+  color: #d32f2f;
+  text-align: center;
+  padding: 20px;
+}
+
+.retryButton {
+  background: #d32f2f;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.retryButton:hover {
+  background: #b71c1c;
+}
+
+.todayUpdate {
+  margin-bottom: 20px;
+}
+
+.text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #333;
+  margin: 0 0 16px 0;
+  text-align: left;
+}
+
+.text span {
+  display: block;
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.text span:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #666;
+  border-top: 1px solid #eee;
+  padding-top: 12px;
+}
+
+.date {
   font-weight: 500;
 }
 
-.timestamp {
-  color: #6b7280;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+.updated {
+  opacity: 0.7;
 }
 
-.contentContainer {
-  position: relative;
+.noUpdate {
+  text-align: center;
+  color: #666;
+  padding: 20px;
 }
 
-.tldrText {
-  color: #e5e7eb;
-  font-size: 1rem;
-  line-height: 1.6;
-  margin: 0;
-  text-align: justify;
-  font-weight: 400;
+.hint {
+  font-size: 14px;
+  opacity: 0.7;
+  margin-top: 8px;
 }
 
-.scrapedIndicator {
-  position: absolute;
-  top: -0.5rem;
-  right: 0;
+.recentUpdates {
+  border-top: 1px solid #eee;
+  padding-top: 20px;
 }
 
-.scrapedBadge {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.75rem;
+.recentUpdates h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: #333;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
-.loadingContainer,
-.errorContainer {
+.recentList {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100px;
-  padding: 2rem;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.loadingText {
-  font-size: 1rem;
-  color: #9ca3af;
-  margin: 0;
-  text-align: center;
+.recentItem {
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
 }
 
-.errorText {
-  font-size: 1rem;
-  color: #ef4444;
-  margin: 0;
-  text-align: center;
+.recentText {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555;
 }
 
-/* Responsive adjustments */
+.recentDate {
+  font-size: 12px;
+  color: #888;
+  font-weight: 500;
+}
+
+/* Mobile responsive */
 @media (max-width: 768px) {
-  .title {
-    font-size: 1.25rem;
-  }
-  
-  .tldrText {
-    font-size: 0.875rem;
-    line-height: 1.5;
-  }
-  
-  .sourceInfo {
+  .header {
+    padding: 14px 16px;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
+    gap: 8px;
+    text-align: center;
   }
   
-  .scrapedIndicator {
-    position: static;
-    margin-top: 1rem;
-    text-align: center;
+  .header h3 {
+    font-size: 16px;
+  }
+  
+  .content {
+    padding: 16px;
+  }
+  
+  .text {
+    font-size: 15px;
+  }
+  
+  .meta {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
   }
 }

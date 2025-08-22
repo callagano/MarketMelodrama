@@ -10,8 +10,7 @@ export async function GET() {
       'trending-stocks',
       'earnings-calendar', 
       'ipo-calendar',
-      'economic-calendar',
-      'tldr-scraper' // Added TLDR scraper
+      'economic-calendar'
     ];
 
     for (const endpoint of endpoints) {
