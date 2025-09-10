@@ -136,6 +136,39 @@
   border-radius: 4px;
 }
 
+.sectionList {
+  margin: 16px 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.sectionListItem {
+  margin: 12px 0;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-left: 4px solid #667eea;
+  border-radius: 0 8px 8px 0;
+  position: relative;
+  line-height: 1.6;
+}
+
+.sectionListItem::before {
+  content: '•';
+  color: #667eea;
+  font-weight: bold;
+  position: absolute;
+  left: 8px;
+  top: 12px;
+}
+
+.sectionListItem strong {
+  font-weight: 700;
+  color: #2c3e50;
+  background: linear-gradient(135deg, #667eea20, #764ba220);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
 .meta {
   display: flex;
   justify-content: space-between;

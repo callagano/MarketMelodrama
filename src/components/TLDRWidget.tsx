@@ -70,7 +70,12 @@ export default function TLDRWidget() {
   };
 
   const parseTLDRText = (text: string) => {
-    // Split by double line breaks to get sections
+    // Check if it's HTML content
+    if (text.includes('<div') || text.includes('<h2') || text.includes('<p>')) {
+      return parseHTMLContent(text);
+    }
+    
+    // Original markdown parsing for backward compatibility
     const sections = text.split('\n\n').filter(section => section.trim());
     
     return sections.map((section, index) => {
@@ -104,6 +109,67 @@ export default function TLDRWidget() {
     });
   };
 
+  const parseHTMLContent = (htmlText: string) => {
+    const sections: Array<{type: string, content: string, key: string}> = [];
+    let index = 0;
+    
+    // Split by HTML tags and process each section
+    const htmlSections = htmlText.split(/(<h2[^>]*>.*?<\/h2>|<p[^>]*>.*?<\/p>|<ul[^>]*>.*?<\/ul>|<li[^>]*>.*?<\/li>)/g);
+    
+    htmlSections.forEach((section) => {
+      if (!section.trim()) return;
+      
+      const trimmedSection = section.trim();
+      
+      // Handle h2 titles
+      if (trimmedSection.match(/<h2[^>]*class="section-title"[^>]*>(.*?)<\/h2>/)) {
+        const titleMatch = trimmedSection.match(/<h2[^>]*class="section-title"[^>]*>(.*?)<\/h2>/);
+        if (titleMatch) {
+          sections.push({
+            type: 'title',
+            content: titleMatch[1].trim(),
+            key: `title-${index++}`
+          });
+        }
+      }
+      // Handle paragraphs
+      else if (trimmedSection.match(/<p[^>]*>(.*?)<\/p>/)) {
+        const paragraphMatch = trimmedSection.match(/<p[^>]*>(.*?)<\/p>/);
+        if (paragraphMatch) {
+          sections.push({
+            type: 'paragraph',
+            content: paragraphMatch[1].trim(),
+            key: `paragraph-${index++}`
+          });
+        }
+      }
+      // Handle unordered lists
+      else if (trimmedSection.match(/<ul[^>]*>(.*?)<\/ul>/)) {
+        const listMatch = trimmedSection.match(/<ul[^>]*>(.*?)<\/ul>/);
+        if (listMatch) {
+          sections.push({
+            type: 'list',
+            content: listMatch[1].trim(),
+            key: `list-${index++}`
+          });
+        }
+      }
+      // Handle list items
+      else if (trimmedSection.match(/<li[^>]*>(.*?)<\/li>/)) {
+        const itemMatch = trimmedSection.match(/<li[^>]*>(.*?)<\/li>/);
+        if (itemMatch) {
+          sections.push({
+            type: 'listItem',
+            content: itemMatch[1].trim(),
+            key: `listItem-${index++}`
+          });
+        }
+      }
+    });
+    
+    return sections;
+  };
+
   const renderTLDRContent = (text: string) => {
     const parsedSections = parseTLDRText(text);
     
@@ -124,14 +190,24 @@ export default function TLDRWidget() {
             case 'paragraph':
               return (
                 <p key={section.key} className={styles.sectionParagraph}>
-                  {section.content.split('**').map((part, index) => 
-                    index % 2 === 1 ? (
-                      <strong key={index}>{part}</strong>
-                    ) : (
-                      part
-                    )
-                  )}
+                  {renderInlineHTML(section.content)}
                 </p>
+              );
+            case 'list':
+              return (
+                <ul key={section.key} className={styles.sectionList}>
+                  {section.content.split(/<li[^>]*>(.*?)<\/li>/g).filter(item => item.trim()).map((item, index) => (
+                    <li key={index} className={styles.sectionListItem}>
+                      {renderInlineHTML(item.trim())}
+                    </li>
+                  ))}
+                </ul>
+              );
+            case 'listItem':
+              return (
+                <li key={section.key} className={styles.sectionListItem}>
+                  {renderInlineHTML(section.content)}
+                </li>
               );
             default:
               return null;
@@ -139,6 +215,19 @@ export default function TLDRWidget() {
         })}
       </div>
     );
+  };
+
+  const renderInlineHTML = (content: string) => {
+    // Handle <strong> tags
+    const parts = content.split(/(<strong>.*?<\/strong>)/g);
+    
+    return parts.map((part, index) => {
+      if (part.match(/<strong>(.*?)<\/strong>/)) {
+        const match = part.match(/<strong>(.*?)<\/strong>/);
+        return match ? <strong key={index}>{match[1]}</strong> : part;
+      }
+      return part;
+    });
   };
 
   if (loading) {
