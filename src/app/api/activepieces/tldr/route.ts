@@ -1,15 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Define types for better TypeScript support
+interface TLDRUpdate {
+  text: string;
+  date: string;
+  source: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface TLDRData {
+  updates: TLDRUpdate[];
+}
+
 // Simple in-memory storage for Vercel compatibility
-let tldrData = { updates: [] };
+let tldrData: TLDRData = { updates: [] };
 
 // Read existing data
-function readData() {
+function readData(): TLDRData {
   return tldrData;
 }
 
 // Write data
-function writeData(data: any) {
+function writeData(data: TLDRData) {
   tldrData = data;
 }
 
@@ -59,24 +72,26 @@ export async function POST(request: NextRequest) {
     const today = new Date().toISOString().split('T')[0];
     
     // Check if we already have an update for today
-    const existingIndex = currentData.updates.findIndex((update: any) => update.date === today);
+    const existingIndex = currentData.updates.findIndex((update: TLDRUpdate) => update.date === today);
     
     if (existingIndex !== -1) {
       // Update existing entry
-      currentData.updates[existingIndex] = {
+      const updatedEntry: TLDRUpdate = {
         text: cleanText,
         date: today,
         source: 'activepieces',
         updatedAt: new Date().toISOString()
       };
+      currentData.updates[existingIndex] = updatedEntry;
     } else {
       // Add new entry
-      currentData.updates.push({
+      const newEntry: TLDRUpdate = {
         text: cleanText,
         date: today,
         source: 'activepieces',
         createdAt: new Date().toISOString()
-      });
+      };
+      currentData.updates.push(newEntry);
     }
 
     // Keep only last 30 days of updates
@@ -119,10 +134,10 @@ export async function GET() {
     const today = new Date().toISOString().split('T')[0];
     
     // Return today's update if available
-    const todayUpdate = data.updates.find((update: any) => update.date === today);
+    const todayUpdate = data.updates.find((update: TLDRUpdate) => update.date === today);
     
     // Get recent updates excluding today's update
-    const recentUpdates = data.updates.filter((update: any) => update.date !== today).slice(-7);
+    const recentUpdates = data.updates.filter((update: TLDRUpdate) => update.date !== today).slice(-7);
     
     return NextResponse.json({
       status: 200,
