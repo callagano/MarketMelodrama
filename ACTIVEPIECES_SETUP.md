@@ -4,7 +4,12 @@ This guide explains how to set up an Activepieces workflow to automatically send
 
 ## Overview
 
-Your app now has a webhook endpoint at `/api/tldr-update` that can receive daily text updates from Activepieces. The workflow will send a POST request with the generated text, and it will automatically appear in the TLDR widget on your app.
+Your app now has a dedicated webhook endpoint at `/api/webhook/tldr` that can receive daily text updates from Activepieces. The workflow will send a POST request with the generated text, and it will automatically appear in the TLDR widget on your app.
+
+## Webhook vs API Endpoint
+
+- **Webhook Endpoint**: `/api/webhook/tldr` - More flexible, accepts various field names
+- **API Endpoint**: `/api/tldr-update` - Standard API endpoint
 
 ## Workflow Setup in Activepieces
 
@@ -123,7 +128,7 @@ Your app now has a webhook endpoint at `/api/tldr-update` that can receive daily
 
 ##### HTTP Request Configuration:
 - **Method**: Select **"POST"** from dropdown
-- **URL**: Enter `https://marketmelodrama.vercel.app/api/tldr-update`
+- **URL**: Enter `https://marketmelodrama.vercel.app/api/webhook/tldr`
 - **Headers**: 
   - Click **"Add Header"**
   - Key: `Content-Type`
@@ -133,12 +138,13 @@ Your app now has a webhook endpoint at `/api/tldr-update` that can receive daily
   - Format: JSON object format
 - **Body**:
   - Set **Body Type** to **"JSON"**
-  - Enter this JSON:
+  - Enter this JSON (webhook accepts multiple field names):
   ```json
   {
-    "body": "{{your_generated_text}}"
+    "text": "{{your_generated_text}}"
   }
   ```
+  - Alternative field names that work: `text`, `body`, `content`, `message`, `data`
   - Replace `{{your_generated_text}}` with the actual variable name from Step 3
 
 #### Step 5: Test the Workflow
