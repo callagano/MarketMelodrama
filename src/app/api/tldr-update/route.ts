@@ -113,9 +113,12 @@ export async function GET() {
     // Return today's update if available
     const todayUpdate = data.updates.find((update: any) => update.date === today);
     
+    // Get recent updates excluding today's update
+    const recentUpdates = data.updates.filter((update: any) => update.date !== today).slice(-7);
+    
     return NextResponse.json({
       today: todayUpdate || null,
-      recent: data.updates.slice(-7), // Last 7 days
+      recent: recentUpdates, // Last 7 days excluding today
       total: data.updates.length
     });
   } catch (error) {

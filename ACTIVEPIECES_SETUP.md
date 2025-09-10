@@ -30,6 +30,31 @@ Your app now has a webhook endpoint at `/api/tldr-update` that can receive daily
 - Add an **HTTP Request** action
 - Configure it as follows:
 
+#### Step-by-Step Configuration:
+
+1. **Basic Settings**:
+   - Set Method to `POST`
+   - Enter URL: `https://your-app.vercel.app/api/tldr-update`
+
+2. **Add Headers**:
+   - Click "Add Header"
+   - Key: `Content-Type`
+   - Value: `application/json`
+
+3. **Add Query Parameters** (mandatory field):
+   - In the "Query params" text field, enter as JSON:
+   
+   {
+    
+     "source": "activepieces"
+   }
+   
+   
+
+4. **Configure Body**:
+   - Set Body Type to `JSON`
+   - Enter the JSON payload (see below)
+
 #### HTTP Request Configuration:
 - **Method**: `POST`
 - **URL**: `https://your-app.vercel.app/api/tldr-update`
@@ -37,14 +62,25 @@ Your app now has a webhook endpoint at `/api/tldr-update` that can receive daily
   - For local testing: `http://localhost:3000/api/tldr-update`
 - **Headers**: 
   - `Content-Type: application/json`
+- **Query Parameters** (in ActivePieces interface):
+  - Add a new query parameter with key: `date` and value: `{{current_date}}` (optional)
+  - Add a new query parameter with key: `source` and value: `activepieces` (optional)
 - **Body** (JSON):
 ```json
 {
-  "text": "{{your_generated_text}}",
-  "date": "{{current_date}}",
-  "source": "activepieces"
+  "body": "{{your_generated_text}}"
 }
 ```
+
+**Important**: Make sure the variable `{{your_generated_text}}` is properly quoted with double quotes in the JSON.
+
+
+**Important**: 
+- Do NOT include empty fields like `"date": ""`
+- Do NOT include trailing commas
+- Only include the `body` field in the JSON payload
+
+**Note**: In ActivePieces, query parameters should be added using the "Add Query Parameter" button in the HTTP Request action, not as JSON in the body.
 
 ### 5. Test the Workflow
 - Use the "Test" button in Activepieces
@@ -56,10 +92,14 @@ Your app now has a webhook endpoint at `/api/tldr-update` that can receive daily
 ### POST `/api/tldr-update`
 **Purpose**: Receive daily TLDR updates
 
+**Query Parameters** (optional):
+- `date`: Override the date for the update (format: YYYY-MM-DD)
+- `source`: Override the source identifier (default: "activepieces")
+
 **Request Body**:
 ```json
 {
-  "text": "Your market analysis text here...",
+  "body": "Your market analysis text here...",
   "date": "2024-12-19",  // Optional, defaults to today
   "source": "activepieces"  // Optional, defaults to "activepieces"
 }
@@ -113,14 +153,45 @@ Your app now has a webhook endpoint at `/api/tldr-update` that can receive daily
    - Check browser console for errors
 
 3. **API errors**:
-   - Ensure the text field is not empty
+   - Ensure the body field is not empty
    - Check the request format matches the expected schema
+   - Verify query parameters are properly formatted if used
+
+4. **"Expected JSON" or "Expected object" errors**:
+   - **Query params**: Must be in JSON format, not URL format
+     - ❌ Wrong: `source=activepieces`
+     - ✅ Correct: `{"source": "activepieces"}`
+   - **Body**: Must use "body" field, not "text"
+     - ❌ Wrong: `{"text": "your text"}`
+     - ✅ Correct: `{"body": "your text"}`
+   - **JSON formatting**: No trailing commas, no empty fields
+     - ❌ Wrong: `{"body": "text", "date": "",}`
+     - ✅ Correct: `{"body": "text"}`
+
+5. **"Text is required" or empty body errors**:
+   - **Variable not populated**: Check that `{{your_generated_text}}` is properly set up
+   - **Test with static text first**: Use `"body": "Test message"` to verify the connection
+   - **Check variable name**: Make sure the variable name matches exactly what you set up in previous steps
+   - **Verify text generation step**: Ensure the text generation action is working and outputting text
+
+6. **"Expected JSON" errors with text content**:
+   - **JSON formatting issue**: The text is not properly quoted in JSON
+   - **Wrong format**: ❌ `"body": Good morning! Global stock markets...`
+   - **Correct format**: ✅ `"body": "Good morning! Global stock markets..."`
+   - **Solution**: Make sure the variable is wrapped in double quotes: `"{{your_generated_text}}"`
 
 ### Testing Locally:
 ```bash
 curl -X POST http://localhost:3000/api/tldr-update \
   -H "Content-Type: application/json" \
-  -d '{"text": "Test market update", "date": "2024-12-19"}'
+  -d '{"body": "Test market update", "date": "2024-12-19"}'
+```
+
+### Testing with Query Parameters:
+```bash
+curl -X POST "http://localhost:3000/api/tldr-update?date=2024-12-19&source=test" \
+  -H "Content-Type: application/json" \
+  -d '{"body": "Test market update with query params"}'
 ```
 
 ## Next Steps
