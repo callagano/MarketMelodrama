@@ -234,7 +234,7 @@ export default function TLDRWidget() {
     return (
       <div className={styles.widget}>
         <div className={styles.header}>
-          <h3>Today's Market TLDR</h3>
+          <h3>Today's happening</h3>
         </div>
         <div className={styles.content}>
           <div className={styles.loading}>Loading...</div>
@@ -247,7 +247,7 @@ export default function TLDRWidget() {
     return (
       <div className={styles.widget}>
         <div className={styles.header}>
-          <h3>Today's Market TLDR</h3>
+          <h3>Today's happening</h3>
         </div>
         <div className={styles.content}>
           <div className={styles.error}>
@@ -264,8 +264,7 @@ export default function TLDRWidget() {
   return (
     <div className={styles.widget}>
       <div className={styles.header}>
-        <h3>Today's Market TLDR</h3>
-        <span className={styles.source}>via Activepieces</span>
+        <h3>Today's happening</h3>
       </div>
       
       <div className={styles.content}>
