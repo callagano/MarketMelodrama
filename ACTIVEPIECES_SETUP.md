@@ -4,10 +4,11 @@ This guide explains how to set up an Activepieces workflow to automatically send
 
 ## Overview
 
-Your app now has a dedicated webhook endpoint at `/api/webhook/tldr` that can receive daily text updates from Activepieces. The workflow will send a POST request with the generated text, and it will automatically appear in the TLDR widget on your app.
+Your app now has a dedicated ActivePieces endpoint at `/api/activepieces/tldr` that can receive daily text updates from Activepieces. The workflow will send a POST request with the generated text, and it will automatically appear in the TLDR widget on your app.
 
-## Webhook vs API Endpoint
+## Available Endpoints
 
+- **ActivePieces Endpoint**: `/api/activepieces/tldr` - Designed for ActivePieces Return Response action
 - **Webhook Endpoint**: `/api/webhook/tldr` - More flexible, accepts various field names
 - **API Endpoint**: `/api/tldr-update` - Standard API endpoint
 
@@ -120,15 +121,17 @@ Your app now has a dedicated webhook endpoint at `/api/webhook/tldr` that can re
    - For Manual: Enter your text template
 4. **Note the output variable name** (e.g., `{{text}}`, `{{content}}`, `{{output}}`)
 
-#### Step 4: Add HTTP Request Action
+#### Step 4: Add HTTP Request Action (or Return Response)
 1. Click **"Add action"** again
-2. Search for **"HTTP Request"**
-3. Select **"HTTP Request"** action
+2. Search for **"HTTP Request"** OR **"Return Response"**
+3. Select the appropriate action
 4. Configure as follows:
+
+##### Option A: HTTP Request Action
 
 ##### HTTP Request Configuration:
 - **Method**: Select **"POST"** from dropdown
-- **URL**: Enter `https://marketmelodrama.vercel.app/api/webhook/tldr`
+- **URL**: Enter `https://marketmelodrama.vercel.app/api/activepieces/tldr`
 - **Headers**: 
   - Click **"Add Header"**
   - Key: `Content-Type`
@@ -146,6 +149,20 @@ Your app now has a dedicated webhook endpoint at `/api/webhook/tldr` that can re
   ```
   - Alternative field names that work: `text`, `body`, `content`, `message`, `data`
   - Replace `{{your_generated_text}}` with the actual variable name from Step 3
+
+##### Option B: Return Response Action (Your Current Setup)
+- **Response Type**: JSON
+- **Status**: 200
+- **Headers**: 
+  - Key: `Content-Type`
+  - Value: `application/json`
+- **JSON Body**:
+  ```json
+  {
+    "text": "{{your_generated_text}}"
+  }
+  ```
+- **URL to use**: `https://marketmelodrama.vercel.app/api/activepieces/tldr`
 
 #### Step 5: Test the Workflow
 1. Click **"Test"** button in ActivePieces
