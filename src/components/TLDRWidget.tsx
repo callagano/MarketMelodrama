@@ -69,6 +69,78 @@ export default function TLDRWidget() {
     });
   };
 
+  const parseTLDRText = (text: string) => {
+    // Split by double line breaks to get sections
+    const sections = text.split('\n\n').filter(section => section.trim());
+    
+    return sections.map((section, index) => {
+      const trimmedSection = section.trim();
+      
+      // Check if it's a title (starts with ###)
+      if (trimmedSection.startsWith('###')) {
+        const title = trimmedSection.replace(/^###\s*\*\*(.*?)\*\*/, '$1');
+        return {
+          type: 'title',
+          content: title,
+          key: `title-${index}`
+        };
+      }
+      
+      // Check if it's a separator (---)
+      if (trimmedSection === '---') {
+        return {
+          type: 'separator',
+          content: '',
+          key: `separator-${index}`
+        };
+      }
+      
+      // Regular paragraph
+      return {
+        type: 'paragraph',
+        content: trimmedSection,
+        key: `paragraph-${index}`
+      };
+    });
+  };
+
+  const renderTLDRContent = (text: string) => {
+    const parsedSections = parseTLDRText(text);
+    
+    return (
+      <div className={styles.parsedContent}>
+        {parsedSections.map((section) => {
+          switch (section.type) {
+            case 'title':
+              return (
+                <h4 key={section.key} className={styles.sectionTitle}>
+                  {section.content}
+                </h4>
+              );
+            case 'separator':
+              return (
+                <hr key={section.key} className={styles.sectionSeparator} />
+              );
+            case 'paragraph':
+              return (
+                <p key={section.key} className={styles.sectionParagraph}>
+                  {section.content.split('**').map((part, index) => 
+                    index % 2 === 1 ? (
+                      <strong key={index}>{part}</strong>
+                    ) : (
+                      part
+                    )
+                  )}
+                </p>
+              );
+            default:
+              return null;
+          }
+        })}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className={styles.widget}>
@@ -110,21 +182,14 @@ export default function TLDRWidget() {
       <div className={styles.content}>
         {tldrData?.today ? (
           <div className={styles.todayUpdate}>
-            <p className={styles.text}>
-              {tldrData.today!.text.split('. ').map((sentence, index) => (
-                <span key={index}>
-                  {sentence.trim()}
-                  {index < tldrData.today!.text.split('. ').length - 1 ? '. ' : ''}
-                </span>
-              ))}
-            </p>
+            {renderTLDRContent(tldrData.today.text)}
             <div className={styles.meta}>
               <span className={styles.date}>
-                {formatDate(tldrData.today!.date)}
+                {formatDate(tldrData.today.date)}
               </span>
-              {tldrData.today!.updatedAt && (
+              {tldrData.today.updatedAt && (
                 <span className={styles.updated}>
-                  Updated: {new Date(tldrData.today!.updatedAt).toLocaleTimeString()}
+                  Updated: {new Date(tldrData.today.updatedAt).toLocaleTimeString()}
                 </span>
               )}
             </div>
