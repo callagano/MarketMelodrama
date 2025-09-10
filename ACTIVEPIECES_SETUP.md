@@ -26,8 +26,13 @@ Your app now has a webhook endpoint at `/api/tldr-update` that can receive daily
   - **Database Query** from your market analysis
   - **Manual Input** (if you prefer to write it yourself)
 
-### 4. Add HTTP Request Action
-- Add an **HTTP Request** action
+### 4. Add HTTP Action
+- Look for one of these actions in ActivePieces:
+  - **"HTTP Request"** (most common)
+  - **"Webhook"** 
+  - **"Custom API Call"**
+  - **"REST API"**
+- This sends data to your app
 - Configure it as follows:
 
 #### Step-by-Step Configuration:
@@ -55,24 +60,26 @@ Your app now has a webhook endpoint at `/api/tldr-update` that can receive daily
    - Set Body Type to `JSON`
    - Enter the JSON payload (see below)
 
-#### HTTP Request Configuration:
+#### Webhook Configuration:
+- **Action Type**: Webhook or HTTP POST
+- **URL**: `https://marketmelodrama.vercel.app/api/tldr-update`
 - **Method**: `POST`
-- **URL**: `https://your-app.vercel.app/api/tldr-update`
-  - Replace `your-app.vercel.app` with your actual Vercel domain
-  - For local testing: `http://localhost:3000/api/tldr-update`
 - **Headers**: 
   - `Content-Type: application/json`
-- **Query Parameters** (in ActivePieces interface):
-  - Add a new query parameter with key: `date` and value: `{{current_date}}` (optional)
-  - Add a new query parameter with key: `source` and value: `activepieces` (optional)
-- **Body** (JSON):
+- **Query Parameters** (mandatory text field):
+  - Enter: `{"source": "activepieces"}`
+  - Format: JSON object format
+- **Payload/Body** (JSON):
 ```json
 {
   "body": "{{your_generated_text}}"
 }
 ```
 
-**Important**: Make sure the variable `{{your_generated_text}}` is properly quoted with double quotes in the JSON.
+**Important**: 
+- Use **Webhook** or **HTTP POST** action, not HTTP Request
+- Make sure the variable `{{your_generated_text}}` is properly quoted
+- This sends data TO your app, not requests data FROM your app
 
 
 **Important**: 
@@ -82,7 +89,69 @@ Your app now has a webhook endpoint at `/api/tldr-update` that can receive daily
 
 **Note**: In ActivePieces, query parameters should be added using the "Add Query Parameter" button in the HTTP Request action, not as JSON in the body.
 
-### 5. Test the Workflow
+### 5. Detailed Webhook Setup Guide
+
+#### Step 1: Create New Workflow
+1. Open ActivePieces dashboard
+2. Click **"Create new workflow"**
+3. Name it **"Daily Market TLDR Update"**
+
+#### Step 2: Add Schedule Trigger
+1. Click **"Add trigger"**
+2. Search for **"Schedule"** or **"Cron"**
+3. Select **"Schedule trigger"**
+4. Set to **"Daily at 7:00 AM"** (or your preferred time)
+5. Click **"Save"**
+
+#### Step 3: Add Text Generation Step
+1. Click **"Add action"**
+2. Search for one of these:
+   - **"OpenAI"** (for AI text generation)
+   - **"Web Scraping"** (for news scraping)
+   - **"Manual Input"** (if you want to write manually)
+3. Configure the text generation:
+   - For OpenAI: Set prompt to generate market analysis
+   - For Web Scraping: Set URL to financial news site
+   - For Manual: Enter your text template
+4. **Note the output variable name** (e.g., `{{text}}`, `{{content}}`, `{{output}}`)
+
+#### Step 4: Add HTTP Request Action
+1. Click **"Add action"** again
+2. Search for **"HTTP Request"**
+3. Select **"HTTP Request"** action
+4. Configure as follows:
+
+##### HTTP Request Configuration:
+- **Method**: Select **"POST"** from dropdown
+- **URL**: Enter `https://marketmelodrama.vercel.app/api/tldr-update`
+- **Headers**: 
+  - Click **"Add Header"**
+  - Key: `Content-Type`
+  - Value: `application/json`
+- **Query Parameters** (mandatory text field):
+  - Enter: `{"source": "activepieces"}`
+  - Format: JSON object format
+- **Body**:
+  - Set **Body Type** to **"JSON"**
+  - Enter this JSON:
+  ```json
+  {
+    "body": "{{your_generated_text}}"
+  }
+  ```
+  - Replace `{{your_generated_text}}` with the actual variable name from Step 3
+
+#### Step 5: Test the Workflow
+1. Click **"Test"** button in ActivePieces
+2. Check the response - should show success
+3. Visit your app at https://marketmelodrama.vercel.app
+4. Look for the TLDR widget with your test message
+
+#### Step 6: Activate the Workflow
+1. Once testing works, click **"Activate"** or **"Publish"**
+2. The workflow will now run automatically on schedule
+
+### 6. Test the Workflow
 - Use the "Test" button in Activepieces
 - Check your app to see if the TLDR appears
 - Verify the data is stored in the `data/tldr-updates.json` file
@@ -179,6 +248,14 @@ Your app now has a webhook endpoint at `/api/tldr-update` that can receive daily
    - **Wrong format**: ❌ `"body": Good morning! Global stock markets...`
    - **Correct format**: ✅ `"body": "Good morning! Global stock markets..."`
    - **Solution**: Make sure the variable is wrapped in double quotes: `"{{your_generated_text}}"`
+
+7. **Webhook/HTTP Request specific issues**:
+   - **Variable not found**: Make sure the variable name matches exactly from the previous step
+   - **Body Type wrong**: Set Body Type to "JSON", not "Raw" or "Text"
+   - **URL incorrect**: Use `https://marketmelodrama.vercel.app/api/tldr-update`
+   - **Method wrong**: Must be "POST", not "GET"
+   - **Headers missing**: Add `Content-Type: application/json` header
+   - **Query Parameters format**: Use `{"source": "activepieces"}` (JSON object format)
 
 ### Testing Locally:
 ```bash

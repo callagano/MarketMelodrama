@@ -38,9 +38,12 @@ function writeData(data: any) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { body, date, source = 'activepieces' } = await request.json();
+    const { body, text, date, source = 'activepieces' } = await request.json();
     
-    if (!body) {
+    // Accept both 'body' and 'text' fields for compatibility
+    const content = body || text;
+    
+    if (!content) {
       return NextResponse.json(
         { error: 'Body is required' }, 
         { status: 400 }
@@ -48,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Clean up the text by removing markdown formatting
-    const cleanText = body
+    const cleanText = content
       .replace(/\*\*(.*?)\*\*/g, '$1') // Remove **bold**
       .replace(/\*(.*?)\*/g, '$1')     // Remove *italic*
       .replace(/📈|💹|🛢️|🚗|🌍/g, '') // Remove emojis
