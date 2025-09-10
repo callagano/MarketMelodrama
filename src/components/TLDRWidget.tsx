@@ -29,14 +29,29 @@ export default function TLDRWidget() {
   const fetchTLDRData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/tldr-update');
+      // Try ActivePieces endpoint first, then fallback to main API
+      let response = await fetch('/api/activepieces/tldr');
+      
+      if (!response.ok) {
+        // Fallback to main API if ActivePieces endpoint fails
+        response = await fetch('/api/tldr-update');
+      }
       
       if (!response.ok) {
         throw new Error('Failed to fetch TLDR data');
       }
       
       const data = await response.json();
-      setTldrData(data);
+      
+      // Handle different response formats
+      if (data.body) {
+        // ActivePieces format
+        setTldrData(data.body);
+      } else {
+        // Standard API format
+        setTldrData(data);
+      }
+      
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
