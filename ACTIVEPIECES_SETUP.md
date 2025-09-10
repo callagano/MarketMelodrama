@@ -72,9 +72,10 @@ Your app now has a dedicated ActivePieces endpoint at `/api/activepieces/tldr` t
 - **Method**: `POST`
 - **Headers**: 
   - `Content-Type: application/json`
-- **Query Parameters** (mandatory text field):
-  - Enter: `{"source": "activepieces"}`
-  - Format: JSON object format
+- **Query Parameters** (two separate text fields):
+  - **Key field**: `source`
+  - **Value field**: `activepieces`
+  - Format: Separate key and value fields
 - **Payload/Body** (JSON):
 ```json
 {
@@ -136,9 +137,10 @@ Your app now has a dedicated ActivePieces endpoint at `/api/activepieces/tldr` t
   - Click **"Add Header"**
   - Key: `Content-Type`
   - Value: `application/json`
-- **Query Parameters** (mandatory text field):
-  - Enter: `{"source": "activepieces"}`
-  - Format: JSON object format
+- **Query Parameters** (two separate text fields):
+  - **Key field**: `source`
+  - **Value field**: `activepieces`
+  - Format: Separate key and value fields
 - **Body**:
   - Set **Body Type** to **"JSON"**
   - Enter this JSON (webhook accepts multiple field names):
@@ -278,7 +280,7 @@ Your app now has a dedicated ActivePieces endpoint at `/api/activepieces/tldr` t
    - **URL incorrect**: Use `https://marketmelodrama.vercel.app/api/tldr-update`
    - **Method wrong**: Must be "POST", not "GET"
    - **Headers missing**: Add `Content-Type: application/json` header
-   - **Query Parameters format**: Use `{"source": "activepieces"}` (JSON object format)
+   - **Query Parameters format**: Use separate key and value fields (not JSON format)
 
 ### Testing Locally:
 ```bash

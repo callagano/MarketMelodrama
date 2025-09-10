@@ -40,15 +40,30 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    // Extract text from the ActivePieces response format
-    const text = body.text || body.body || body.content || body.message || body.data;
+    // Debug: Log the request structure
+    console.log('ActivePieces request body:', JSON.stringify(body, null, 2));
+    
+    // Extract text from various possible locations in ActivePieces request
+    const text = body.text || 
+                 body.body || 
+                 body.content || 
+                 body.message || 
+                 body.data ||
+                 (body.body && body.body.text) ||
+                 (body.response && body.response.text) ||
+                 (body.data && body.data.text);
     
     if (!text) {
+      console.log('No text found in request. Available keys:', Object.keys(body));
       return NextResponse.json(
         { 
           status: 400,
           headers: { "Content-Type": "application/json" },
-          body: { error: "Text content is required" }
+          body: { 
+            error: "Text content is required",
+            receivedKeys: Object.keys(body),
+            requestBody: body
+          }
         }, 
         { status: 400 }
       );
