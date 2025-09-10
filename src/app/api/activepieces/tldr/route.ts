@@ -1,39 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 
-const DATA_FILE = path.join(process.cwd(), 'data', 'tldr-updates.json');
-
-// Ensure data directory exists
-function ensureDataDirectory() {
-  const dataDir = path.dirname(DATA_FILE);
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-}
+// Simple in-memory storage for Vercel compatibility
+let tldrData = { updates: [] };
 
 // Read existing data
 function readData() {
-  try {
-    if (fs.existsSync(DATA_FILE)) {
-      const data = fs.readFileSync(DATA_FILE, 'utf-8');
-      return JSON.parse(data);
-    }
-  } catch (error) {
-    console.error('Error reading data file:', error);
-  }
-  return { updates: [] };
+  return tldrData;
 }
 
-// Write data to file
+// Write data
 function writeData(data: any) {
-  try {
-    ensureDataDirectory();
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-  } catch (error) {
-    console.error('Error writing data file:', error);
-    throw error;
-  }
+  tldrData = data;
 }
 
 export async function POST(request: NextRequest) {
