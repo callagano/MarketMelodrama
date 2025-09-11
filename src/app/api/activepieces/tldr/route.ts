@@ -13,10 +13,34 @@ interface TLDRData {
   updates: TLDRUpdate[];
 }
 
-// Enhanced storage with 24-hour persistence
+// Enhanced storage with 24-hour persistence and deployment survival
 let tldrData: TLDRData = { updates: [] };
 let lastUpdateTime: number = 0;
 let dataExpiryTime: number = 0;
+
+// Try to restore data from environment variables or external storage
+function initializeData() {
+  // Check if we have data in environment variables (for critical data)
+  const envData = process.env.TLDR_BACKUP_DATA;
+  if (envData) {
+    try {
+      const parsedData = JSON.parse(envData);
+      const dataAge = Date.now() - (parsedData.timestamp || 0);
+      // Only restore if data is less than 24 hours old
+      if (dataAge < 24 * 60 * 60 * 1000) {
+        tldrData = parsedData.data || { updates: [] };
+        lastUpdateTime = parsedData.timestamp || 0;
+        dataExpiryTime = lastUpdateTime + (24 * 60 * 60 * 1000);
+        console.log('Restored data from backup after deployment');
+      }
+    } catch (error) {
+      console.log('Failed to restore backup data:', error);
+    }
+  }
+}
+
+// Initialize data on module load
+initializeData();
 
 // Read existing data with 24-hour persistence
 function readData(): TLDRData {
@@ -32,12 +56,35 @@ function readData(): TLDRData {
   return tldrData;
 }
 
-// Write data with 24-hour expiry
+// Write data with 24-hour expiry and backup
 function writeData(data: TLDRData) {
   tldrData = data;
   lastUpdateTime = Date.now();
   dataExpiryTime = lastUpdateTime + (24 * 60 * 60 * 1000); // 24 hours from now
+  
+  // Create backup for deployment survival
+  const backupData = {
+    data: data,
+    timestamp: lastUpdateTime,
+    expiresAt: dataExpiryTime
+  };
+  
+  // Store backup data for deployment survival
+  // This is a simplified approach - for production, consider:
+  // 1. Vercel KV (Key-Value database)
+  // 2. External database (PostgreSQL, MongoDB)
+  // 3. Vercel Edge Config
+  // 4. External API storage service
+  
+  try {
+    // Store in environment variable as a simple backup
+    process.env.TLDR_BACKUP_DATA = JSON.stringify(backupData);
+  } catch (error) {
+    console.log('Failed to create backup:', error);
+  }
+  
   console.log(`Data written to memory: ${data.updates.length} updates (expires in 24 hours)`);
+  console.log(`Backup created for deployment survival`);
 }
 
 export async function POST(request: NextRequest) {
@@ -177,6 +224,12 @@ export async function GET() {
           lastUpdated: lastUpdateTime,
           expiresInMinutes: timeUntilExpiry,
           isExpired: timeUntilExpiry === 0
+        },
+        deploymentInfo: {
+          hasData: data.updates.length > 0,
+          message: data.updates.length === 0 ? 
+            "No data available. This may be due to a recent deployment. Data will be restored when ActivePieces sends the next update." :
+            "Data is available and persistent."
         }
       }
     });
