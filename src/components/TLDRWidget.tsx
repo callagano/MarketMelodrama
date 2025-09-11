@@ -17,8 +17,27 @@ interface TLDRData {
   total: number;
 }
 
+interface Highlight {
+  word: string;
+  direction: 'up' | 'down';
+}
+
+interface TLDRItem {
+  text: string;
+  highlights: Highlight[];
+}
+
+interface ActivePiecesData {
+  title: string;
+  sentiment: number;
+  tldr: TLDRItem[];
+  insights: TLDRItem[];
+  big_picture: TLDRItem[];
+}
+
 export default function TLDRWidget() {
   const [tldrData, setTldrData] = useState<TLDRData | null>(null);
+  const [activePiecesData, setActivePiecesData] = useState<ActivePiecesData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,12 +64,28 @@ export default function TLDRWidget() {
       
       // Handle different response formats
       if (data.body) {
-        // ActivePieces format
+        // Check if we have the new ActivePieces JSON format
+        if (data.body.today && typeof data.body.today.text === 'string') {
+          try {
+            const parsedData = JSON.parse(data.body.today.text);
+            if (parsedData.title && parsedData.tldr && parsedData.insights && parsedData.big_picture) {
+              setActivePiecesData(parsedData);
+              setTldrData(null);
+              setError(null);
+              return;
+            }
+          } catch (parseError) {
+            // If parsing fails, fall back to old format
+            console.log('Not ActivePieces JSON format, using old format');
+          }
+        }
+        // ActivePieces format (old)
         setTldrData(data.body);
       } else {
         // Standard API format
         setTldrData(data);
       }
+      setActivePiecesData(null);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -66,6 +101,25 @@ export default function TLDRWidget() {
       day: 'numeric',
       year: 'numeric'
     });
+  };
+
+  const renderHighlightedText = (item: TLDRItem) => {
+    let text = item.text;
+    
+    // Sort highlights by position in text (from end to start to avoid index shifting)
+    const sortedHighlights = [...item.highlights].sort((a, b) => {
+      const aIndex = text.lastIndexOf(a.word);
+      const bIndex = text.lastIndexOf(b.word);
+      return bIndex - aIndex;
+    });
+    
+    sortedHighlights.forEach(highlight => {
+      const regex = new RegExp(`\\b${highlight.word}\\b`, 'gi');
+      const replacement = `<span class="${styles.highlight} ${styles[highlight.direction]}">${highlight.word}</span>`;
+      text = text.replace(regex, replacement);
+    });
+    
+    return <span dangerouslySetInnerHTML={{ __html: text }} />;
   };
 
   const parseTLDRText = (text: string) => {
@@ -233,7 +287,7 @@ export default function TLDRWidget() {
     return (
       <div className={styles.widget}>
         <div className={styles.header}>
-          <h3>Today's happening</h3>
+          <h3>Today's</h3>
         </div>
         <div className={styles.content}>
           <div className={styles.loading}>Loading...</div>
@@ -246,7 +300,7 @@ export default function TLDRWidget() {
     return (
       <div className={styles.widget}>
         <div className={styles.header}>
-          <h3>Today's happening</h3>
+          <h3>Today's</h3>
         </div>
         <div className={styles.content}>
           <div className={styles.error}>
@@ -260,6 +314,64 @@ export default function TLDRWidget() {
     );
   }
 
+  // Render ActivePieces data format
+  if (activePiecesData) {
+    return (
+      <div className={styles.widget}>
+        <div className={styles.header}>
+          <h3>Today's happening</h3>
+        </div>
+        
+        <div className={styles.content}>
+          {/* Title Section */}
+          <div className={styles.titleSection}>
+            <h2 className={styles.titleText}>{activePiecesData.title}</h2>
+            <div className={styles.sentimentBadge}>
+              Sentiment: {activePiecesData.sentiment}
+            </div>
+          </div>
+
+          {/* TLDR Section */}
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>TLDR</h3>
+            <div className={styles.sectionContent}>
+              {activePiecesData.tldr.map((item, index) => (
+                <div key={index} className={styles.sectionItem}>
+                  {renderHighlightedText(item)}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Insights Section */}
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Insights</h3>
+            <div className={styles.sectionContent}>
+              {activePiecesData.insights.map((item, index) => (
+                <div key={index} className={styles.sectionItem}>
+                  {renderHighlightedText(item)}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Big Picture Section */}
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Big Picture</h3>
+            <div className={styles.sectionContent}>
+              {activePiecesData.big_picture.map((item, index) => (
+                <div key={index} className={styles.sectionItem}>
+                  {renderHighlightedText(item)}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render old format
   return (
     <div className={styles.widget}>
       <div className={styles.header}>
