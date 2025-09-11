@@ -42,25 +42,17 @@ function initializeData() {
 // Initialize data on module load
 initializeData();
 
-// Read existing data with 24-hour persistence
+// Read existing data (always returns current data, no expiry check)
 function readData(): TLDRData {
-  const now = Date.now();
-  
-  // Check if data has expired (24 hours)
-  if (now > dataExpiryTime) {
-    console.log('Data expired after 24 hours, returning empty data');
-    return { updates: [] };
-  }
-  
-  console.log(`Reading data: ${tldrData.updates.length} updates in memory (expires in ${Math.round((dataExpiryTime - now) / 1000 / 60)} minutes)`);
+  console.log(`Reading data: ${tldrData.updates.length} updates in memory`);
   return tldrData;
 }
 
-// Write data with 24-hour expiry and backup
+// Write data with backup (no expiry - always overridden by new ActivePieces data)
 function writeData(data: TLDRData) {
   tldrData = data;
   lastUpdateTime = Date.now();
-  dataExpiryTime = lastUpdateTime + (24 * 60 * 60 * 1000); // 24 hours from now
+  dataExpiryTime = lastUpdateTime + (24 * 60 * 60 * 1000); // Keep for reference but not used for expiry
   
   // Create backup for deployment survival
   const backupData = {
@@ -83,7 +75,7 @@ function writeData(data: TLDRData) {
     console.log('Failed to create backup:', error);
   }
   
-  console.log(`Data written to memory: ${data.updates.length} updates (expires in 24 hours)`);
+  console.log(`Data written to memory: ${data.updates.length} updates (always overridden by new ActivePieces data)`);
   console.log(`Backup created for deployment survival`);
 }
 
@@ -132,11 +124,11 @@ export async function POST(request: NextRequest) {
     const currentData = readData();
     const today = new Date().toISOString().split('T')[0];
     
-    // Check if we already have an update for today
+    // Always override data when new data comes from ActivePieces
     const existingIndex = currentData.updates.findIndex((update: TLDRUpdate) => update.date === today);
     
     if (existingIndex !== -1) {
-      // Update existing entry
+      // Override existing entry (regardless of age or expiry)
       const updatedEntry: TLDRUpdate = {
         text: cleanText,
         date: today,
@@ -144,6 +136,7 @@ export async function POST(request: NextRequest) {
         updatedAt: new Date().toISOString()
       };
       currentData.updates[existingIndex] = updatedEntry;
+      console.log(`Overriding existing TLDR for ${today} with new ActivePieces data`);
     } else {
       // Add new entry
       const newEntry: TLDRUpdate = {
@@ -153,14 +146,15 @@ export async function POST(request: NextRequest) {
         createdAt: new Date().toISOString()
       };
       currentData.updates.push(newEntry);
+      console.log(`Added new TLDR for ${today} from ActivePieces`);
     }
 
-    // Enhanced data retention: keep today's data for 24 hours, others for 7 days
+    // Data retention: keep today's data (always overridden by new ActivePieces data), others for 7 days
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     const cutoffDate = sevenDaysAgo.toISOString().split('T')[0];
     
-    // Filter out old updates but always keep today's update
+    // Filter out old updates but always keep today's update (which gets overridden by new data)
     currentData.updates = currentData.updates.filter((update: TLDRUpdate) => 
       update.date >= cutoffDate || update.date === today
     );
@@ -223,13 +217,14 @@ export async function GET() {
         persistence: {
           lastUpdated: lastUpdateTime,
           expiresInMinutes: timeUntilExpiry,
-          isExpired: timeUntilExpiry === 0
+          isExpired: false, // Data never expires - always overridden by new ActivePieces data
+          behavior: "Always overridden by new ActivePieces data"
         },
         deploymentInfo: {
           hasData: data.updates.length > 0,
           message: data.updates.length === 0 ? 
             "No data available. This may be due to a recent deployment. Data will be restored when ActivePieces sends the next update." :
-            "Data is available and persistent."
+            "Data is available and will be overridden when new data arrives from ActivePieces."
         }
       }
     });
