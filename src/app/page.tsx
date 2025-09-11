@@ -36,6 +36,7 @@ export default function Home() {
         }
         
         const jsonData = await response.json();
+        console.log('FearGreedCharts data received:', jsonData.length, 'items');
         setData(jsonData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
@@ -80,10 +81,11 @@ export default function Home() {
           </div>
         </div>
         
+        <TLDRWidget />
+        
         {data.length > 0 ? (
           <>
             <FearGreedCharts data={data} />
-            <TLDRWidget />
             <TrendingStocks />
             <HybridCalendar />
           </>
