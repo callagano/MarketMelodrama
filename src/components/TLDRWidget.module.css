@@ -34,63 +34,6 @@
   border-radius: 1rem;
 }
 
-/* Development Controls */
-.devControls {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-  margin-top: 0.75rem;
-  flex-wrap: wrap;
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  opacity: 0.7;
-  transition: opacity 0.3s ease;
-}
-
-.devControls:hover {
-  opacity: 1;
-}
-
-.toggleButton {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.toggleButton:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
-}
-
-.mockControls {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.scenarioButton {
-  background: rgba(255, 255, 255, 0.1);
-  color: #e0e0e0;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 0.375rem 0.75rem;
-  border-radius: 0.375rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.scenarioButton:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
-}
 
 .source {
   font-size: 12px;
@@ -609,23 +552,6 @@
     gap: 1rem;
   }
   
-  .devControls {
-    position: static;
-    opacity: 1;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-    width: 100%;
-  }
-  
-  .mockControls {
-    width: 100%;
-  }
-  
-  .scenarioButton {
-    width: 100%;
-    text-align: center;
-  }
   
   .mainContentBox {
     flex-direction: column;
