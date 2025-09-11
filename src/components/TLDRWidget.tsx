@@ -266,6 +266,8 @@ export default function TLDRWidget() {
     );
   }
 
+  console.log('Rendering TLDRWidget with data:', tldrData);
+  
   return (
     <div className={styles.widget}>
       <div className={styles.header}>
