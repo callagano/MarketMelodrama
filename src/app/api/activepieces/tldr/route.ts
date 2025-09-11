@@ -13,17 +13,31 @@ interface TLDRData {
   updates: TLDRUpdate[];
 }
 
-// Simple in-memory storage for Vercel compatibility
+// Enhanced storage with 24-hour persistence
 let tldrData: TLDRData = { updates: [] };
+let lastUpdateTime: number = 0;
+let dataExpiryTime: number = 0;
 
-// Read existing data
+// Read existing data with 24-hour persistence
 function readData(): TLDRData {
+  const now = Date.now();
+  
+  // Check if data has expired (24 hours)
+  if (now > dataExpiryTime) {
+    console.log('Data expired after 24 hours, returning empty data');
+    return { updates: [] };
+  }
+  
+  console.log(`Reading data: ${tldrData.updates.length} updates in memory (expires in ${Math.round((dataExpiryTime - now) / 1000 / 60)} minutes)`);
   return tldrData;
 }
 
-// Write data
+// Write data with 24-hour expiry
 function writeData(data: TLDRData) {
   tldrData = data;
+  lastUpdateTime = Date.now();
+  dataExpiryTime = lastUpdateTime + (24 * 60 * 60 * 1000); // 24 hours from now
+  console.log(`Data written to memory: ${data.updates.length} updates (expires in 24 hours)`);
 }
 
 export async function POST(request: NextRequest) {
@@ -94,9 +108,19 @@ export async function POST(request: NextRequest) {
       currentData.updates.push(newEntry);
     }
 
-    // Keep only last 30 days of updates
-    if (currentData.updates.length > 30) {
-      currentData.updates = currentData.updates.slice(-30);
+    // Enhanced data retention: keep today's data for 24 hours, others for 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const cutoffDate = sevenDaysAgo.toISOString().split('T')[0];
+    
+    // Filter out old updates but always keep today's update
+    currentData.updates = currentData.updates.filter((update: TLDRUpdate) => 
+      update.date >= cutoffDate || update.date === today
+    );
+    
+    // Ensure we don't have too many updates (max 50)
+    if (currentData.updates.length > 50) {
+      currentData.updates = currentData.updates.slice(-50);
     }
 
     writeData(currentData);
@@ -139,13 +163,21 @@ export async function GET() {
     // Get recent updates excluding today's update
     const recentUpdates = data.updates.filter((update: TLDRUpdate) => update.date !== today).slice(-7);
     
+    const now = Date.now();
+    const timeUntilExpiry = dataExpiryTime > now ? Math.round((dataExpiryTime - now) / 1000 / 60) : 0;
+    
     return NextResponse.json({
       status: 200,
       headers: { "Content-Type": "application/json" },
       body: {
         today: todayUpdate || null,
         recent: recentUpdates,
-        total: data.updates.length
+        total: data.updates.length,
+        persistence: {
+          lastUpdated: lastUpdateTime,
+          expiresInMinutes: timeUntilExpiry,
+          isExpired: timeUntilExpiry === 0
+        }
       }
     });
   } catch (error) {

@@ -43,20 +43,14 @@ export default function TLDRWidget() {
       
       const data = await response.json();
       
-      console.log('TLDR API Response:', data);
-      
       // Handle different response formats
       if (data.body) {
         // ActivePieces format
-        console.log('Using ActivePieces format:', data.body);
         setTldrData(data.body);
       } else {
         // Standard API format
-        console.log('Using standard format:', data);
         setTldrData(data);
       }
-      
-      console.log('TLDR data set successfully');
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -266,8 +260,6 @@ export default function TLDRWidget() {
     );
   }
 
-  console.log('Rendering TLDRWidget with data:', tldrData);
-  
   return (
     <div className={styles.widget}>
       <div className={styles.header}>
