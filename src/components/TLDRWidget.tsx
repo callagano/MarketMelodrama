@@ -41,13 +41,107 @@ export default function TLDRWidget() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Local storage keys
+  const TLDR_CACHE_KEY = 'tldr-widget-cache';
+  const ACTIVE_PIECES_CACHE_KEY = 'activepieces-widget-cache';
+  const CACHE_TIMESTAMP_KEY = 'tldr-cache-timestamp';
+  const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours - data persists until new data arrives
+
   useEffect(() => {
+    // Try to restore data from localStorage first
+    restoreFromCache();
+    // Then fetch fresh data
     fetchTLDRData();
+
+    // Set up periodic refresh every 15 minutes to check for new data
+    const refreshInterval = setInterval(() => {
+      console.log('Checking for new TLDR data...');
+      fetchTLDRData();
+    }, 15 * 60 * 1000); // 15 minutes - less frequent since data persists
+
+    // Cleanup interval on unmount
+    return () => clearInterval(refreshInterval);
   }, []);
+
+  // Restore data from localStorage cache
+  const restoreFromCache = () => {
+    try {
+      const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+      if (cachedTimestamp) {
+        const cacheAge = Date.now() - parseInt(cachedTimestamp);
+        if (cacheAge < CACHE_DURATION) {
+          // Try to restore ActivePieces data first
+          const cachedActivePieces = localStorage.getItem(ACTIVE_PIECES_CACHE_KEY);
+          if (cachedActivePieces) {
+            const parsedData = JSON.parse(cachedActivePieces);
+            if (parsedData.title && parsedData.sentiment && parsedData.highlights && parsedData.big_picture) {
+              setActivePiecesData(parsedData);
+              setTldrData(null);
+              setLoading(false); // Stop loading since we have data
+              console.log('Restored ActivePieces data from cache (survived deployment)');
+              return;
+            }
+          }
+          
+          // Try to restore TLDR data
+          const cachedTLDR = localStorage.getItem(TLDR_CACHE_KEY);
+          if (cachedTLDR) {
+            const parsedData = JSON.parse(cachedTLDR);
+            if (parsedData.updates && parsedData.updates.length > 0) {
+              setTldrData(parsedData);
+              setActivePiecesData(null);
+              setLoading(false); // Stop loading since we have data
+              console.log('Restored TLDR data from cache (survived deployment)');
+              return;
+            }
+          }
+        } else {
+          // Cache expired, clear it
+          console.log('Cache expired, clearing old data');
+          clearCache();
+        }
+      }
+    } catch (error) {
+      console.log('Failed to restore from cache:', error);
+      clearCache();
+    }
+  };
+
+  // Save data to localStorage cache
+  const saveToCache = (data: TLDRData | ActivePiecesData | null, isActivePieces = false) => {
+    try {
+      const timestamp = Date.now().toString();
+      localStorage.setItem(CACHE_TIMESTAMP_KEY, timestamp);
+      
+      if (isActivePieces && data) {
+        localStorage.setItem(ACTIVE_PIECES_CACHE_KEY, JSON.stringify(data));
+        localStorage.removeItem(TLDR_CACHE_KEY); // Clear old TLDR cache
+      } else if (data) {
+        localStorage.setItem(TLDR_CACHE_KEY, JSON.stringify(data));
+        localStorage.removeItem(ACTIVE_PIECES_CACHE_KEY); // Clear old ActivePieces cache
+      }
+    } catch (error) {
+      console.log('Failed to save to cache:', error);
+    }
+  };
+
+  // Clear localStorage cache
+  const clearCache = () => {
+    try {
+      localStorage.removeItem(TLDR_CACHE_KEY);
+      localStorage.removeItem(ACTIVE_PIECES_CACHE_KEY);
+      localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+    } catch (error) {
+      console.log('Failed to clear cache:', error);
+    }
+  };
 
   const fetchTLDRData = async () => {
     try {
-      setLoading(true);
+      // Only show loading if we don't have cached data
+      if (!activePiecesData && !tldrData) {
+        setLoading(true);
+      }
       
       // Try ActivePieces endpoint first, then fallback to main API
       let response = await fetch('/api/activepieces/tldr');
@@ -73,6 +167,8 @@ export default function TLDRWidget() {
               setActivePiecesData(parsedData);
               setTldrData(null);
               setError(null);
+              // Save to cache
+              saveToCache(parsedData, true);
               return;
             }
           } catch (parseError) {
@@ -82,9 +178,13 @@ export default function TLDRWidget() {
         }
         // ActivePieces format (old)
         setTldrData(data.body);
+        // Save to cache
+        saveToCache(data.body, false);
       } else {
         // Standard API format
         setTldrData(data);
+        // Save to cache
+        saveToCache(data, false);
       }
       setActivePiecesData(null);
       setError(null);

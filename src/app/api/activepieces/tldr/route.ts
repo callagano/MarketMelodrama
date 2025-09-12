@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cacheManager } from '@/lib/cache';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 // Define types for better TypeScript support
 interface TLDRUpdate {
@@ -13,70 +16,111 @@ interface TLDRData {
   updates: TLDRUpdate[];
 }
 
-// Enhanced storage with 24-hour persistence and deployment survival
-let tldrData: TLDRData = { updates: [] };
-let lastUpdateTime: number = 0;
-let dataExpiryTime: number = 0;
+// Cache key for TLDR data
+const CACHE_KEY = 'tldr-activepieces-data';
+const PERSISTENT_FILE_PATH = path.join(process.cwd(), 'data', 'tldr-persistent.json');
+const BACKUP_FILE_PATH = path.join(process.cwd(), 'data', 'tldr-backup.json');
 
-// Try to restore data from environment variables or external storage
-function initializeData() {
-  // Check if we have data in environment variables (for critical data)
-  const envData = process.env.TLDR_BACKUP_DATA;
-  if (envData) {
-    try {
-      const parsedData = JSON.parse(envData);
-      const dataAge = Date.now() - (parsedData.timestamp || 0);
-      // Only restore if data is less than 24 hours old
-      if (dataAge < 24 * 60 * 60 * 1000) {
-        tldrData = parsedData.data || { updates: [] };
-        lastUpdateTime = parsedData.timestamp || 0;
-        dataExpiryTime = lastUpdateTime + (24 * 60 * 60 * 1000);
-        console.log('Restored data from backup after deployment');
-      }
-    } catch (error) {
-      console.log('Failed to restore backup data:', error);
-    }
-  }
-}
-
-// Initialize data on module load
-initializeData();
-
-// Read existing data (always returns current data, no expiry check)
-function readData(): TLDRData {
-  console.log(`Reading data: ${tldrData.updates.length} updates in memory`);
-  return tldrData;
-}
-
-// Write data with backup (no expiry - always overridden by new ActivePieces data)
-function writeData(data: TLDRData) {
-  tldrData = data;
-  lastUpdateTime = Date.now();
-  dataExpiryTime = lastUpdateTime + (24 * 60 * 60 * 1000); // Keep for reference but not used for expiry
-  
-  // Create backup for deployment survival
-  const backupData = {
-    data: data,
-    timestamp: lastUpdateTime,
-    expiresAt: dataExpiryTime
-  };
-  
-  // Store backup data for deployment survival
-  // This is a simplified approach - for production, consider:
-  // 1. Vercel KV (Key-Value database)
-  // 2. External database (PostgreSQL, MongoDB)
-  // 3. Vercel Edge Config
-  // 4. External API storage service
-  
+// Read existing data from multiple persistence sources
+async function readData(): Promise<TLDRData> {
+  // Try cache first (fastest)
   try {
-    // Store in environment variable as a simple backup
-    process.env.TLDR_BACKUP_DATA = JSON.stringify(backupData);
+    const cachedData = await cacheManager.get<TLDRData>(CACHE_KEY);
+    if (cachedData && cachedData.updates.length > 0) {
+      console.log(`Reading data from cache: ${cachedData.updates.length} updates`);
+      return cachedData;
+    }
   } catch (error) {
-    console.log('Failed to create backup:', error);
+    console.log('Failed to read from cache:', error);
+  }
+
+  // Try persistent file (survives deployments)
+  try {
+    const persistentData = await fs.readFile(PERSISTENT_FILE_PATH, 'utf-8');
+    const parsedData = JSON.parse(persistentData);
+    if (parsedData.updates && parsedData.updates.length > 0) {
+      console.log(`Reading data from persistent file: ${parsedData.updates.length} updates`);
+      // Restore to cache for faster future access
+      await cacheManager.set(CACHE_KEY, parsedData, 24 * 7);
+      return parsedData;
+    }
+  } catch (error) {
+    console.log('Failed to read from persistent file:', error);
+  }
+
+  // Try backup file (last resort)
+  try {
+    const backupData = await fs.readFile(BACKUP_FILE_PATH, 'utf-8');
+    const parsedData = JSON.parse(backupData);
+    if (parsedData.updates && parsedData.updates.length > 0) {
+      console.log(`Reading data from backup file: ${parsedData.updates.length} updates`);
+      // Restore to both cache and persistent file
+      await cacheManager.set(CACHE_KEY, parsedData, 24 * 7);
+      await writePersistentFile(parsedData);
+      return parsedData;
+    }
+  } catch (error) {
+    console.log('Failed to read from backup file:', error);
   }
   
-  console.log(`Data written to memory: ${data.updates.length} updates (always overridden by new ActivePieces data)`);
-  console.log(`Backup created for deployment survival`);
+  console.log('No persistent data found, returning empty data');
+  return { updates: [] };
+}
+
+// Write data to persistent file (survives deployments)
+async function writePersistentFile(data: TLDRData): Promise<void> {
+  try {
+    // Ensure data directory exists
+    await fs.mkdir(path.dirname(PERSISTENT_FILE_PATH), { recursive: true });
+    
+    const persistentData = {
+      ...data,
+      lastUpdated: Date.now(),
+      version: '1.0'
+    };
+    
+    await fs.writeFile(PERSISTENT_FILE_PATH, JSON.stringify(persistentData, null, 2));
+    console.log(`Data written to persistent file: ${data.updates.length} updates`);
+  } catch (error) {
+    console.error('Failed to write to persistent file:', error);
+  }
+}
+
+// Write data to backup file (additional safety)
+async function writeBackupFile(data: TLDRData): Promise<void> {
+  try {
+    // Ensure data directory exists
+    await fs.mkdir(path.dirname(BACKUP_FILE_PATH), { recursive: true });
+    
+    const backupData = {
+      ...data,
+      lastUpdated: Date.now(),
+      version: '1.0',
+      backup: true
+    };
+    
+    await fs.writeFile(BACKUP_FILE_PATH, JSON.stringify(backupData, null, 2));
+    console.log(`Data written to backup file: ${data.updates.length} updates`);
+  } catch (error) {
+    console.error('Failed to write to backup file:', error);
+  }
+}
+
+// Write data to all persistence layers
+async function writeData(data: TLDRData): Promise<void> {
+  // Write to cache (fast access)
+  try {
+    await cacheManager.set(CACHE_KEY, data, 24 * 7); // 7 days TTL
+    console.log(`Data written to cache: ${data.updates.length} updates`);
+  } catch (error) {
+    console.error('Failed to write to cache:', error);
+  }
+
+  // Write to persistent file (survives deployments)
+  await writePersistentFile(data);
+  
+  // Write to backup file (additional safety)
+  await writeBackupFile(data);
 }
 
 export async function POST(request: NextRequest) {
@@ -146,7 +190,7 @@ export async function POST(request: NextRequest) {
       console.log('Processing as plain text data');
     }
 
-    const currentData = readData();
+    const currentData = await readData();
     const today = new Date().toISOString().split('T')[0];
     
     // Always override data when new data comes from ActivePieces
@@ -189,7 +233,7 @@ export async function POST(request: NextRequest) {
       currentData.updates = currentData.updates.slice(-50);
     }
 
-    writeData(currentData);
+    await writeData(currentData);
 
     console.log(`ActivePieces TLDR update received for ${today}: ${processedText.substring(0, 100)}...`);
 
@@ -220,7 +264,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    const data = readData();
+    const data = await readData();
     const today = new Date().toISOString().split('T')[0];
     
     // Return today's update if available
@@ -229,8 +273,19 @@ export async function GET() {
     // Get recent updates excluding today's update
     const recentUpdates = data.updates.filter((update: TLDRUpdate) => update.date !== today).slice(-7);
     
+    // Get cache info for persistence details
+    const cacheInfo = await cacheManager.getCacheInfo(CACHE_KEY);
     const now = Date.now();
-    const timeUntilExpiry = dataExpiryTime > now ? Math.round((dataExpiryTime - now) / 1000 / 60) : 0;
+    const timeUntilExpiry = cacheInfo?.expiresAt ? Math.round((cacheInfo.expiresAt - now) / 1000 / 60) : 0;
+    
+    // Check persistent file status
+    let persistentFileStatus = 'not_found';
+    try {
+      const persistentStats = await fs.stat(PERSISTENT_FILE_PATH);
+      persistentFileStatus = 'exists';
+    } catch (error) {
+      // File doesn't exist
+    }
     
     return NextResponse.json({
       status: 200,
@@ -240,16 +295,19 @@ export async function GET() {
         recent: recentUpdates,
         total: data.updates.length,
         persistence: {
-          lastUpdated: lastUpdateTime,
+          lastUpdated: cacheInfo?.age ? now - cacheInfo.age : 0,
           expiresInMinutes: timeUntilExpiry,
-          isExpired: false, // Data never expires - always overridden by new ActivePieces data
-          behavior: "Always overridden by new ActivePieces data"
+          isExpired: timeUntilExpiry <= 0,
+          behavior: "Data persists until new data arrives - survives Vercel deployments",
+          cacheStatus: cacheInfo?.exists ? 'cached' : 'not_cached',
+          persistentFileStatus: persistentFileStatus,
+          layers: ['cache', 'persistent_file', 'backup_file']
         },
         deploymentInfo: {
           hasData: data.updates.length > 0,
           message: data.updates.length === 0 ? 
-            "No data available. This may be due to a recent deployment. Data will be restored when ActivePieces sends the next update." :
-            "Data is available and will be overridden when new data arrives from ActivePieces."
+            "No data available. Data will be restored from persistent storage when ActivePieces sends the next update." :
+            "Data is available and persisted across deployments. New data will override existing data."
         }
       }
     });
