@@ -50,14 +50,13 @@ export default function TLDRWidget() {
   useEffect(() => {
     // Try to restore data from localStorage first
     restoreFromCache();
-    // Then fetch fresh data
-    fetchTLDRData();
-
-    // Set up periodic refresh every 15 minutes to check for new data
+    
+    // Set up periodic refresh every 2 minutes to check for new data
+    // More frequent since server-side persistence is limited
     const refreshInterval = setInterval(() => {
       console.log('Checking for new TLDR data...');
       fetchTLDRData();
-    }, 15 * 60 * 1000); // 15 minutes - less frequent since data persists
+    }, 2 * 60 * 1000); // 2 minutes - more frequent due to serverless limitations
 
     // Cleanup interval on unmount
     return () => clearInterval(refreshInterval);
@@ -480,7 +479,23 @@ export default function TLDRWidget() {
         <div className={styles.content}>
           {/* Main Content Section */}
           <div className={styles.section}>
-            <h2 className="title">The brief</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <h2 className="title">The brief</h2>
+              <button 
+                onClick={() => fetchTLDRData()} 
+                style={{ 
+                  background: '#667eea', 
+                  border: 'none', 
+                  borderRadius: '4px', 
+                  padding: '4px 8px', 
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  color: 'white'
+                }}
+              >
+                Refresh
+              </button>
+            </div>
             <p className="subtitle">A daily snapshot of the markets.</p>
             <div className={`${styles.mainContentBox} ${
               activePiecesData.sentiment >= 70 ? styles.positive :
@@ -544,8 +559,22 @@ export default function TLDRWidget() {
   // Render old format or no data
   return (
     <div className={styles.widget}>
-      <div className={styles.header}>
+      <div className={styles.header} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3>The Brief</h3>
+        <button 
+          onClick={() => fetchTLDRData()} 
+          style={{ 
+            background: '#667eea', 
+            border: 'none', 
+            borderRadius: '4px', 
+            padding: '4px 8px', 
+            cursor: 'pointer',
+            fontSize: '12px',
+            color: 'white'
+          }}
+        >
+          Refresh
+        </button>
       </div>
       
       <div className={styles.content}>
