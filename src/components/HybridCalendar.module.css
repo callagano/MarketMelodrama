@@ -130,6 +130,19 @@
   grid-template-columns: 100px 80px 1fr 100px 80px 100px;
 } */
 
+/* Header Cell Styles */
+.dateHeader,
+.symbolHeader,
+.companyHeader,
+.exchangeHeader,
+.priceHeader,
+.sharesHeader {
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* Cell Styles */
 .dateCell {
   color: #9ca3af;
@@ -219,10 +232,18 @@
   
   .tableHeader,
   .tableRow {
-    grid-template-columns: 70px 60px 1fr 60px 80px 60px;
+    grid-template-columns: 70px 1fr 60px 80px;
     padding: 0.5rem 0.75rem;
     font-size: 0.625rem;
     box-sizing: border-box;
+  }
+  
+  /* Hide symbol and exchange columns on mobile */
+  .symbolCell,
+  .exchangeCell,
+  .symbolHeader,
+  .exchangeHeader {
+    display: none;
   }
   
   .contentContainer {
