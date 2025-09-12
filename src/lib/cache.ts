@@ -49,7 +49,7 @@ export class CacheManager {
       return null;
     } catch (error) {
       // Cache file doesn't exist or is invalid
-      console.log(`CacheManager: Cache miss for key ${key}:`, error.message);
+      console.log(`CacheManager: Cache miss for key ${key}:`, error instanceof Error ? error.message : String(error));
       return null;
     }
   }
