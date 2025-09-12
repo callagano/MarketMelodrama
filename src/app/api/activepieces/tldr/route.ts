@@ -34,33 +34,37 @@ async function readData(): Promise<TLDRData> {
     console.log('Failed to read from cache:', error);
   }
 
-  // Try persistent file (survives deployments)
-  try {
-    const persistentData = await fs.readFile(PERSISTENT_FILE_PATH, 'utf-8');
-    const parsedData = JSON.parse(persistentData);
-    if (parsedData.updates && parsedData.updates.length > 0) {
-      console.log(`Reading data from persistent file: ${parsedData.updates.length} updates`);
-      // Restore to cache for faster future access
-      await cacheManager.set(CACHE_KEY, parsedData, 24 * 7);
-      return parsedData;
+  // Try persistent file (survives deployments) - skip in Vercel
+  if (!process.env.VERCEL) {
+    try {
+      const persistentData = await fs.readFile(PERSISTENT_FILE_PATH, 'utf-8');
+      const parsedData = JSON.parse(persistentData);
+      if (parsedData.updates && parsedData.updates.length > 0) {
+        console.log(`Reading data from persistent file: ${parsedData.updates.length} updates`);
+        // Restore to cache for faster future access
+        await cacheManager.set(CACHE_KEY, parsedData, 24 * 7);
+        return parsedData;
+      }
+    } catch (error) {
+      console.log('Failed to read from persistent file:', error);
     }
-  } catch (error) {
-    console.log('Failed to read from persistent file:', error);
-  }
 
-  // Try backup file (last resort)
-  try {
-    const backupData = await fs.readFile(BACKUP_FILE_PATH, 'utf-8');
-    const parsedData = JSON.parse(backupData);
-    if (parsedData.updates && parsedData.updates.length > 0) {
-      console.log(`Reading data from backup file: ${parsedData.updates.length} updates`);
-      // Restore to both cache and persistent file
-      await cacheManager.set(CACHE_KEY, parsedData, 24 * 7);
-      await writePersistentFile(parsedData);
-      return parsedData;
+    // Try backup file (last resort) - skip in Vercel
+    try {
+      const backupData = await fs.readFile(BACKUP_FILE_PATH, 'utf-8');
+      const parsedData = JSON.parse(backupData);
+      if (parsedData.updates && parsedData.updates.length > 0) {
+        console.log(`Reading data from backup file: ${parsedData.updates.length} updates`);
+        // Restore to both cache and persistent file
+        await cacheManager.set(CACHE_KEY, parsedData, 24 * 7);
+        await writePersistentFile(parsedData);
+        return parsedData;
+      }
+    } catch (error) {
+      console.log('Failed to read from backup file:', error);
     }
-  } catch (error) {
-    console.log('Failed to read from backup file:', error);
+  } else {
+    console.log('Skipping file-based persistence in Vercel environment');
   }
   
   console.log('No persistent data found, returning empty data');
@@ -70,6 +74,12 @@ async function readData(): Promise<TLDRData> {
 // Write data to persistent file (survives deployments)
 async function writePersistentFile(data: TLDRData): Promise<void> {
   try {
+    // Check if we're in a Vercel environment
+    if (process.env.VERCEL) {
+      console.log('Skipping persistent file write in Vercel environment');
+      return;
+    }
+    
     // Ensure data directory exists
     await fs.mkdir(path.dirname(PERSISTENT_FILE_PATH), { recursive: true });
     
@@ -83,12 +93,19 @@ async function writePersistentFile(data: TLDRData): Promise<void> {
     console.log(`Data written to persistent file: ${data.updates.length} updates`);
   } catch (error) {
     console.error('Failed to write to persistent file:', error);
+    // Don't throw - this is optional persistence
   }
 }
 
 // Write data to backup file (additional safety)
 async function writeBackupFile(data: TLDRData): Promise<void> {
   try {
+    // Check if we're in a Vercel environment
+    if (process.env.VERCEL) {
+      console.log('Skipping backup file write in Vercel environment');
+      return;
+    }
+    
     // Ensure data directory exists
     await fs.mkdir(path.dirname(BACKUP_FILE_PATH), { recursive: true });
     
@@ -103,32 +120,44 @@ async function writeBackupFile(data: TLDRData): Promise<void> {
     console.log(`Data written to backup file: ${data.updates.length} updates`);
   } catch (error) {
     console.error('Failed to write to backup file:', error);
+    // Don't throw - this is optional persistence
   }
 }
 
 // Write data to all persistence layers
 async function writeData(data: TLDRData): Promise<void> {
-  // Write to cache (fast access)
+  // Write to cache (fast access) - this is the primary persistence in Vercel
   try {
     await cacheManager.set(CACHE_KEY, data, 24 * 7); // 7 days TTL
     console.log(`Data written to cache: ${data.updates.length} updates`);
   } catch (error) {
     console.error('Failed to write to cache:', error);
+    // This is critical - if cache fails, we should still try to continue
   }
 
-  // Write to persistent file (survives deployments)
-  await writePersistentFile(data);
+  // Write to persistent file (survives deployments) - optional
+  try {
+    await writePersistentFile(data);
+  } catch (error) {
+    console.error('Failed to write persistent file:', error);
+  }
   
-  // Write to backup file (additional safety)
-  await writeBackupFile(data);
+  // Write to backup file (additional safety) - optional
+  try {
+    await writeBackupFile(data);
+  } catch (error) {
+    console.error('Failed to write backup file:', error);
+  }
 }
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('=== ActivePieces POST request received ===');
     const body = await request.json();
     
     // Debug: Log the request structure
     console.log('ActivePieces request body:', JSON.stringify(body, null, 2));
+    console.log('Request headers:', Object.fromEntries(request.headers.entries()));
     
     // Extract text from various possible locations in ActivePieces request
     // If the body itself is structured data (has title, sentiment, etc.), use it directly
@@ -236,6 +265,8 @@ export async function POST(request: NextRequest) {
     await writeData(currentData);
 
     console.log(`ActivePieces TLDR update received for ${today}: ${processedText.substring(0, 100)}...`);
+    console.log(`Total updates in storage: ${currentData.updates.length}`);
+    console.log('=== ActivePieces POST request completed successfully ===');
 
     // Return response in ActivePieces expected format
     return NextResponse.json({ 
@@ -245,7 +276,8 @@ export async function POST(request: NextRequest) {
         success: true,
         message: "TLDR update received successfully",
         date: today,
-        textLength: processedText.length
+        textLength: processedText.length,
+        totalUpdates: currentData.updates.length
       }
     });
 
