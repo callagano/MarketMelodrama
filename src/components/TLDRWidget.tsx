@@ -118,11 +118,31 @@ export default function TLDRWidget() {
     // Highlight all words that appear in the highlights array
     allWords.forEach(word => {
       const direction = wordDirectionMap.get(word.toLowerCase()) || 'neutral';
-      // Use a more flexible regex that doesn't require word boundaries for symbols
       const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(escapedWord, 'gi');
-      const replacement = `<span class="${styles.highlight} ${styles[direction]}">${word}</span>`;
-      text = text.replace(regex, replacement);
+      
+      // First try to match the word with common symbols (▲, ▼, etc.)
+      const symbolPatterns = [
+        `[▲▼↑↓]\\s*${escapedWord}`,  // Word with symbols before it
+        `${escapedWord}\\s*[▲▼↑↓]`,  // Word with symbols after it
+        `\\b${escapedWord}\\b`       // Word with word boundaries
+      ];
+      
+      let found = false;
+      symbolPatterns.forEach(pattern => {
+        const regex = new RegExp(pattern, 'gi');
+        if (regex.test(text)) {
+          const replacement = `<span class="${styles.highlight} ${styles[direction]}">${word}</span>`;
+          text = text.replace(regex, replacement);
+          found = true;
+        }
+      });
+      
+      // If no symbol pattern matched, try simple word matching
+      if (!found) {
+        const regex = new RegExp(escapedWord, 'gi');
+        const replacement = `<span class="${styles.highlight} ${styles[direction]}">${word}</span>`;
+        text = text.replace(regex, replacement);
+      }
     });
     
     return <span dangerouslySetInnerHTML={{ __html: text }} />;
