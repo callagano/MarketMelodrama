@@ -27,7 +27,7 @@ function MiniLineChart({ data, color }: { data: ChartData[], color: string }) {
   const padding = 0; // Remove all internal padding
   
   // Calculate min and max values for scaling
-  const values = data.map(d => d["Fear & Greed Index"]);
+  const values = data.map(d => d["Fear_Greed_Index"]);
   const min = Math.min(...values);
   const max = Math.max(...values);
   const range = max - min || 1; // Avoid division by zero
@@ -35,7 +35,7 @@ function MiniLineChart({ data, color }: { data: ChartData[], color: string }) {
   // Generate SVG path with no padding - ensure proper path generation
   const linePoints = data.map((d, index) => {
     const x = (index / (data.length - 1)) * width;
-    const y = ((max - d["Fear & Greed Index"]) / range) * height;
+    const y = ((max - d["Fear_Greed_Index"]) / range) * height;
     return `${x},${y}`;
   });
   
@@ -124,7 +124,7 @@ export default function FearGreedCharts({ data }: Props) {
                     "Market Momentum": item.momentum,
                     "Stock Price Strength": item.strength,
                     "Safe Haven Demand": item.safe_haven,
-                    "Fear & Greed Index": item.Fear_Greed_Index,
+                    "Fear_Greed_Index": item.Fear_Greed_Index,
                   };
       });
   };
@@ -143,11 +143,10 @@ export default function FearGreedCharts({ data }: Props) {
       .filter(item => new Date(item.date) >= sixMonthsAgo)
       .map(item => ({
         date: formatDate(new Date(item.date), "MMM d"),
-        originalDate: item.date,
-        "Market Momentum": item.momentum,
-        "Stock Price Strength": item.strength,
-        "Safe Haven Demand": item.safe_haven,
-        "Fear & Greed Index": item.Fear_Greed_Index,
+        momentum: item.momentum,
+        strength: item.strength,
+        safe_haven: item.safe_haven,
+        Fear_Greed_Index: item.Fear_Greed_Index,
       }));
     
     // Sample every ~12 days (approximately 15 points over 6 months)
@@ -410,7 +409,7 @@ export default function FearGreedCharts({ data }: Props) {
                   />
                   <Line
                     type="monotone"
-                    dataKey="Fear & Greed Index"
+                    dataKey="Fear_Greed_Index"
                     stroke={getSentimentColor(latestData.Fear_Greed_Index)}
                     strokeWidth={2}
                     dot={false}
