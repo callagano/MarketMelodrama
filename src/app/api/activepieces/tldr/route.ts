@@ -87,14 +87,22 @@ export async function POST(request: NextRequest) {
     console.log('ActivePieces request body:', JSON.stringify(body, null, 2));
     
     // Extract text from various possible locations in ActivePieces request
-    const text = body.text || 
-                 body.body || 
-                 body.content || 
-                 body.message || 
-                 body.data ||
-                 (body.body && body.body.text) ||
-                 (body.response && body.response.text) ||
-                 (body.data && body.data.text);
+    // If the body itself is structured data (has title, sentiment, etc.), use it directly
+    let text;
+    if (body.title && body.sentiment && body.highlights && body.big_picture) {
+      // This is structured data, stringify it for processing
+      text = JSON.stringify(body);
+    } else {
+      // Extract text from various possible field names
+      text = body.text || 
+             body.body || 
+             body.content || 
+             body.message || 
+             body.data ||
+             (body.body && body.body.text) ||
+             (body.response && body.response.text) ||
+             (body.data && body.data.text);
+    }
     
     if (!text) {
       console.log('No text found in request. Available keys:', Object.keys(body));
@@ -112,14 +120,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Clean up the text by removing markdown formatting
-    const cleanText = text
-      .replace(/\*\*(.*?)\*\*/g, '$1') // Remove **bold**
-      .replace(/\*(.*?)\*/g, '$1')     // Remove *italic*
-      .replace(/📈|💹|🛢️|🚗|🌍/g, '') // Remove emojis
-      .replace(/\n\n/g, ' ')           // Replace double line breaks with single space
-      .replace(/\n/g, ' ')             // Replace single line breaks with space
-      .trim();                         // Remove extra whitespace
+    // Check if the text is valid JSON (ActivePieces structured format)
+    let processedText = text;
+    let isStructuredData = false;
+    
+    try {
+      const parsedData = JSON.parse(text);
+      if (parsedData.title && parsedData.sentiment && parsedData.highlights && parsedData.big_picture) {
+        // This is structured ActivePieces data, keep it as JSON
+        processedText = text; // Keep original JSON
+        isStructuredData = true;
+        console.log('Detected structured ActivePieces data, preserving JSON format');
+      } else {
+        throw new Error('Not structured data');
+      }
+    } catch (parseError) {
+      // Not JSON or not the expected structure, clean up as plain text
+      processedText = text
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove **bold**
+        .replace(/\*(.*?)\*/g, '$1')     // Remove *italic*
+        .replace(/📈|💹|🛢️|🚗|🌍/g, '') // Remove emojis
+        .replace(/\n\n/g, ' ')           // Replace double line breaks with single space
+        .replace(/\n/g, ' ')             // Replace single line breaks with space
+        .trim();                         // Remove extra whitespace
+      console.log('Processing as plain text data');
+    }
 
     const currentData = readData();
     const today = new Date().toISOString().split('T')[0];
@@ -130,7 +155,7 @@ export async function POST(request: NextRequest) {
     if (existingIndex !== -1) {
       // Override existing entry (regardless of age or expiry)
       const updatedEntry: TLDRUpdate = {
-        text: cleanText,
+        text: processedText,
         date: today,
         source: 'activepieces',
         updatedAt: new Date().toISOString()
@@ -140,7 +165,7 @@ export async function POST(request: NextRequest) {
     } else {
       // Add new entry
       const newEntry: TLDRUpdate = {
-        text: cleanText,
+        text: processedText,
         date: today,
         source: 'activepieces',
         createdAt: new Date().toISOString()
@@ -166,7 +191,7 @@ export async function POST(request: NextRequest) {
 
     writeData(currentData);
 
-    console.log(`ActivePieces TLDR update received for ${today}: ${cleanText.substring(0, 100)}...`);
+    console.log(`ActivePieces TLDR update received for ${today}: ${processedText.substring(0, 100)}...`);
 
     // Return response in ActivePieces expected format
     return NextResponse.json({ 
@@ -176,7 +201,7 @@ export async function POST(request: NextRequest) {
         success: true,
         message: "TLDR update received successfully",
         date: today,
-        textLength: cleanText.length
+        textLength: processedText.length
       }
     });
 

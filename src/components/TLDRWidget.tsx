@@ -68,7 +68,7 @@ export default function TLDRWidget() {
         if (data.body.today && typeof data.body.today.text === 'string') {
           try {
             const parsedData = JSON.parse(data.body.today.text);
-            if (parsedData.title && parsedData.tldr && parsedData.insights && parsedData.big_picture) {
+            if (parsedData.title && parsedData.sentiment && parsedData.highlights && parsedData.big_picture) {
               setActivePiecesData(parsedData);
               setTldrData(null);
               setError(null);
