@@ -84,7 +84,28 @@ export default function TLDRWidget() {
             const parsedData = JSON.parse(data.body.today.text);
             if (parsedData.title && parsedData.sentiment && parsedData.highlights && parsedData.big_picture) {
               console.log('Successfully parsed ActivePieces data:', parsedData);
-              setActivePiecesData(parsedData);
+              
+              // Convert string arrays to TLDRItem format
+              const processedData: ActivePiecesData = {
+                title: parsedData.title,
+                sentiment: parsedData.sentiment,
+                highlights: Array.isArray(parsedData.highlights) 
+                  ? parsedData.highlights.map((item: any) => 
+                      typeof item === 'string' 
+                        ? { text: item, highlights: [] }
+                        : item
+                    )
+                  : [],
+                big_picture: Array.isArray(parsedData.big_picture)
+                  ? parsedData.big_picture.map((item: any) => 
+                      typeof item === 'string'
+                        ? { text: item, highlights: [] }
+                        : item
+                    )
+                  : []
+              };
+              
+              setActivePiecesData(processedData);
               setTldrData(null);
               setError(null);
               return;
@@ -121,10 +142,16 @@ export default function TLDRWidget() {
   };
 
   const renderHighlightedText = (item: TLDRItem, isBigPicture = false) => {
+    if (!item || !item.text) {
+      return <span>No content available</span>;
+    }
+    
     let text = item.text;
     
-    // Extract all unique words from highlights array
-    const allWords = [...new Set(item.highlights.map(h => h.word))];
+    // Extract all unique words from highlights array (with safety check)
+    const allWords = item.highlights && Array.isArray(item.highlights) 
+      ? [...new Set(item.highlights.map(h => h.word))] 
+      : [];
     
     // Create a map of words to their direction for quick lookup
     const wordDirectionMap = new Map();
@@ -434,11 +461,14 @@ export default function TLDRWidget() {
           {/* Highlights Section */}
           <div className={styles.section}>
             <div className={`${styles.sectionContent} ${styles.masonry}`}>
-              {activePiecesData.highlights.map((item, index) => (
-                <div key={index} className={styles.sectionItem}>
-                  {renderHighlightedText(item)}
-                </div>
-              ))}
+              {activePiecesData.highlights && Array.isArray(activePiecesData.highlights) 
+                ? activePiecesData.highlights.map((item, index) => (
+                    <div key={index} className={styles.sectionItem}>
+                      {renderHighlightedText(item)}
+                    </div>
+                  ))
+                : <div className={styles.sectionItem}>No highlights available</div>
+              }
             </div>
           </div>
 
@@ -446,11 +476,14 @@ export default function TLDRWidget() {
           <div className={styles.section}>
             <div className={styles.sectionContent}>
             <h3 className={styles.bigPictureTitle}>Big Picture</h3>
-              {activePiecesData.big_picture.map((item, index) => (
-                <div key={index} className={`${styles.sectionItem} ${styles.bigPictureItem}`}>
-                  {renderHighlightedText(item, true)}
-                </div>
-              ))}
+              {activePiecesData.big_picture && Array.isArray(activePiecesData.big_picture)
+                ? activePiecesData.big_picture.map((item, index) => (
+                    <div key={index} className={`${styles.sectionItem} ${styles.bigPictureItem}`}>
+                      {renderHighlightedText(item, true)}
+                    </div>
+                  ))
+                : <div className={styles.sectionItem}>No big picture data available</div>
+              }
             </div>
           </div>
         </div>
