@@ -49,42 +49,6 @@ export default function TLDRWidget() {
     try {
       setLoading(true);
       
-      // Use mock data for development
-      const mockData = {
-        "title": "Stocks Rally Amid Positive Earnings Reports",
-        "sentiment": 75,
-        "highlights": [
-          { 
-            "text": "▲ Tech stocks surged after strong earnings results.", 
-            "highlights": [ { "word": "▲ Tech", "direction": "up" } ] 
-          },
-          { 
-            "text": "▼ Energy sector struggled as oil prices fell.", 
-            "highlights": [ { "word": "▼ Energy", "direction": "down" } ] 
-          },
-          { 
-            "text": "▲ S&P 500 climbed 1.2% on investor optimism.", 
-            "highlights": [ { "word": "▲ S&P 500", "direction": "up" } ] 
-          },
-          { 
-            "text": "Mixed signals from the Fed caused some uncertainty.", 
-            "highlights": [] 
-          }
-        ],
-        "big_picture": [
-          { 
-            "text": "Today's market movements reflect a strong recovery in tech, with several companies reporting higher-than-expected earnings. This sentiment has lifted the broader market, indicating renewed investor confidence. However, the decline in oil prices is a reminder of ongoing challenges in the energy sector. Investors should monitor both sectors closely as they assess market stability and future growth prospects.\n\nThe mixed signals from the Federal Reserve regarding interest rate hikes have created some anxiety, suggesting that caution may be warranted. Overall, the current trend indicates a preference for growth stocks, particularly in technology, but it's essential to remain aware of external factors influencing these movements.", 
-            "highlights": [ { "word": "strong recovery", "direction": "up" }, { "word": "ongoing challenges", "direction": "down" }, { "word": "renewed investor confidence", "direction": "up" }, { "word": "caution", "direction": "down" } ] 
-          }
-        ]
-      };
-      
-      setActivePiecesData(mockData);
-      setTldrData(null);
-      setError(null);
-      
-      // Original API code (commented out for mock data)
-      /*
       // Try ActivePieces endpoint first, then fallback to main API
       let response = await fetch('/api/activepieces/tldr');
       
@@ -124,7 +88,6 @@ export default function TLDRWidget() {
       }
       setActivePiecesData(null);
       setError(null);
-      */
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
