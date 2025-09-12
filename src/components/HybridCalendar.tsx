@@ -102,8 +102,7 @@ export default function HybridCalendar() {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
       month: 'short', 
-      day: 'numeric',
-      year: 'numeric'
+      day: 'numeric'
     });
   };
 
@@ -134,7 +133,7 @@ export default function HybridCalendar() {
             className={`${styles.tabButton} ${activeTab === 'ipo' ? styles.active : ''}`}
             onClick={() => setActiveTab('ipo')}
           >
-            IPOs ({ipoData.length})
+            Next IPOs
           </button>
         </div>
 
