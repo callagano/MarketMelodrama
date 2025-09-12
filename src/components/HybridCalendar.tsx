@@ -159,12 +159,9 @@ export default function HybridCalendar() {
     <Card className={styles.hybridCalendar}>
       <CardContent className={styles.cardContent}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Market Calendar</h2>
-          <p className={styles.subtitle}>
-            Economic, earnings and IPO most important events
-          </p>
+          <h2 className="title">Market Calendar</h2>
+          <p className="subtitle">Economic, earnings and IPO most important events</p>
         </div>
-
         <div className={styles.tabContainer}>
           <button
             className={`${styles.tabButton} ${activeTab === 'economic' ? styles.active : ''}`}

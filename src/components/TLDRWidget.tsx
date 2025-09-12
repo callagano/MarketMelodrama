@@ -48,6 +48,43 @@ export default function TLDRWidget() {
   const fetchTLDRData = async () => {
     try {
       setLoading(true);
+      
+      // Use mock data for development
+      const mockData = {
+        "title": "Stocks Rally Amid Positive Earnings Reports",
+        "sentiment": 75,
+        "highlights": [
+          { 
+            "text": "▲ Tech stocks surged after strong earnings results.", 
+            "highlights": [ { "word": "▲ Tech", "direction": "up" } ] 
+          },
+          { 
+            "text": "▼ Energy sector struggled as oil prices fell.", 
+            "highlights": [ { "word": "▼ Energy", "direction": "down" } ] 
+          },
+          { 
+            "text": "▲ S&P 500 climbed 1.2% on investor optimism.", 
+            "highlights": [ { "word": "▲ S&P 500", "direction": "up" } ] 
+          },
+          { 
+            "text": "Mixed signals from the Fed caused some uncertainty.", 
+            "highlights": [] 
+          }
+        ],
+        "big_picture": [
+          { 
+            "text": "Today's market movements reflect a strong recovery in tech, with several companies reporting higher-than-expected earnings. This sentiment has lifted the broader market, indicating renewed investor confidence. However, the decline in oil prices is a reminder of ongoing challenges in the energy sector. Investors should monitor both sectors closely as they assess market stability and future growth prospects.\n\nThe mixed signals from the Federal Reserve regarding interest rate hikes have created some anxiety, suggesting that caution may be warranted. Overall, the current trend indicates a preference for growth stocks, particularly in technology, but it's essential to remain aware of external factors influencing these movements.", 
+            "highlights": [ { "word": "strong recovery", "direction": "up" }, { "word": "ongoing challenges", "direction": "down" }, { "word": "renewed investor confidence", "direction": "up" }, { "word": "caution", "direction": "down" } ] 
+          }
+        ]
+      };
+      
+      setActivePiecesData(mockData);
+      setTldrData(null);
+      setError(null);
+      
+      // Original API code (commented out for mock data)
+      /*
       // Try ActivePieces endpoint first, then fallback to main API
       let response = await fetch('/api/activepieces/tldr');
       
@@ -87,6 +124,7 @@ export default function TLDRWidget() {
       }
       setActivePiecesData(null);
       setError(null);
+      */
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -103,7 +141,7 @@ export default function TLDRWidget() {
     });
   };
 
-  const renderHighlightedText = (item: TLDRItem) => {
+  const renderHighlightedText = (item: TLDRItem, isBigPicture = false) => {
     let text = item.text;
     
     // Extract all unique words from highlights array
@@ -145,10 +183,24 @@ export default function TLDRWidget() {
       }
     });
     
-    // Add extra spacing after periods for better readability
-    text = text.replace(/\.\s+/g, '.&nbsp;&nbsp;');
-    
-    return <span dangerouslySetInnerHTML={{ __html: text }} />;
+    // For Big Picture section, split into paragraphs after each period
+    if (isBigPicture) {
+      // Split text into sentences and wrap each in a paragraph
+      const sentences = text.split(/\.\s+/).filter(sentence => sentence.trim());
+      const paragraphs = sentences.map((sentence, index) => {
+        const trimmedSentence = sentence.trim();
+        // Add period back if it's not the last sentence and doesn't end with punctuation
+        const finalSentence = index < sentences.length - 1 && !trimmedSentence.match(/[.!?]$/) 
+          ? trimmedSentence + '.' 
+          : trimmedSentence;
+        return `<p class="${styles.bigPictureParagraph}">${finalSentence}</p>`;
+      });
+      return <div dangerouslySetInnerHTML={{ __html: paragraphs.join('') }} />;
+    } else {
+      // For highlights section, add extra spacing after periods
+      text = text.replace(/\.\s+/g, '.&nbsp;&nbsp;');
+      return <span dangerouslySetInnerHTML={{ __html: text }} />;
+    }
   };
 
   const parseTLDRText = (text: string) => {
@@ -347,16 +399,15 @@ export default function TLDRWidget() {
   if (activePiecesData) {
     return (
       <div className={styles.widget}>
-        <div className={styles.header}>
-          <h3>Today's happening</h3>
-        </div>
-        
         <div className={styles.content}>
-          {/* Main Content Box */}
-          <div className={`${styles.mainContentBox} ${
-            activePiecesData.sentiment >= 70 ? styles.positive :
-            activePiecesData.sentiment <= 30 ? styles.negative : styles.neutral
-          }`}>
+          {/* Main Content Section */}
+          <div className={styles.section}>
+            <h2 className="title">The brief</h2>
+            <p className="subtitle">A daily snapshot of the markets.</p>
+            <div className={`${styles.mainContentBox} ${
+              activePiecesData.sentiment >= 70 ? styles.positive :
+              activePiecesData.sentiment <= 30 ? styles.negative : styles.neutral
+            }`}>
             <div className={styles.pulseIcon}>
               <svg 
                 width="24" 
@@ -383,10 +434,10 @@ export default function TLDRWidget() {
               </div>
             </div>
           </div>
+          </div>
 
           {/* Highlights Section */}
           <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Highlights</h3>
             <div className={`${styles.sectionContent} ${styles.masonry}`}>
               {activePiecesData.highlights.map((item, index) => (
                 <div key={index} className={styles.sectionItem}>
@@ -398,11 +449,11 @@ export default function TLDRWidget() {
 
           {/* Big Picture Section */}
           <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Big Picture</h3>
+            <h3 className={styles.bigPictureTitle}>Big Picture</h3>
             <div className={styles.sectionContent}>
               {activePiecesData.big_picture.map((item, index) => (
                 <div key={index} className={`${styles.sectionItem} ${styles.bigPictureItem}`}>
-                  {renderHighlightedText(item)}
+                  {renderHighlightedText(item, true)}
                 </div>
               ))}
             </div>

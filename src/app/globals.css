@@ -35,3 +35,25 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background-color: #52525b;
 }
+
+/* Centralized title styling for all widgets */
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  background: linear-gradient(45deg, #cbdefc 0%, #7f34c9 40%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 0.5rem 0;
+  padding-bottom: 0;
+  border-bottom: none;
+  position: relative;
+}
+
+/* Centralized subtitle styling for all widgets */
+.subtitle {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  margin: 0 0 1rem 0;
+  line-height: 1;
+}

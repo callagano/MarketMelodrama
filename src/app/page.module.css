@@ -1,6 +1,6 @@
 .mainContainer {
   padding: 1rem;
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -73,17 +73,6 @@
   }
 }
 
-.subtitle {
-  color: #9ca3af;
-  font-size: 0.875rem;
-  margin: 0;
-}
-
-@media (max-width: 480px) {
-  .subtitle {
-    font-size: 0.75rem;
-  }
-}
 
 .indexCard {
   padding: 1.5rem;

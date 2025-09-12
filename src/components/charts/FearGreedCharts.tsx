@@ -18,9 +18,68 @@ interface Props {
   data: ChartData[];
 }
 
+// Mini Line Chart Component
+function MiniLineChart({ data, color }: { data: ChartData[], color: string }) {
+  if (!data || data.length === 0) return null;
+
+  const width = 120;
+  const height = 40;
+  const padding = 0; // Remove all internal padding
+  
+  // Calculate min and max values for scaling
+  const values = data.map(d => d["Fear & Greed Index"]);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1; // Avoid division by zero
+  
+  // Generate SVG path with no padding - ensure proper path generation
+  const linePoints = data.map((d, index) => {
+    const x = (index / (data.length - 1)) * width;
+    const y = ((max - d["Fear & Greed Index"]) / range) * height;
+    return `${x},${y}`;
+  });
+  
+  const pathData = `M ${linePoints.join(' L')}`;
+  
+  // Generate area path for fill - use exact same line points
+  const areaPoints = [
+    `0,${height + 1}`, // Extend slightly beyond bottom to eliminate gap
+    ...linePoints,
+    `${width},${height + 1}` // Extend slightly beyond bottom to eliminate gap
+  ];
+  
+  const areaData = `M ${areaPoints.join(' L')} Z`;
+
+  // Add padding to viewBox to accommodate stroke width (only vertical)
+  const strokePadding = 1; // Half of stroke width (1.5/2 = 0.75, rounded up to 1)
+  const viewBoxWidth = width; // No horizontal padding
+  const viewBoxHeight = height + (strokePadding * 2); // Only vertical padding
+
+  return (
+    <svg width="100%" height="100%" viewBox={`0 -${strokePadding} ${viewBoxWidth} ${viewBoxHeight}`} preserveAspectRatio="none" style={{ display: 'block' }}>
+      {/* Area fill */}
+      <path
+        d={areaData}
+        fill={`${color}20`}
+        stroke="none"
+      />
+      {/* Line */}
+      <path
+        d={pathData}
+        fill="none"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export default function FearGreedCharts({ data }: Props) {
   const { timeframe, setTimeframe } = useTimeframe();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isChartExpanded, setIsChartExpanded] = useState(false);
   
   // Filter data based on selected timeframe
   const getFilteredData = () => {
@@ -73,6 +132,28 @@ export default function FearGreedCharts({ data }: Props) {
   // Get the latest data point
   const filteredData = getFilteredData();
   const latestData = data[data.length - 1];
+  
+  // Get data for mini chart - last 6 months with sampling every ~12 days
+  const getLast6MonthsData = () => {
+    // Get 6 months of data from the raw data
+    const now = new Date();
+    const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate());
+    
+    const sixMonthsData = data
+      .filter(item => new Date(item.date) >= sixMonthsAgo)
+      .map(item => ({
+        date: formatDate(new Date(item.date), "MMM d"),
+        originalDate: item.date,
+        "Market Momentum": item.momentum,
+        "Stock Price Strength": item.strength,
+        "Safe Haven Demand": item.safe_haven,
+        "Fear & Greed Index": item.Fear_Greed_Index,
+      }));
+    
+    // Sample every ~12 days (approximately 15 points over 6 months)
+    const sampleInterval = Math.max(1, Math.floor(sixMonthsData.length / 15));
+    return sixMonthsData.filter((_, index) => index % sampleInterval === 0);
+  };
 
   // Helper to get the closest data point to a given date
   function getClosestIndex(targetDate: Date) {
@@ -96,11 +177,6 @@ export default function FearGreedCharts({ data }: Props) {
   const yearAgoIdx = getClosestIndex(new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()));
 
   const historicals = [
-    {
-      label: '1 Week Ago',
-      value: data[weekAgoIdx]?.Fear_Greed_Index,
-      change: ((latestData.Fear_Greed_Index - data[weekAgoIdx]?.Fear_Greed_Index) / data[weekAgoIdx]?.Fear_Greed_Index) * 100,
-    },
     {
       label: '1 Month Ago',
       value: data[monthAgoIdx]?.Fear_Greed_Index,
@@ -196,8 +272,8 @@ export default function FearGreedCharts({ data }: Props) {
     <div className={styles.chartContainer}>
       <div className={styles.chartCard}>
         <div className={styles.chartHeader}>
-          <h2 className={styles.chartTitle}>People's mood</h2>
-          <p className={styles.chartDescription}>
+          <h2 className="title">People's mood</h2>
+          <p className="subtitle">
             A Fear and Greed indicator based onvolatility, momentum, and safe-haven demand.
           </p>
           {/* Horizontal Slider Chart - moved here */}
@@ -233,6 +309,15 @@ export default function FearGreedCharts({ data }: Props) {
         </div>
         {/* Historical Comparison Cards */}
         <div className={styles.historicalCards}>
+          {/* Mini Chart Widget */}
+          <div className={styles.miniChartWidget}>
+            <div className={styles.miniChartHeader}>
+              <span className={styles.miniChartTitle}>6M Trend</span>
+            </div>
+            <div className={styles.miniChartContainer}>
+              <MiniLineChart data={getLast6MonthsData()} color={getSentimentColor(latestData.Fear_Greed_Index)} />
+            </div>
+          </div>
           {historicals.map((h) => (
             <div className={styles.historicalCard} key={h.label}>
               <span className={styles.historicalTitle}>{h.label}</span>
@@ -243,15 +328,27 @@ export default function FearGreedCharts({ data }: Props) {
             </div>
           ))}
         </div>
-        {/* Timeframe Selector (moved here) */}
-        <div className={styles.timeframeSelectorWrapper}>
-          <TimeframeSelector />
-        </div>
-        {/* Line Chart for Fear & Greed Index */}
-        <div className={styles.chartWrapper}>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={filteredData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
+        {/* Detailed Chart Accordion */}
+        <div className={styles.chartAccordion}>
+          <button 
+            className={styles.chartAccordionButton}
+            onClick={() => setIsChartExpanded(!isChartExpanded)}
+          >
+            <span>Index 3 years chart</span>
+            <span className={`${styles.chartAccordionIcon} ${isChartExpanded ? styles.expanded : ''}`}>
+              ▼
+            </span>
+          </button>
+          <div className={`${styles.chartAccordionContent} ${isChartExpanded ? styles.expanded : ''}`}>
+            {/* Timeframe Selector */}
+            <div className={styles.timeframeSelectorWrapper}>
+              <TimeframeSelector />
+            </div>
+            {/* Line Chart for Fear & Greed Index */}
+            <div className={styles.chartWrapper}>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={filteredData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
                                     <XAxis 
                         dataKey="date" 
                         stroke="#9ca3af"
@@ -292,35 +389,37 @@ export default function FearGreedCharts({ data }: Props) {
                           return index % interval === 0 ? value : '';
                         }}
                       />
-              <YAxis 
-                stroke="#9ca3af"
-                tick={false}
-                tickLine={false}
-                axisLine={false}
-                width={0}
-              />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1e1e22',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  borderRadius: '0.5rem',
-                  color: '#fff',
-                  fontSize: '12px',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                }}
-                labelStyle={{ color: '#9ca3af', fontSize: '10px' }}
-                itemStyle={{ fontSize: '12px' }}
-              />
-              <Line
-                type="monotone"
-                dataKey="Fear & Greed Index"
-                stroke={getSentimentColor(latestData.Fear_Greed_Index)}
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4, strokeWidth: 0 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+                  <YAxis 
+                    stroke="#9ca3af"
+                    tick={false}
+                    tickLine={false}
+                    axisLine={false}
+                    width={0}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1e1e22',
+                      border: '1px solid rgba(255, 255, 255, 0.05)',
+                      borderRadius: '0.5rem',
+                      color: '#fff',
+                      fontSize: '12px',
+                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                    }}
+                    labelStyle={{ color: '#9ca3af', fontSize: '10px' }}
+                    itemStyle={{ fontSize: '12px' }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="Fear & Greed Index"
+                    stroke={getSentimentColor(latestData.Fear_Greed_Index)}
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 4, strokeWidth: 0 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </div>
         {/* Expansion Panel for Metric Cards */}
         <div className={styles.expansionPanel}>
@@ -328,7 +427,7 @@ export default function FearGreedCharts({ data }: Props) {
             className={styles.expansionButton}
             onClick={() => setIsExpanded(!isExpanded)}
           >
-                            <span>Index Components</span>
+                            <span>Index detailed components</span>
             <span className={`${styles.expansionIcon} ${isExpanded ? styles.expanded : ''}`}>
               ▼
             </span>
