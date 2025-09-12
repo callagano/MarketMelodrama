@@ -138,56 +138,71 @@ export default function TLDRWidget() {
 
   const fetchTLDRData = async () => {
     try {
+      console.log('=== Fetching TLDR data ===');
       // Only show loading if we don't have cached data
       if (!activePiecesData && !tldrData) {
         setLoading(true);
+        console.log('Setting loading state to true');
       }
       
       // Try ActivePieces endpoint first, then fallback to main API
+      console.log('Fetching from ActivePieces endpoint...');
       let response = await fetch('/api/activepieces/tldr');
       
       if (!response.ok) {
+        console.log('ActivePieces endpoint failed, trying fallback...');
         // Fallback to main API if ActivePieces endpoint fails
         response = await fetch('/api/tldr-update');
       }
       
       if (!response.ok) {
-        throw new Error('Failed to fetch TLDR data');
+        throw new Error(`Failed to fetch TLDR data: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
+      console.log('API response received:', data);
       
       // Handle different response formats
       if (data.body) {
+        console.log('Processing data.body format');
         // Check if we have the new ActivePieces JSON format
         if (data.body.today && typeof data.body.today.text === 'string') {
+          console.log('Found today.text, attempting to parse as ActivePieces JSON');
           try {
             const parsedData = JSON.parse(data.body.today.text);
             if (parsedData.title && parsedData.sentiment && parsedData.highlights && parsedData.big_picture) {
+              console.log('Successfully parsed ActivePieces data:', parsedData);
               setActivePiecesData(parsedData);
               setTldrData(null);
               setError(null);
+              setLoading(false); // Clear loading state
               // Save to cache
               saveToCache(parsedData, true);
               return;
             }
           } catch (parseError) {
             // If parsing fails, fall back to old format
-            console.log('Not ActivePieces JSON format, using old format');
+            console.log('Not ActivePieces JSON format, using old format:', parseError);
           }
         }
         // ActivePieces format (old)
+        console.log('Using old ActivePieces format');
         setTldrData(data.body);
+        setActivePiecesData(null);
+        setError(null);
+        setLoading(false); // Clear loading state
         // Save to cache
         saveToCache(data.body, false);
       } else {
         // Standard API format
+        console.log('Using standard API format');
         setTldrData(data);
+        setActivePiecesData(null);
+        setError(null);
+        setLoading(false); // Clear loading state
         // Save to cache
         saveToCache(data, false);
       }
-      setActivePiecesData(null);
-      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -434,7 +449,7 @@ export default function TLDRWidget() {
         <h2 className="title">The brief</h2>
         </div>
         <div className={styles.content}>
-          <div className={styles.loading}>Loading...</div>
+          <div className={styles.loading}>Loading data...</div>
         </div>
       </div>
     );
@@ -526,7 +541,7 @@ export default function TLDRWidget() {
     );
   }
 
-  // Render old format
+  // Render old format or no data
   return (
     <div className={styles.widget}>
       <div className={styles.header}>
@@ -550,9 +565,12 @@ export default function TLDRWidget() {
           </div>
         ) : (
           <div className={styles.noUpdate}>
-            <p>No update available for today yet.</p>
+            <p>No data available yet.</p>
             <p className={styles.hint}>
-              Come back later to see the latest update.
+              Waiting for ActivePieces to send the latest market data...
+            </p>
+            <p className={styles.hint}>
+              Data will appear here automatically when available.
             </p>
           </div>
         )}
