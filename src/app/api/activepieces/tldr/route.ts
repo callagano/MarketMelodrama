@@ -1,8 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cacheManager } from '@/lib/cache';
-import { storage } from '@/lib/storage';
-import { promises as fs } from 'fs';
-import path from 'path';
 
 // Define types for better TypeScript support
 interface TLDRUpdate {
@@ -17,177 +13,21 @@ interface TLDRData {
   updates: TLDRUpdate[];
 }
 
-// Cache key for TLDR data
-const CACHE_KEY = 'tldr-activepieces-data';
-const PERSISTENT_FILE_PATH = path.join(process.cwd(), 'data', 'tldr-persistent.json');
-const BACKUP_FILE_PATH = path.join(process.cwd(), 'data', 'tldr-backup.json');
-const DATA_FILE_PATH = path.join(process.cwd(), 'data', 'tldr-data.json');
+// Simple in-memory storage (data survives until next Vercel deploy)
+let tldrData: TLDRData = { updates: [] };
+let lastUpdateTime: number = 0;
 
-// In-memory cache for Vercel (fallback)
-let memoryCache: TLDRData | null = null;
-let memoryCacheTimestamp: number = 0;
-
-// Read existing data from multiple persistence sources
-async function readData(): Promise<TLDRData> {
-  // Use simple storage (works in Vercel)
-  try {
-    const data = await storage.getData();
-    if (data.updates && data.updates.length > 0) {
-      console.log(`Reading data from storage: ${data.updates.length} updates`);
-      return data;
-    }
-  } catch (error) {
-    console.log('Failed to read from storage:', error);
-  }
-
-  // Fallback to memory cache
-  if (memoryCache && memoryCache.updates.length > 0) {
-    const now = Date.now();
-    const cacheAge = now - memoryCacheTimestamp;
-    if (cacheAge < 24 * 60 * 60 * 1000) { // 24 hours
-      console.log(`Reading data from memory cache: ${memoryCache.updates.length} updates`);
-      return memoryCache;
-    }
-  }
-
-  // Try file cache (fastest)
-  try {
-    const cachedData = await cacheManager.get<TLDRData>(CACHE_KEY);
-    if (cachedData && cachedData.updates.length > 0) {
-      console.log(`Reading data from file cache: ${cachedData.updates.length} updates`);
-      // Update memory cache
-      memoryCache = cachedData;
-      memoryCacheTimestamp = Date.now();
-      return cachedData;
-    }
-  } catch (error) {
-    console.log('Failed to read from file cache:', error);
-  }
-
-  // Try data file (committed to repo as fallback)
-  try {
-    const dataFileContent = await fs.readFile(DATA_FILE_PATH, 'utf-8');
-    const dataFile = JSON.parse(dataFileContent);
-    if (dataFile.updates && dataFile.updates.length > 0) {
-      console.log(`Reading data from data file: ${dataFile.updates.length} updates`);
-      // Update memory cache
-      memoryCache = dataFile;
-      memoryCacheTimestamp = Date.now();
-      return dataFile;
-    }
-  } catch (error) {
-    console.log('Failed to read from data file:', error);
-  }
-  
-  console.log('No persistent data found, returning empty data');
-  return { updates: [] };
+// Read existing data
+function readData(): TLDRData {
+  console.log(`Reading data: ${tldrData.updates.length} updates in memory`);
+  return tldrData;
 }
 
-// Write data to persistent file (survives deployments)
-async function writePersistentFile(data: TLDRData): Promise<void> {
-  try {
-    // Check if we're in a Vercel environment
-    if (process.env.VERCEL) {
-      console.log('Skipping persistent file write in Vercel environment');
-      return;
-    }
-    
-    // Ensure data directory exists
-    await fs.mkdir(path.dirname(PERSISTENT_FILE_PATH), { recursive: true });
-    
-    const persistentData = {
-      ...data,
-      lastUpdated: Date.now(),
-      version: '1.0'
-    };
-    
-    await fs.writeFile(PERSISTENT_FILE_PATH, JSON.stringify(persistentData, null, 2));
-    console.log(`Data written to persistent file: ${data.updates.length} updates`);
-  } catch (error) {
-    console.error('Failed to write to persistent file:', error);
-    // Don't throw - this is optional persistence
-  }
-}
-
-// Write data to backup file (additional safety)
-async function writeBackupFile(data: TLDRData): Promise<void> {
-  try {
-    // Check if we're in a Vercel environment
-    if (process.env.VERCEL) {
-      console.log('Skipping backup file write in Vercel environment');
-      return;
-    }
-    
-    // Ensure data directory exists
-    await fs.mkdir(path.dirname(BACKUP_FILE_PATH), { recursive: true });
-    
-    const backupData = {
-      ...data,
-      lastUpdated: Date.now(),
-      version: '1.0',
-      backup: true
-    };
-    
-    await fs.writeFile(BACKUP_FILE_PATH, JSON.stringify(backupData, null, 2));
-    console.log(`Data written to backup file: ${data.updates.length} updates`);
-  } catch (error) {
-    console.error('Failed to write to backup file:', error);
-    // Don't throw - this is optional persistence
-  }
-}
-
-// Write data to data file (committed to repo)
-async function writeDataFile(data: TLDRData): Promise<void> {
-  try {
-    const dataFile = {
-      ...data,
-      lastUpdated: Date.now(),
-      version: '1.0'
-    };
-    
-    await fs.writeFile(DATA_FILE_PATH, JSON.stringify(dataFile, null, 2));
-    console.log(`Data written to data file: ${data.updates.length} updates`);
-  } catch (error) {
-    console.error('Failed to write to data file:', error);
-  }
-}
-
-// Write data to all persistence layers
-async function writeData(data: TLDRData): Promise<void> {
-  // Use simple storage (works in Vercel)
-  await storage.setData(data);
-  console.log(`Data written to storage: ${data.updates.length} updates`);
-
-  // Update memory cache
-  memoryCache = data;
-  memoryCacheTimestamp = Date.now();
-  console.log(`Data written to memory cache: ${data.updates.length} updates`);
-
-  // Write to data file (committed to repo) - this will persist across deployments
-  await writeDataFile(data);
-
-  // Write to file cache (fast access) - this is the primary persistence in Vercel
-  try {
-    await cacheManager.set(CACHE_KEY, data, 24 * 7); // 7 days TTL
-    console.log(`Data written to file cache: ${data.updates.length} updates`);
-  } catch (error) {
-    console.error('Failed to write to file cache:', error);
-    // This is critical - if cache fails, we should still try to continue
-  }
-
-  // Write to persistent file (survives deployments) - optional
-  try {
-    await writePersistentFile(data);
-  } catch (error) {
-    console.error('Failed to write persistent file:', error);
-  }
-  
-  // Write to backup file (additional safety) - optional
-  try {
-    await writeBackupFile(data);
-  } catch (error) {
-    console.error('Failed to write backup file:', error);
-  }
+// Write data (simple in-memory storage)
+function writeData(data: TLDRData): void {
+  tldrData = data;
+  lastUpdateTime = Date.now();
+  console.log(`Data written to memory: ${data.updates.length} updates`);
 }
 
 export async function POST(request: NextRequest) {
@@ -259,7 +99,7 @@ export async function POST(request: NextRequest) {
       console.log('Processing as plain text data');
     }
 
-    const currentData = await readData();
+    const currentData = readData();
     const today = new Date().toISOString().split('T')[0];
     
     // Always override data when new data comes from ActivePieces
@@ -302,7 +142,7 @@ export async function POST(request: NextRequest) {
       currentData.updates = currentData.updates.slice(-50);
     }
 
-    await writeData(currentData);
+    writeData(currentData);
 
     console.log(`ActivePieces TLDR update received for ${today}: ${processedText.substring(0, 100)}...`);
     console.log(`Total updates in storage: ${currentData.updates.length}`);
@@ -336,7 +176,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    const data = await readData();
+    const data = readData();
     const today = new Date().toISOString().split('T')[0];
     
     // Return today's update if available
@@ -345,19 +185,8 @@ export async function GET() {
     // Get recent updates excluding today's update
     const recentUpdates = data.updates.filter((update: TLDRUpdate) => update.date !== today).slice(-7);
     
-    // Get cache info for persistence details
-    const cacheInfo = await cacheManager.getCacheInfo(CACHE_KEY);
     const now = Date.now();
-    const timeUntilExpiry = cacheInfo?.expiresAt ? Math.round((cacheInfo.expiresAt - now) / 1000 / 60) : 0;
-    
-    // Check persistent file status
-    let persistentFileStatus = 'not_found';
-    try {
-      const persistentStats = await fs.stat(PERSISTENT_FILE_PATH);
-      persistentFileStatus = 'exists';
-    } catch (error) {
-      // File doesn't exist
-    }
+    const timeSinceLastUpdate = lastUpdateTime > 0 ? Math.round((now - lastUpdateTime) / 1000 / 60) : 0;
     
     return NextResponse.json({
       status: 200,
@@ -367,19 +196,16 @@ export async function GET() {
         recent: recentUpdates,
         total: data.updates.length,
         persistence: {
-          lastUpdated: cacheInfo?.age ? now - cacheInfo.age : 0,
-          expiresInMinutes: timeUntilExpiry,
-          isExpired: timeUntilExpiry <= 0,
-          behavior: "Data persists until new data arrives - survives Vercel deployments",
-          cacheStatus: cacheInfo?.exists ? 'cached' : 'not_cached',
-          persistentFileStatus: persistentFileStatus,
-          layers: ['cache', 'persistent_file', 'backup_file']
+          lastUpdated: lastUpdateTime,
+          minutesSinceLastUpdate: timeSinceLastUpdate,
+          behavior: "Data persists in memory until next Vercel deployment",
+          storage: 'memory'
         },
         deploymentInfo: {
           hasData: data.updates.length > 0,
           message: data.updates.length === 0 ? 
-            "No data available. Data will be restored from persistent storage when ActivePieces sends the next update." :
-            "Data is available and persisted across deployments. New data will override existing data."
+            "No data available. Data will appear when ActivePieces sends the next update." :
+            "Data is available in memory. New data will override existing data."
         }
       }
     });
