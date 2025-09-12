@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cacheManager } from '@/lib/cache';
+import { storage } from '@/lib/storage';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -28,7 +29,18 @@ let memoryCacheTimestamp: number = 0;
 
 // Read existing data from multiple persistence sources
 async function readData(): Promise<TLDRData> {
-  // Try in-memory cache first (for Vercel)
+  // Use simple storage (works in Vercel)
+  try {
+    const data = await storage.getData();
+    if (data.updates && data.updates.length > 0) {
+      console.log(`Reading data from storage: ${data.updates.length} updates`);
+      return data;
+    }
+  } catch (error) {
+    console.log('Failed to read from storage:', error);
+  }
+
+  // Fallback to memory cache
   if (memoryCache && memoryCache.updates.length > 0) {
     const now = Date.now();
     const cacheAge = now - memoryCacheTimestamp;
@@ -50,39 +62,6 @@ async function readData(): Promise<TLDRData> {
     }
   } catch (error) {
     console.log('Failed to read from file cache:', error);
-  }
-
-  // Try persistent file (survives deployments) - skip in Vercel
-  if (!process.env.VERCEL) {
-    try {
-      const persistentData = await fs.readFile(PERSISTENT_FILE_PATH, 'utf-8');
-      const parsedData = JSON.parse(persistentData);
-      if (parsedData.updates && parsedData.updates.length > 0) {
-        console.log(`Reading data from persistent file: ${parsedData.updates.length} updates`);
-        // Restore to cache for faster future access
-        await cacheManager.set(CACHE_KEY, parsedData, 24 * 7);
-        return parsedData;
-      }
-    } catch (error) {
-      console.log('Failed to read from persistent file:', error);
-    }
-
-    // Try backup file (last resort) - skip in Vercel
-    try {
-      const backupData = await fs.readFile(BACKUP_FILE_PATH, 'utf-8');
-      const parsedData = JSON.parse(backupData);
-      if (parsedData.updates && parsedData.updates.length > 0) {
-        console.log(`Reading data from backup file: ${parsedData.updates.length} updates`);
-        // Restore to both cache and persistent file
-        await cacheManager.set(CACHE_KEY, parsedData, 24 * 7);
-        await writePersistentFile(parsedData);
-        return parsedData;
-      }
-    } catch (error) {
-      console.log('Failed to read from backup file:', error);
-    }
-  } else {
-    console.log('Skipping file-based persistence in Vercel environment');
   }
 
   // Try data file (committed to repo as fallback)
@@ -175,7 +154,11 @@ async function writeDataFile(data: TLDRData): Promise<void> {
 
 // Write data to all persistence layers
 async function writeData(data: TLDRData): Promise<void> {
-  // Update memory cache first (for Vercel)
+  // Use simple storage (works in Vercel)
+  await storage.setData(data);
+  console.log(`Data written to storage: ${data.updates.length} updates`);
+
+  // Update memory cache
   memoryCache = data;
   memoryCacheTimestamp = Date.now();
   console.log(`Data written to memory cache: ${data.updates.length} updates`);
