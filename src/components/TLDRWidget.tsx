@@ -145,6 +145,9 @@ export default function TLDRWidget() {
       }
     });
     
+    // Add extra spacing after periods for better readability
+    text = text.replace(/\.\s+/g, '.&nbsp;&nbsp;');
+    
     return <span dangerouslySetInnerHTML={{ __html: text }} />;
   };
 
@@ -398,7 +401,7 @@ export default function TLDRWidget() {
             <h3 className={styles.sectionTitle}>Big Picture</h3>
             <div className={styles.sectionContent}>
               {activePiecesData.big_picture.map((item, index) => (
-                <div key={index} className={styles.sectionItem}>
+                <div key={index} className={`${styles.sectionItem} ${styles.bigPictureItem}`}>
                   {renderHighlightedText(item)}
                 </div>
               ))}

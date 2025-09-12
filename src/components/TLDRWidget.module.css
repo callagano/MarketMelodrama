@@ -426,6 +426,21 @@
   color: #e0e0e0;
 }
 
+/* Big Picture section with improved sentence spacing */
+.bigPictureItem {
+  text-align: justify;
+  line-height: 1.8;
+}
+
+/* Add spacing after periods for better readability */
+.bigPictureItem p {
+  margin-bottom: 1rem;
+}
+
+.bigPictureItem p:last-child {
+  margin-bottom: 0;
+}
+
 .sectionItem:hover {
   background: rgba(255, 255, 255, 0.05);
 }
