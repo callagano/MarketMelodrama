@@ -198,7 +198,7 @@ export async function GET() {
         persistence: {
           lastUpdated: lastUpdateTime,
           minutesSinceLastUpdate: timeSinceLastUpdate,
-          behavior: "Data persists in memory until next Vercel deployment",
+          behavior: "Data persists in memory until next Vercel deployment (v2)",
           storage: 'memory'
         },
         deploymentInfo: {
