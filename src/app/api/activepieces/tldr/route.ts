@@ -20,6 +20,7 @@ interface TLDRData {
 const CACHE_KEY = 'tldr-activepieces-data';
 const PERSISTENT_FILE_PATH = path.join(process.cwd(), 'data', 'tldr-persistent.json');
 const BACKUP_FILE_PATH = path.join(process.cwd(), 'data', 'tldr-backup.json');
+const DATA_FILE_PATH = path.join(process.cwd(), 'data', 'tldr-data.json');
 
 // In-memory cache for Vercel (fallback)
 let memoryCache: TLDRData | null = null;
@@ -83,6 +84,21 @@ async function readData(): Promise<TLDRData> {
   } else {
     console.log('Skipping file-based persistence in Vercel environment');
   }
+
+  // Try data file (committed to repo as fallback)
+  try {
+    const dataFileContent = await fs.readFile(DATA_FILE_PATH, 'utf-8');
+    const dataFile = JSON.parse(dataFileContent);
+    if (dataFile.updates && dataFile.updates.length > 0) {
+      console.log(`Reading data from data file: ${dataFile.updates.length} updates`);
+      // Update memory cache
+      memoryCache = dataFile;
+      memoryCacheTimestamp = Date.now();
+      return dataFile;
+    }
+  } catch (error) {
+    console.log('Failed to read from data file:', error);
+  }
   
   console.log('No persistent data found, returning empty data');
   return { updates: [] };
@@ -141,12 +157,31 @@ async function writeBackupFile(data: TLDRData): Promise<void> {
   }
 }
 
+// Write data to data file (committed to repo)
+async function writeDataFile(data: TLDRData): Promise<void> {
+  try {
+    const dataFile = {
+      ...data,
+      lastUpdated: Date.now(),
+      version: '1.0'
+    };
+    
+    await fs.writeFile(DATA_FILE_PATH, JSON.stringify(dataFile, null, 2));
+    console.log(`Data written to data file: ${data.updates.length} updates`);
+  } catch (error) {
+    console.error('Failed to write to data file:', error);
+  }
+}
+
 // Write data to all persistence layers
 async function writeData(data: TLDRData): Promise<void> {
   // Update memory cache first (for Vercel)
   memoryCache = data;
   memoryCacheTimestamp = Date.now();
   console.log(`Data written to memory cache: ${data.updates.length} updates`);
+
+  // Write to data file (committed to repo) - this will persist across deployments
+  await writeDataFile(data);
 
   // Write to file cache (fast access) - this is the primary persistence in Vercel
   try {
