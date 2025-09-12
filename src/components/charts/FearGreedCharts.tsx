@@ -273,7 +273,7 @@ export default function FearGreedCharts({ data }: Props) {
         <div className={styles.chartHeader}>
           <h2 className="title">People's mood</h2>
           <p className="subtitle">
-            A Fear and Greed indicator based onvolatility, momentum, and safe-haven demand.
+            A Fear and Greed indicator based on volatility, momentum, and safe-haven demand.
           </p>
           {/* Horizontal Slider Chart - moved here */}
           <div className={styles.sliderChartWrapper}>
@@ -333,7 +333,7 @@ export default function FearGreedCharts({ data }: Props) {
             className={styles.chartAccordionButton}
             onClick={() => setIsChartExpanded(!isChartExpanded)}
           >
-            <span>Index 3 years chart</span>
+            <span>Main index chart</span>
             <span className={`${styles.chartAccordionIcon} ${isChartExpanded ? styles.expanded : ''}`}>
               ▼
             </span>
@@ -426,7 +426,7 @@ export default function FearGreedCharts({ data }: Props) {
             className={styles.expansionButton}
             onClick={() => setIsExpanded(!isExpanded)}
           >
-                            <span>Index detailed components</span>
+                            <span>Index components</span>
             <span className={`${styles.expansionIcon} ${isExpanded ? styles.expanded : ''}`}>
               ▼
             </span>

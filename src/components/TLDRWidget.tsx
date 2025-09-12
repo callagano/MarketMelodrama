@@ -330,8 +330,8 @@ export default function TLDRWidget() {
   if (loading) {
     return (
       <div className={styles.widget}>
-        <div className={styles.header}>
-          <h3>Today's</h3>
+        <div className={styles.section}>
+        <h2 className="title">The brief</h2>
         </div>
         <div className={styles.content}>
           <div className={styles.loading}>Loading...</div>
@@ -343,8 +343,8 @@ export default function TLDRWidget() {
   if (error) {
     return (
       <div className={styles.widget}>
-        <div className={styles.header}>
-          <h3>Today's</h3>
+        <div className={styles.section}>
+        <h2 className="title">The brief</h2>
         </div>
         <div className={styles.content}>
           <div className={styles.error}>
@@ -412,8 +412,8 @@ export default function TLDRWidget() {
 
           {/* Big Picture Section */}
           <div className={styles.section}>
-            <h3 className={styles.bigPictureTitle}>Big Picture</h3>
             <div className={styles.sectionContent}>
+            <h3 className={styles.bigPictureTitle}>Big Picture</h3>
               {activePiecesData.big_picture.map((item, index) => (
                 <div key={index} className={`${styles.sectionItem} ${styles.bigPictureItem}`}>
                   {renderHighlightedText(item, true)}
@@ -430,7 +430,7 @@ export default function TLDRWidget() {
   return (
     <div className={styles.widget}>
       <div className={styles.header}>
-        <h3>Today's happening</h3>
+        <h3>The Brief</h3>
       </div>
       
       <div className={styles.content}>
@@ -450,9 +450,9 @@ export default function TLDRWidget() {
           </div>
         ) : (
           <div className={styles.noUpdate}>
-            <p>No TLDR update available for today yet.</p>
+            <p>No update available for today yet.</p>
             <p className={styles.hint}>
-              Your Activepieces workflow will send updates here automatically.
+              Come back later to see the latest update.
             </p>
           </div>
         )}

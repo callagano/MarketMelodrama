@@ -40,7 +40,7 @@ body {
 .title {
   font-size: 1.5rem;
   font-weight: 600;
-  background: linear-gradient(45deg, #cbdefc 0%, #7f34c9 40%);
+  background: linear-gradient(45deg, #c3daff 0%, #c68eff 40%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

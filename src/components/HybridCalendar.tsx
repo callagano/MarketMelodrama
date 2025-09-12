@@ -4,16 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import styles from './HybridCalendar.module.css';
 
-interface EarningsEvent {
-  id: number;
-  symbol: string;
-  name: string;
-  reportDate: string;
-  fiscalDateEnding: string;
-  estimate: string;
-  currency: string;
-}
-
 interface IPOEvent {
   id: number;
   company: string;
@@ -27,8 +17,7 @@ interface IPOEvent {
 }
 
 export default function HybridCalendar() {
-  const [activeTab, setActiveTab] = useState<'economic' | 'earnings' | 'ipo'>('economic');
-  const [earningsData, setEarningsData] = useState<EarningsEvent[]>([]);
+  const [activeTab, setActiveTab] = useState<'economic' | 'ipo'>('economic');
   const [ipoData, setIpoData] = useState<IPOEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,31 +61,6 @@ export default function HybridCalendar() {
     }
   }, [activeTab]);
 
-  // Fetch earnings data from Alpha Vantage
-  const fetchEarningsData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await fetch('/api/earnings-calendar?horizon=1month');
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch earnings data');
-      }
-      
-      const result = await response.json();
-      if (result.success) {
-        setEarningsData(result.data);
-      } else {
-        throw new Error(result.error || 'Failed to fetch earnings data');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Fetch IPO data
   const fetchIPOData = async () => {
     try {
@@ -124,16 +88,13 @@ export default function HybridCalendar() {
 
   // Fetch data when tab changes
   useEffect(() => {
-    if (activeTab === 'earnings') {
-      fetchEarningsData();
-    } else if (activeTab === 'ipo') {
+    if (activeTab === 'ipo') {
       fetchIPOData();
     }
   }, [activeTab]);
 
-  // Fetch all data when component first loads to show counts immediately
+  // Fetch IPO data when component first loads to show count immediately
   useEffect(() => {
-    fetchEarningsData();
     fetchIPOData();
   }, []);
 
@@ -160,7 +121,7 @@ export default function HybridCalendar() {
       <CardContent className={styles.cardContent}>
         <div className={styles.header}>
           <h2 className="title">Market Calendar</h2>
-          <p className="subtitle">Economic, earnings and IPO most important events</p>
+          <p className="subtitle">Economic and IPO most important events</p>
         </div>
         <div className={styles.tabContainer}>
           <button
@@ -168,12 +129,6 @@ export default function HybridCalendar() {
             onClick={() => setActiveTab('economic')}
           >
             Economic Events
-          </button>
-          <button
-            className={`${styles.tabButton} ${activeTab === 'earnings' ? styles.active : ''}`}
-            onClick={() => setActiveTab('earnings')}
-          >
-            Earnings ({earningsData.length})
           </button>
           <button
             className={`${styles.tabButton} ${activeTab === 'ipo' ? styles.active : ''}`}
@@ -187,47 +142,6 @@ export default function HybridCalendar() {
           {activeTab === 'economic' && (
             <div ref={containerRef} className={styles.tradingViewContainer}>
               {/* TradingView widget will be inserted here */}
-            </div>
-          )}
-
-          {activeTab === 'earnings' && (
-            <div className={styles.tableContainer}>
-              {loading ? (
-                <div className={styles.loadingContainer}>
-                  <p className={styles.loadingText}>Loading earnings data...</p>
-                </div>
-              ) : error ? (
-                <div className={styles.errorContainer}>
-                  <p className={styles.errorText}>Error: {error}</p>
-                </div>
-              ) : (
-                <>
-                  <div className={styles.tableHeader}>
-                    <div className={styles.dateHeader}>Date</div>
-                    <div className={styles.symbolHeader}>Symbol</div>
-                    <div className={styles.companyHeader}>Company</div>
-                    <div className={styles.estimateHeader}>EPS Estimate</div>
-                    <div className={styles.fiscalHeader}>Fiscal Period</div>
-                  </div>
-                  <div className={styles.tableBody}>
-                    {earningsData.map((earnings) => (
-                      <div key={earnings.id} className={styles.tableRow}>
-                        <div className={styles.dateCell}>
-                          {earnings.reportDate ? formatDate(earnings.reportDate) : '—'}
-                        </div>
-                        <div className={styles.symbolCell}>{earnings.symbol}</div>
-                        <div className={styles.companyCell}>{earnings.name}</div>
-                        <div className={styles.estimateCell}>
-                          {earnings.estimate ? `$${earnings.estimate}` : '—'}
-                        </div>
-                        <div className={styles.fiscalCell}>
-                          {earnings.fiscalDateEnding ? formatDate(earnings.fiscalDateEnding) : '—'}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
             </div>
           )}
 

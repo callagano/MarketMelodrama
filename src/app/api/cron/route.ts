@@ -8,7 +8,6 @@ export async function GET() {
     // Refresh all data sources
     const endpoints = [
       'trending-stocks',
-      'earnings-calendar', 
       'ipo-calendar',
       'economic-calendar'
     ];
