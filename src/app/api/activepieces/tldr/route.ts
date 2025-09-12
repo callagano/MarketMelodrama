@@ -21,17 +21,34 @@ const CACHE_KEY = 'tldr-activepieces-data';
 const PERSISTENT_FILE_PATH = path.join(process.cwd(), 'data', 'tldr-persistent.json');
 const BACKUP_FILE_PATH = path.join(process.cwd(), 'data', 'tldr-backup.json');
 
+// In-memory cache for Vercel (fallback)
+let memoryCache: TLDRData | null = null;
+let memoryCacheTimestamp: number = 0;
+
 // Read existing data from multiple persistence sources
 async function readData(): Promise<TLDRData> {
-  // Try cache first (fastest)
+  // Try in-memory cache first (for Vercel)
+  if (memoryCache && memoryCache.updates.length > 0) {
+    const now = Date.now();
+    const cacheAge = now - memoryCacheTimestamp;
+    if (cacheAge < 24 * 60 * 60 * 1000) { // 24 hours
+      console.log(`Reading data from memory cache: ${memoryCache.updates.length} updates`);
+      return memoryCache;
+    }
+  }
+
+  // Try file cache (fastest)
   try {
     const cachedData = await cacheManager.get<TLDRData>(CACHE_KEY);
     if (cachedData && cachedData.updates.length > 0) {
-      console.log(`Reading data from cache: ${cachedData.updates.length} updates`);
+      console.log(`Reading data from file cache: ${cachedData.updates.length} updates`);
+      // Update memory cache
+      memoryCache = cachedData;
+      memoryCacheTimestamp = Date.now();
       return cachedData;
     }
   } catch (error) {
-    console.log('Failed to read from cache:', error);
+    console.log('Failed to read from file cache:', error);
   }
 
   // Try persistent file (survives deployments) - skip in Vercel
@@ -126,12 +143,17 @@ async function writeBackupFile(data: TLDRData): Promise<void> {
 
 // Write data to all persistence layers
 async function writeData(data: TLDRData): Promise<void> {
-  // Write to cache (fast access) - this is the primary persistence in Vercel
+  // Update memory cache first (for Vercel)
+  memoryCache = data;
+  memoryCacheTimestamp = Date.now();
+  console.log(`Data written to memory cache: ${data.updates.length} updates`);
+
+  // Write to file cache (fast access) - this is the primary persistence in Vercel
   try {
     await cacheManager.set(CACHE_KEY, data, 24 * 7); // 7 days TTL
-    console.log(`Data written to cache: ${data.updates.length} updates`);
+    console.log(`Data written to file cache: ${data.updates.length} updates`);
   } catch (error) {
-    console.error('Failed to write to cache:', error);
+    console.error('Failed to write to file cache:', error);
     // This is critical - if cache fails, we should still try to continue
   }
 
