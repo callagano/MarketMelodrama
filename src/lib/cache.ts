@@ -11,7 +11,10 @@ export class CacheManager {
   private cacheDir: string;
 
   constructor() {
-    this.cacheDir = path.join(process.cwd(), '.cache');
+    // Use /tmp directory in Vercel environment, .cache in local development
+    this.cacheDir = process.env.VERCEL 
+      ? path.join('/tmp', 'cache') 
+      : path.join(process.cwd(), '.cache');
   }
 
   private async ensureCacheDir(): Promise<void> {
@@ -29,20 +32,24 @@ export class CacheManager {
   async get<T>(key: string): Promise<T | null> {
     try {
       const cacheFile = this.getCacheFilePath(key);
+      console.log(`CacheManager: Reading from ${cacheFile}`);
       const cacheContent = await fs.readFile(cacheFile, 'utf-8');
       const cacheData: CacheData<T> = JSON.parse(cacheContent);
 
       // Check if cache is still valid (24 hours)
       const now = Date.now();
       if (now < cacheData.expiresAt) {
+        console.log(`CacheManager: Cache hit for key ${key}`);
         return cacheData.data;
       }
 
       // Cache expired, remove the file
+      console.log(`CacheManager: Cache expired for key ${key}`);
       await this.delete(key);
       return null;
     } catch (error) {
       // Cache file doesn't exist or is invalid
+      console.log(`CacheManager: Cache miss for key ${key}:`, error.message);
       return null;
     }
   }
@@ -61,7 +68,9 @@ export class CacheManager {
       };
 
       const cacheFile = this.getCacheFilePath(key);
+      console.log(`CacheManager: Writing to ${cacheFile}`);
       await fs.writeFile(cacheFile, JSON.stringify(cacheData, null, 2));
+      console.log(`CacheManager: Successfully cached data for key ${key}`);
     } catch (error) {
       console.error(`Failed to save cache for key ${key}:`, error);
     }
