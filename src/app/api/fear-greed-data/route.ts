@@ -26,17 +26,11 @@ const generateMockData = (days: number = 1825) => {
     const date = new Date(today);
     date.setDate(date.getDate() - i);
     
-    // Generate random values for each metric
-    const momentum = 50 + Math.sin(i / 30) * 30 + (Math.random() - 0.5) * 10;
-    const strength = 50 + Math.sin(i / 45) * 30 + (Math.random() - 0.5) * 10;
-    const safe_haven = 50 + Math.sin(i / 60) * 30 + (Math.random() - 0.5) * 10;
-    const fearGreedIndex = (momentum + strength + safe_haven) / 3;
+    // Generate random Fear & Greed Index value
+    const fearGreedIndex = 50 + Math.sin(i / 30) * 30 + (Math.random() - 0.5) * 10;
     
     data.push({
       date: date.toISOString().split('T')[0],
-      momentum,
-      strength,
-      safe_haven,
       Fear_Greed_Index: fearGreedIndex
     });
   }
@@ -55,9 +49,6 @@ async function fetchFearGreedData() {
       const csvData = readCsvFile(updatedCsvPath);
       return csvData.map((row: any) => ({
         date: row.Date,
-        momentum: parseFloat(row['Fear Greed']) || 0,
-        strength: parseFloat(row['Fear Greed']) || 0,
-        safe_haven: parseFloat(row['Fear Greed']) || 0,
         Fear_Greed_Index: parseFloat(row['Fear Greed']) || 0
       }));
     }
@@ -70,9 +61,6 @@ async function fetchFearGreedData() {
       const csvData = readCsvFile(originalCsvPath);
       return csvData.map((row: any) => ({
         date: row.Date,
-        momentum: parseFloat(row['Fear Greed']) || 0,
-        strength: parseFloat(row['Fear Greed']) || 0,
-        safe_haven: parseFloat(row['Fear Greed']) || 0,
         Fear_Greed_Index: parseFloat(row['Fear Greed']) || 0
       }));
     }
@@ -86,9 +74,6 @@ async function fetchFearGreedData() {
       const csvData = readCsvFile(csvPath);
       return csvData.map((row: any) => ({
         date: row.date,
-        momentum: parseFloat(row.momentum),
-        strength: parseFloat(row.strength),
-        safe_haven: parseFloat(row.safe_haven),
         Fear_Greed_Index: parseFloat(row.Fear_Greed_Index)
       }));
     }

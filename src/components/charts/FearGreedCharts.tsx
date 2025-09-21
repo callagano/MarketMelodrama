@@ -8,9 +8,6 @@ import styles from './FearGreedCharts.module.css';
 
 interface ChartData {
   date: string;
-  momentum: number;
-  strength: number;
-  safe_haven: number;
   Fear_Greed_Index: number;
 }
 
@@ -78,7 +75,6 @@ function MiniLineChart({ data, color }: { data: ChartData[], color: string }) {
 
 export default function FearGreedCharts({ data }: Props) {
   const { timeframe, setTimeframe } = useTimeframe();
-  const [isExpanded, setIsExpanded] = useState(false);
   const [isChartExpanded, setIsChartExpanded] = useState(false);
   
   // Filter data based on selected timeframe
@@ -121,9 +117,6 @@ export default function FearGreedCharts({ data }: Props) {
                           return {
                     date: formatDate(new Date(item.date), dateFormat),
                     originalDate: item.date, // Keep original date for tickFormatter
-                    "Market Momentum": item.momentum,
-                    "Stock Price Strength": item.strength,
-                    "Safe Haven Demand": item.safe_haven,
                     "Fear_Greed_Index": item.Fear_Greed_Index,
                   };
       });
@@ -155,9 +148,6 @@ export default function FearGreedCharts({ data }: Props) {
       .filter(item => new Date(item.date) >= sixMonthsAgo)
       .map(item => ({
         date: formatDate(new Date(item.date), "MMM d"),
-        momentum: item.momentum,
-        strength: item.strength,
-        safe_haven: item.safe_haven,
         Fear_Greed_Index: item.Fear_Greed_Index,
       }));
     
@@ -223,37 +213,27 @@ export default function FearGreedCharts({ data }: Props) {
     return "#ef4444"; // red
   };
 
+  // Function to handle mini chart click
+  const handleMiniChartClick = () => {
+    // Open the Timeline accordion if it's closed
+    if (!isChartExpanded) {
+      setIsChartExpanded(true);
+    }
+    
+    // Scroll to the Timeline accordion after a short delay to ensure it's rendered
+    setTimeout(() => {
+      const accordionElement = document.querySelector(`.${styles.chartAccordion}`);
+      if (accordionElement) {
+        accordionElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+    }, 100);
+  };
 
 
-  const chartConfigs = [
-    {
-      title: "Market Momentum",
-      dataKey: "Market Momentum",
-      color: "#10b981", // emerald
-      description: "Measures the rate of change in market prices. High values indicate strong upward momentum, suggesting investors are confident and actively buying. This can signal potential market bubbles.",
-      currentValue: latestValidData.momentum,
-      sentimentLabel: getSentimentLabel(latestValidData.momentum),
-      sentimentColor: getSentimentColor(latestValidData.momentum)
-    },
-    {
-      title: "Stock Price Strength",
-      dataKey: "Stock Price Strength",
-      color: "#f59e0b", // amber
-      description: "Tracks the number of stocks hitting 52-week highs vs. lows. High values show broad market strength with many stocks reaching new highs, indicating strong bullish sentiment.",
-      currentValue: latestValidData.strength,
-      sentimentLabel: getSentimentLabel(latestValidData.strength),
-      sentimentColor: getSentimentColor(latestValidData.strength)
-    },
-    {
-      title: "Safe Haven Demand",
-      dataKey: "Safe Haven Demand",
-      color: "#ec4899", // pink
-      description: "Measures the performance of safe-haven assets like gold and bonds. High values indicate investors are seeking safety, often during market uncertainty or fear periods.",
-      currentValue: latestValidData.safe_haven,
-      sentimentLabel: getSentimentLabel(latestValidData.safe_haven),
-      sentimentColor: getSentimentColor(latestValidData.safe_haven)
-    },
-  ];
+
 
   // Timeframe selector component to be reused
   const TimeframeSelector = () => (
@@ -326,7 +306,7 @@ export default function FearGreedCharts({ data }: Props) {
         {/* Historical Comparison Cards */}
         <div className={styles.historicalCards}>
           {/* Mini Chart Widget */}
-          <div className={styles.miniChartWidget}>
+          <div className={styles.miniChartWidget} onClick={handleMiniChartClick}>
             <div className={styles.miniChartHeader}>
               <span className={styles.miniChartTitle}>6M Trend</span>
             </div>
@@ -344,13 +324,13 @@ export default function FearGreedCharts({ data }: Props) {
             </div>
           ))}
         </div>
-        {/* Detailed Chart Accordion */}
+        {/* Timeline Accordion */}
         <div className={styles.chartAccordion}>
           <button 
             className={styles.chartAccordionButton}
             onClick={() => setIsChartExpanded(!isChartExpanded)}
           >
-            <span>Main index chart</span>
+            <span>Timeline</span>
             <span className={`${styles.chartAccordionIcon} ${isChartExpanded ? styles.expanded : ''}`}>
               ▼
             </span>
@@ -435,106 +415,6 @@ export default function FearGreedCharts({ data }: Props) {
                 </LineChart>
               </ResponsiveContainer>
             </div>
-          </div>
-        </div>
-        {/* Expansion Panel for Metric Cards */}
-        <div className={styles.expansionPanel}>
-          <button 
-            className={styles.expansionButton}
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-                            <span>Index components</span>
-            <span className={`${styles.expansionIcon} ${isExpanded ? styles.expanded : ''}`}>
-              ▼
-            </span>
-          </button>
-          <div className={`${styles.expansionContent} ${isExpanded ? styles.expanded : ''}`}>
-            {chartConfigs.map((config) => (
-              <div key={config.title} className={styles.chartCard}>
-                <div className={styles.chartHeader}>
-                  <h2 className={styles.chartTitle}>{config.title}</h2>
-                  <p className={styles.chartDescription}>{config.description}</p>
-                  <div className={styles.currentValueContainer} style={{ borderColor: config.sentimentColor }}>
-                    <div className={styles.valueDisplay}>
-                      <span className={styles.currentValue} style={{ color: config.sentimentColor }}>
-                        {Math.round(config.currentValue)}
-                      </span>
-                      <span className={styles.sentimentLabel} style={{ color: config.sentimentColor }}>
-                        {config.sentimentLabel}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className={styles.chartWrapper}>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={filteredData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
-                                    <XAxis 
-                dataKey="date" 
-                stroke="#9ca3af"
-                tick={{ fill: '#9ca3af', fontSize: 10 }}
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(value, index) => {
-                  // For 3Y: show only one label per year with proper spacing
-                  if (timeframe === '3Y') {
-                    const dataPoint = filteredData[index];
-                    if (!dataPoint || !dataPoint.originalDate) return '';
-                    
-                    const date = new Date(dataPoint.originalDate);
-                    const year = date.getFullYear();
-                    
-                    // Get all unique years in the data
-                    const uniqueYears = [...new Set(filteredData.map(item => 
-                      new Date(item.originalDate).getFullYear()
-                    ))].sort();
-                    
-                    // Find the middle data point for each year
-                    const yearDataPoints = filteredData.filter(item => 
-                      new Date(item.originalDate).getFullYear() === year
-                    );
-                    
-                    const middleIndex = Math.floor(yearDataPoints.length / 2);
-                    const isMiddlePoint = yearDataPoints[middleIndex] === dataPoint;
-                    
-                    return isMiddlePoint ? value : '';
-                  }
-                  
-                  // For 1M and 6M: uniform distribution
-                  const totalPoints = filteredData.length;
-                  const maxLabels = timeframe === '1M' ? 6 : 4; // Max labels to show
-                  const interval = Math.max(1, Math.floor(totalPoints / maxLabels));
-                  
-                  // Show labels at regular intervals
-                  return index % interval === 0 ? value : '';
-                }}
-              />
-
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#1e1e22',
-                          border: '1px solid rgba(255, 255, 255, 0.05)',
-                          borderRadius: '0.5rem',
-                          color: '#fff',
-                          fontSize: '12px',
-                          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                        }}
-                        labelStyle={{ color: '#9ca3af', fontSize: '10px' }}
-                        itemStyle={{ fontSize: '12px' }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey={config.dataKey}
-                        stroke={config.color}
-                        strokeWidth={2}
-                        dot={false}
-                        activeDot={{ r: 4, strokeWidth: 0 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </div>
