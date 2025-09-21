@@ -48,22 +48,6 @@ export default function Home() {
     fetchData();
   }, []);
 
-  if (loading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <p className={styles.loadingText}>Loading data...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.errorContainer}>
-        <p className={styles.errorText}>Error: {error}</p>
-      </div>
-    );
-  }
-
   return (
     <TimeframeProvider>
       <main className={styles.mainContainer}>
@@ -83,7 +67,15 @@ export default function Home() {
         
         <TLDRWidget />
         
-        {data.length > 0 ? (
+        {loading ? (
+          <div className={styles.loadingContainer}>
+            <p className={styles.loadingText}>Loading charts...</p>
+          </div>
+        ) : error ? (
+          <div className={styles.errorContainer}>
+            <p className={styles.errorText}>Error loading charts: {error}</p>
+          </div>
+        ) : data.length > 0 ? (
           <>
             <FearGreedCharts data={data} />
             <TrendingStocks />
@@ -91,7 +83,7 @@ export default function Home() {
           </>
         ) : (
           <div className={styles.noDataCard}>
-            <p className={styles.noDataText}>No data available</p>
+            <p className={styles.noDataText}>No chart data available</p>
           </div>
         )}
       </main>
