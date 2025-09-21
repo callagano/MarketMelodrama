@@ -67,25 +67,10 @@ export default function Home() {
         
         <TLDRWidget />
         
-        {loading ? (
-          <div className={styles.loadingContainer}>
-            <p className={styles.loadingText}>Loading charts...</p>
-          </div>
-        ) : error ? (
-          <div className={styles.errorContainer}>
-            <p className={styles.errorText}>Error loading charts: {error}</p>
-          </div>
-        ) : data.length > 0 ? (
-          <>
-            <FearGreedCharts data={data} />
-            <TrendingStocks />
-            <HybridCalendar />
-          </>
-        ) : (
-          <div className={styles.noDataCard}>
-            <p className={styles.noDataText}>No chart data available</p>
-          </div>
-        )}
+        {/* Temporarily disable other components to isolate TLDRWidget */}
+        <div className={styles.loadingContainer}>
+          <p className={styles.loadingText}>Other components temporarily disabled for debugging</p>
+        </div>
       </main>
     </TimeframeProvider>
   );
