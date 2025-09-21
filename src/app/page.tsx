@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import FearGreedCharts from '@/components/charts/FearGreedCharts';
 import TrendingStocks from '@/components/TrendingStocks';
 import HybridCalendar from '@/components/HybridCalendar';
-import SimpleTLDRWidget from '@/components/SimpleTLDRWidget';
+import StaticTLDRWidget from '@/components/StaticTLDRWidget';
 import { TimeframeProvider } from '@/context/TimeframeContext';
 import styles from './page.module.css';
 
@@ -65,7 +65,7 @@ export default function Home() {
           </div>
         </div>
         
-        <SimpleTLDRWidget />
+        <StaticTLDRWidget />
         
         {loading ? (
           <div className={styles.loadingContainer}>
