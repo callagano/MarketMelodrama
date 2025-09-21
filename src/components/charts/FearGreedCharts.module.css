@@ -88,7 +88,7 @@
   align-items: baseline;
   gap: 0.75rem;
   width: 100%;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .currentValue {
@@ -103,16 +103,6 @@
   color: #9ca3af;
 }
 
-.lastUpdateInfo {
-  margin-top: 0.5rem;
-  text-align: center;
-}
-
-.lastUpdateText {
-  font-size: 0.75rem;
-  color: #6b7280;
-  font-weight: 400;
-}
 
 .chartWrapper {
   flex: 1;

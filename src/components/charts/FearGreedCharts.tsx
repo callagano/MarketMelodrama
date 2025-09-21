@@ -296,11 +296,6 @@ export default function FearGreedCharts({ data }: Props) {
                 {getSentimentLabel(latestValidData.Fear_Greed_Index)}
               </span>
             </div>
-            <div className={styles.lastUpdateInfo}>
-              <span className={styles.lastUpdateText}>
-                Last update: {formatDate(new Date(latestValidData.date), "MMM d, yyyy")}
-              </span>
-            </div>
           </div>
         </div>
         {/* Historical Comparison Cards */}
