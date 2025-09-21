@@ -177,7 +177,7 @@ export default function TLDRWidget() {
     return (
       <div className={styles.widget}>
         <div className={styles.section}>
-          <h2 className="title">The brief</h2>
+          <h2 className="title">Breakfast briefing</h2>
         </div>
         <div className={styles.content}>
           <div className={styles.loading}>Loading data...</div>
@@ -190,7 +190,7 @@ export default function TLDRWidget() {
     return (
       <div className={styles.widget}>
         <div className={styles.section}>
-          <h2 className="title">The brief</h2>
+          <h2 className="title">Breakfast briefing</h2>
         </div>
         <div className={styles.content}>
           <div className={styles.error}>
@@ -210,8 +210,8 @@ export default function TLDRWidget() {
       <div className={styles.widget}>
         <div className={styles.content}>
           <div className={styles.section}>
-            <h2 className="title">The brief</h2>
-            <p className="subtitle">A daily snapshot of the markets.</p>
+            <h2 className="title">Breakfast briefing</h2>
+            <p className="subtitle">What's happening and affecting people's behavior.</p>
             <div className={`${styles.mainContentBox} ${
               activePiecesData.sentiment >= 70 ? styles.positive :
               activePiecesData.sentiment <= 30 ? styles.negative : styles.neutral
@@ -286,8 +286,8 @@ export default function TLDRWidget() {
     <div className={styles.widget}>
       <div className={styles.content}>
         <div className={styles.section}>
-          <h2 className="title">The brief</h2>
-          <p className="subtitle">A daily snapshot of the markets.</p>
+          <h2 className="title">Breakfast briefing</h2>
+          <p className="subtitle">What's happening and affecting people's behavior.</p>
           <div className={`${styles.mainContentBox} ${styles.neutral}`}>
             <div className={styles.pulseIcon}>
               <svg 

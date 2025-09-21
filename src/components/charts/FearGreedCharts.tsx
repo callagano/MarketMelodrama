@@ -263,9 +263,9 @@ export default function FearGreedCharts({ data }: Props) {
     <div className={styles.chartContainer}>
       <div className={styles.chartCard}>
         <div className={styles.chartHeader}>
-          <h2 className="title">People's mood</h2>
+          <h2 className="title">Investor's mood</h2>
           <p className="subtitle">
-            A Fear and Greed indicator based on volatility, momentum, and safe-haven demand.
+            From extreme fear to extreme greed, how people are feeling about the markets.
           </p>
           {/* Horizontal Slider Chart - moved here */}
           <div className={styles.sliderChartWrapper}>

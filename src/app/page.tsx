@@ -86,6 +86,13 @@ export default function Home() {
             <p className={styles.noDataText}>No chart data available</p>
           </div>
         )}
+        
+        {/* Disclaimer */}
+        <div className={styles.disclaimer}>
+          <p className={styles.disclaimerText}>
+            Marketmelodrama.vercel.app is for educational and entertainment purposes only. It is based on real market data but is not investment advice. Content is generated using AI language models that can be unpredictable. Market insights may be inaccurate or misleading. Creator assumes no liability whatsoever for any decisions made based on this information. Do not use for investment decisions.
+          </p>
+        </div>
       </main>
     </TimeframeProvider>
   );

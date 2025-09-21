@@ -138,4 +138,33 @@
 .noDataText {
   color: #9ca3af;
   font-size: 1rem;
+}
+
+/* Disclaimer */
+.disclaimer {
+  margin-top: 3rem;
+  padding: 1rem;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.disclaimerText {
+  color: #6b7280;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  margin: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  .disclaimer {
+    margin-top: 2rem;
+    padding: 0.75rem;
+  }
+  
+  .disclaimerText {
+    font-size: 0.7rem;
+  }
 } 
