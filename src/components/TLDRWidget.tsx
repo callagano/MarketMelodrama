@@ -75,12 +75,6 @@ export default function TLDRWidget() {
       
       const data = await response.json();
       console.log('API response received:', data);
-      console.log('Data structure check:', {
-        hasBody: !!data.body,
-        hasToday: !!data.body?.today,
-        todayType: typeof data.body?.today,
-        totalUpdates: data.body?.total || 0
-      });
       
       // Handle different response formats
       if (data.body) {
@@ -482,7 +476,6 @@ export default function TLDRWidget() {
   }
 
   // Render old format or no data
-  console.log('Rendering old format or no data. tldrData:', tldrData);
   return (
       <div className={styles.widget}>
         <div className={styles.header}>
