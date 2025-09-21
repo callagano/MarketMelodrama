@@ -66,7 +66,7 @@ export default function TrendingStocks() {
       <div className={styles.container}>
         <div className={styles.header}>
           <h2 className="title">Trending stocks</h2>
-          <p className="subtitle">What people's talking about, on Reddit over the past 24 hours.</p>
+          <p className="subtitle">What <span className="people-highlight">people</span>'s talking about, on Reddit over the past 24 hours.</p>
         </div>
         <div className={styles.loading}>Loading trending stocks...</div>
       </div>
@@ -78,7 +78,7 @@ export default function TrendingStocks() {
       <div className={styles.container}>
         <div className={styles.header}>
           <h2 className="title">Trending stocks</h2>
-          <p className="subtitle">What people's talking about, on Reddit over the past 24 hours.</p>
+          <p className="subtitle">What <span className="people-highlight">people</span>'s talking about, on Reddit over the past 24 hours.</p>
         </div>
         <div className={styles.error}>Error: {error}</div>
       </div>
@@ -89,7 +89,7 @@ export default function TrendingStocks() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h2 className="title">Trending stocks</h2>
-        <p className="subtitle">What people's talking about, on Reddit over the past 24 hours.</p>
+        <p className="subtitle">What <span className="people-highlight">people</span>'s talking about, on Reddit over the past 24 hours.</p>
       </div>
       
       {/* Tab Navigation */}

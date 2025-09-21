@@ -60,7 +60,7 @@ export default function Home() {
             />
             <div className={styles.textContainer}>
               <h1 className={styles.title}>Market Melodrama</h1>
-              <p className="subtitle">Markets aren't always rational. People either.</p>
+              <p className="subtitle">Markets aren't always rational. <span className="people-highlight">People</span> either.</p>
             </div>
           </div>
         </div>

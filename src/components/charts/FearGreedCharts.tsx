@@ -265,7 +265,7 @@ export default function FearGreedCharts({ data }: Props) {
         <div className={styles.chartHeader}>
           <h2 className="title">Investor's mood</h2>
           <p className="subtitle">
-            From extreme fear to extreme greed, how people are feeling about the markets.
+            From extreme fear to extreme greed, how <span className="people-highlight">people</span> are feeling about the markets.
           </p>
           {/* Horizontal Slider Chart - moved here */}
           <div className={styles.sliderChartWrapper}>

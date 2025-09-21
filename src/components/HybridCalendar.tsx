@@ -119,8 +119,8 @@ export default function HybridCalendar() {
     <Card className={styles.hybridCalendar}>
       <CardContent className={styles.cardContent}>
         <div className={styles.header}>
-          <h2 className="title">Market agenda</h2>
-          <p className="subtitle">When things might change peopl's decisions next</p>
+          <h2 className="title">Market calendar</h2>
+          <p className="subtitle">When things might change <span className="people-highlight">people</span>'s decisions next.</p>
         </div>
         <div className={styles.tabContainer}>
           <button

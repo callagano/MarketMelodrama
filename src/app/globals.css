@@ -57,3 +57,12 @@ body {
   margin: 0 0 1rem 0;
   line-height: 1;
 }
+
+/* Highlighted "People" text with gradient */
+.people-highlight {
+  background: linear-gradient(45deg, #c3daff 0%, #c68eff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+}

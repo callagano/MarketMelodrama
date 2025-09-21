@@ -211,7 +211,7 @@ export default function TLDRWidget() {
         <div className={styles.content}>
           <div className={styles.section}>
             <h2 className="title">Breakfast briefing</h2>
-            <p className="subtitle">What's happening and affecting people's behavior.</p>
+            <p className="subtitle">What happened in the last 24 hours and how <span className="people-highlight">people</span> reacted.</p>
             <div className={`${styles.mainContentBox} ${
               activePiecesData.sentiment >= 70 ? styles.positive :
               activePiecesData.sentiment <= 30 ? styles.negative : styles.neutral
@@ -287,7 +287,7 @@ export default function TLDRWidget() {
       <div className={styles.content}>
         <div className={styles.section}>
           <h2 className="title">Breakfast briefing</h2>
-          <p className="subtitle">What's happening and affecting people's behavior.</p>
+          <p className="subtitle">What happened in the last 24 hours and how <span className="people-highlight">people</span> reacted.</p>
           <div className={`${styles.mainContentBox} ${styles.neutral}`}>
             <div className={styles.pulseIcon}>
               <svg 
