@@ -26,18 +26,24 @@ export default function TestTLDRWidget() {
   useEffect(() => {
     console.log('TestTLDRWidget useEffect running...');
     
-    // Simulate API call
+    // Simulate API call with mocked data
     setTimeout(() => {
       console.log('TestTLDRWidget: Simulating API response...');
       const mockData: TLDRData = {
-        today: null,
+        today: {
+          text: "Test data: Markets are showing mixed signals today with tech stocks leading gains while energy sector faces headwinds.",
+          date: "2025-01-15",
+          source: "test",
+          createdAt: new Date().toISOString()
+        },
         recent: [],
-        total: 0
+        total: 1
       };
       console.log('TestTLDRWidget: Setting tldrData to:', mockData);
       setTldrData(mockData);
       setLoading(false);
-    }, 1000);
+      console.log('TestTLDRWidget: Loading set to false, should render data now');
+    }, 2000);
   }, []);
 
   if (loading) {
