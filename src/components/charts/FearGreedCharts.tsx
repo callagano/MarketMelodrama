@@ -310,7 +310,7 @@ export default function FearGreedCharts({ data }: Props) {
           <div className={styles.currentValueContainer} style={{ borderColor: getSentimentColor(latestValidData.Fear_Greed_Index) }}>
             <div className={styles.valueDisplay}>
               <span className={styles.currentValue} style={{ color: getSentimentColor(latestValidData.Fear_Greed_Index) }}>
-                {latestValidData.Fear_Greed_Index.toFixed(2)}
+                {Math.round(latestValidData.Fear_Greed_Index)}
               </span>
               <span className={styles.sentimentLabel} style={{ color: getSentimentColor(latestValidData.Fear_Greed_Index) }}>
                 {getSentimentLabel(latestValidData.Fear_Greed_Index)}
@@ -337,9 +337,9 @@ export default function FearGreedCharts({ data }: Props) {
           {historicals.map((h) => (
             <div className={styles.historicalCard} key={h.label}>
               <span className={styles.historicalTitle}>{h.label}</span>
-              <span className={styles.historicalValue}>{h.value?.toFixed(2) ?? '--'}</span>
+              <span className={styles.historicalValue}>{h.value ? Math.round(h.value) : '--'}</span>
               <span className={styles.historicalChange} style={{color: h.change >= 0 ? '#10b981' : '#ef4444'}}>
-                {h.change >= 0 ? '+' : ''}{h.value ? h.change.toFixed(2) : '--'}%
+                {h.change >= 0 ? '+' : ''}{h.value ? Math.round(h.change) : '--'}%
               </span>
             </div>
           ))}
@@ -457,7 +457,7 @@ export default function FearGreedCharts({ data }: Props) {
                   <div className={styles.currentValueContainer} style={{ borderColor: config.sentimentColor }}>
                     <div className={styles.valueDisplay}>
                       <span className={styles.currentValue} style={{ color: config.sentimentColor }}>
-                        {config.currentValue.toFixed(2)}
+                        {Math.round(config.currentValue)}
                       </span>
                       <span className={styles.sentimentLabel} style={{ color: config.sentimentColor }}>
                         {config.sentimentLabel}
