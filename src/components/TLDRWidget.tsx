@@ -505,10 +505,7 @@ export default function TLDRWidget() {
           <div className={styles.noUpdate}>
             <p>No data available yet.</p>
             <p className={styles.hint}>
-              Waiting for ActivePieces to send the latest market data...
-            </p>
-            <p className={styles.hint}>
-              Data will appear here automatically when available.
+              Next data update at 8:00 AM GMT+1
             </p>
           </div>
         )}

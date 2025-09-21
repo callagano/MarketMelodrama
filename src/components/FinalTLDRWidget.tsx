@@ -262,54 +262,82 @@ export default function FinalTLDRWidget() {
     );
   }
 
-  // Render old format or no data
+  // Render with modern style even when no data
   return (
     <div className={styles.widget}>
-      <div className={styles.header}>
-        <h3>The Brief</h3>
-      </div>
-      
       <div className={styles.content}>
-        {tldrData?.today ? (
-          <div className={styles.todayUpdate}>
-            {renderTLDRContent(tldrData.today.text)}
-            <div className={styles.meta}>
-              <span className={styles.date}>
-                {formatDate(tldrData.today.date)}
-              </span>
-              {tldrData.today.updatedAt && (
-                <span className={styles.updated}>
-                  Updated: {new Date(tldrData.today.updatedAt).toLocaleTimeString()}
-                </span>
-              )}
+        <div className={styles.section}>
+          <h2 className="title">The brief</h2>
+          <p className="subtitle">A daily snapshot of the markets.</p>
+          <div className={`${styles.mainContentBox} ${styles.neutral}`}>
+            <div className={styles.pulseIcon}>
+              <svg 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+                className={styles.pulseSvg}
+              >
+                <circle 
+                  cx="12" 
+                  cy="12" 
+                  r="4" 
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+            <div className={styles.titleContainer}>
+              <div className={styles.titleText}>
+                {tldrData?.today ? tldrData.today.text : "No data available yet"}
+              </div>
+              <div className={styles.sentimentScore}>
+                {tldrData?.today ? `Updated: ${formatDate(tldrData.today.date)}` : "Waiting for ActivePieces data..."}
+              </div>
             </div>
           </div>
-        ) : (
-          <div className={styles.noUpdate}>
-            <p>No data available yet.</p>
-            <p className={styles.hint}>
-              Waiting for ActivePieces to send the latest market data...
-            </p>
-            <p className={styles.hint}>
-              Data will appear here automatically when available.
-            </p>
-          </div>
-        )}
-      </div>
+        </div>
 
-      {tldrData?.recent && tldrData.recent.length > 1 && (
-        <div className={styles.recentUpdates}>
-          <h4>Recent Updates</h4>
-          <div className={styles.recentList}>
-            {tldrData.recent.slice(1).map((update, index) => (
-              <div key={index} className={styles.recentItem}>
-                <p className={styles.recentText}>{update.text}</p>
-                <span className={styles.recentDate}>{formatDate(update.date)}</span>
+        <div className={styles.section}>
+          <div className={`${styles.sectionContent} ${styles.masonry}`}>
+            {tldrData?.today ? (
+              <div className={styles.sectionItem}>
+                {renderTLDRContent(tldrData.today.text)}
               </div>
-            ))}
+            ) : (
+              <div className={styles.sectionItem}>
+                <p>Waiting for ActivePieces to send the latest market data...</p>
+                <p className={styles.hint}>
+                  Data will appear here automatically when available.
+                </p>
+              </div>
+            )}
           </div>
         </div>
-      )}
+
+        <div className={styles.section}>
+          <div className={styles.sectionContent}>
+            <h3 className={styles.bigPictureTitle}>Big Picture</h3>
+            {tldrData?.recent && tldrData.recent.length > 1 ? (
+              <div className={styles.sectionItem}>
+                <p>Recent updates will appear here when available.</p>
+                <div className={styles.recentList}>
+                  {tldrData.recent.slice(1).map((update, index) => (
+                    <div key={index} className={styles.recentItem}>
+                      <p className={styles.recentText}>{update.text}</p>
+                      <span className={styles.recentDate}>{formatDate(update.date)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className={styles.sectionItem}>
+                <p>Market insights and analysis will appear here when data is available.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
