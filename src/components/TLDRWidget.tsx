@@ -336,7 +336,7 @@ export default function TLDRWidget() {
                   </>
                 ) : (
                   <>
-                    <p>Waiting for ActivePieces to send the latest market data...</p>
+                    <p>Waiting the latest market data...</p>
                     <p className={styles.hint}>
                       Data will appear here automatically when available.
                     </p>
