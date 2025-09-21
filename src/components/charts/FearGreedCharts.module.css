@@ -117,6 +117,17 @@
   color: #9ca3af;
 }
 
+.lastUpdateInfo {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.lastUpdateText {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 400;
+}
+
 .chartWrapper {
   flex: 1;
   min-height: 300px;

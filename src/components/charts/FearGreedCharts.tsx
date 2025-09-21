@@ -129,9 +129,21 @@ export default function FearGreedCharts({ data }: Props) {
       });
   };
 
-  // Get the latest data point
+  // Get the latest data point (most recent from all_fng_csv.csv)
   const filteredData = getFilteredData();
   const latestData = data[data.length - 1];
+  
+  // Get the most recent non-zero value (in case latest is 0 for weekends)
+  const getLatestValidData = () => {
+    for (let i = data.length - 1; i >= 0; i--) {
+      if (data[i].Fear_Greed_Index > 0) {
+        return data[i];
+      }
+    }
+    return latestData; // fallback to latest even if 0
+  };
+  
+  const latestValidData = getLatestValidData();
   
   // Get data for mini chart - last 6 months with sampling every ~12 days
   const getLast6MonthsData = () => {
@@ -169,7 +181,7 @@ export default function FearGreedCharts({ data }: Props) {
   }
 
   // Get historical values
-  const now = new Date(latestData.date);
+  const now = new Date(latestValidData.date);
   const weekAgoIdx = getClosestIndex(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7));
   const monthAgoIdx = getClosestIndex(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
   const sixMonthsAgoIdx = getClosestIndex(new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()));
@@ -179,17 +191,17 @@ export default function FearGreedCharts({ data }: Props) {
     {
       label: '1 Month Ago',
       value: data[monthAgoIdx]?.Fear_Greed_Index,
-      change: ((latestData.Fear_Greed_Index - data[monthAgoIdx]?.Fear_Greed_Index) / data[monthAgoIdx]?.Fear_Greed_Index) * 100,
+      change: ((latestValidData.Fear_Greed_Index - data[monthAgoIdx]?.Fear_Greed_Index) / data[monthAgoIdx]?.Fear_Greed_Index) * 100,
     },
     {
       label: '6 Months Ago',
       value: data[sixMonthsAgoIdx]?.Fear_Greed_Index,
-      change: ((latestData.Fear_Greed_Index - data[sixMonthsAgoIdx]?.Fear_Greed_Index) / data[sixMonthsAgoIdx]?.Fear_Greed_Index) * 100,
+      change: ((latestValidData.Fear_Greed_Index - data[sixMonthsAgoIdx]?.Fear_Greed_Index) / data[sixMonthsAgoIdx]?.Fear_Greed_Index) * 100,
     },
     {
       label: '1 Year Ago',
       value: data[yearAgoIdx]?.Fear_Greed_Index,
-      change: ((latestData.Fear_Greed_Index - data[yearAgoIdx]?.Fear_Greed_Index) / data[yearAgoIdx]?.Fear_Greed_Index) * 100,
+      change: ((latestValidData.Fear_Greed_Index - data[yearAgoIdx]?.Fear_Greed_Index) / data[yearAgoIdx]?.Fear_Greed_Index) * 100,
     },
   ];
 
@@ -219,27 +231,27 @@ export default function FearGreedCharts({ data }: Props) {
       dataKey: "Market Momentum",
       color: "#10b981", // emerald
       description: "Measures the rate of change in market prices. High values indicate strong upward momentum, suggesting investors are confident and actively buying. This can signal potential market bubbles.",
-      currentValue: latestData.momentum,
-      sentimentLabel: getSentimentLabel(latestData.momentum),
-      sentimentColor: getSentimentColor(latestData.momentum)
+      currentValue: latestValidData.momentum,
+      sentimentLabel: getSentimentLabel(latestValidData.momentum),
+      sentimentColor: getSentimentColor(latestValidData.momentum)
     },
     {
       title: "Stock Price Strength",
       dataKey: "Stock Price Strength",
       color: "#f59e0b", // amber
       description: "Tracks the number of stocks hitting 52-week highs vs. lows. High values show broad market strength with many stocks reaching new highs, indicating strong bullish sentiment.",
-      currentValue: latestData.strength,
-      sentimentLabel: getSentimentLabel(latestData.strength),
-      sentimentColor: getSentimentColor(latestData.strength)
+      currentValue: latestValidData.strength,
+      sentimentLabel: getSentimentLabel(latestValidData.strength),
+      sentimentColor: getSentimentColor(latestValidData.strength)
     },
     {
       title: "Safe Haven Demand",
       dataKey: "Safe Haven Demand",
       color: "#ec4899", // pink
       description: "Measures the performance of safe-haven assets like gold and bonds. High values indicate investors are seeking safety, often during market uncertainty or fear periods.",
-      currentValue: latestData.safe_haven,
-      sentimentLabel: getSentimentLabel(latestData.safe_haven),
-      sentimentColor: getSentimentColor(latestData.safe_haven)
+      currentValue: latestValidData.safe_haven,
+      sentimentLabel: getSentimentLabel(latestValidData.safe_haven),
+      sentimentColor: getSentimentColor(latestValidData.safe_haven)
     },
   ];
 
@@ -290,18 +302,23 @@ export default function FearGreedCharts({ data }: Props) {
             <div 
               className={styles.valueIndicator}
               style={{ 
-                left: `${latestData.Fear_Greed_Index}%`
+                left: `${latestValidData.Fear_Greed_Index}%`
               }}
             >
             </div>
           </div>
-          <div className={styles.currentValueContainer} style={{ borderColor: getSentimentColor(latestData.Fear_Greed_Index) }}>
+          <div className={styles.currentValueContainer} style={{ borderColor: getSentimentColor(latestValidData.Fear_Greed_Index) }}>
             <div className={styles.valueDisplay}>
-              <span className={styles.currentValue} style={{ color: getSentimentColor(latestData.Fear_Greed_Index) }}>
-                {latestData.Fear_Greed_Index.toFixed(2)}
+              <span className={styles.currentValue} style={{ color: getSentimentColor(latestValidData.Fear_Greed_Index) }}>
+                {latestValidData.Fear_Greed_Index.toFixed(2)}
               </span>
-              <span className={styles.sentimentLabel} style={{ color: getSentimentColor(latestData.Fear_Greed_Index) }}>
-                {getSentimentLabel(latestData.Fear_Greed_Index)}
+              <span className={styles.sentimentLabel} style={{ color: getSentimentColor(latestValidData.Fear_Greed_Index) }}>
+                {getSentimentLabel(latestValidData.Fear_Greed_Index)}
+              </span>
+            </div>
+            <div className={styles.lastUpdateInfo}>
+              <span className={styles.lastUpdateText}>
+                Last update: {formatDate(new Date(latestValidData.date), "MMM d, yyyy")}
               </span>
             </div>
           </div>
@@ -314,7 +331,7 @@ export default function FearGreedCharts({ data }: Props) {
               <span className={styles.miniChartTitle}>6M Trend</span>
             </div>
             <div className={styles.miniChartContainer}>
-              <MiniLineChart data={getLast6MonthsData()} color={getSentimentColor(latestData.Fear_Greed_Index)} />
+              <MiniLineChart data={getLast6MonthsData()} color={getSentimentColor(latestValidData.Fear_Greed_Index)} />
             </div>
           </div>
           {historicals.map((h) => (
@@ -410,7 +427,7 @@ export default function FearGreedCharts({ data }: Props) {
                   <Line
                     type="monotone"
                     dataKey="Fear_Greed_Index"
-                    stroke={getSentimentColor(latestData.Fear_Greed_Index)}
+                    stroke={getSentimentColor(latestValidData.Fear_Greed_Index)}
                     strokeWidth={2}
                     dot={false}
                     activeDot={{ r: 4, strokeWidth: 0 }}
