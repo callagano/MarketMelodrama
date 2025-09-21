@@ -41,77 +41,90 @@ export default function TLDRWidget() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Check if it's weekend (Saturday = 6, Sunday = 0)
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+    
     // Use a simple approach that works
     const fetchData = () => {
-      // Try ActivePieces endpoint first
-      fetch('/api/activepieces/tldr')
-        .then(response => {
-          if (!response.ok) {
-            // Fallback to main API if ActivePieces endpoint fails
-            return fetch('/api/tldr-update');
-          }
-          return response;
-        })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Failed to fetch TLDR data');
-          }
-          return response.json();
-        })
-        .then(data => {
-          // Handle different response formats
-          if (data.body) {
-            // Check if we have the new ActivePieces JSON format
-            if (data.body.today && typeof data.body.today.text === 'string') {
-              try {
-                const parsedData = JSON.parse(data.body.today.text);
-                if (parsedData.title && parsedData.sentiment && parsedData.highlights && parsedData.big_picture) {
-                  // Convert string arrays to TLDRItem format
-                  const processedData: ActivePiecesData = {
-                    title: parsedData.title,
-                    sentiment: parsedData.sentiment,
-                    highlights: Array.isArray(parsedData.highlights) 
-                      ? parsedData.highlights.map((item: any) => 
-                          typeof item === 'string' 
-                            ? { text: item, highlights: [] }
-                            : item
-                        )
-                      : [],
-                    big_picture: Array.isArray(parsedData.big_picture)
-                      ? parsedData.big_picture.map((item: any) => 
-                          typeof item === 'string'
-                            ? { text: item, highlights: [] }
-                            : item
-                        )
-                      : []
-                  };
-                  
-                  setActivePiecesData(processedData);
-                  setTldrData(null);
-                  setError(null);
-                  setLoading(false);
-                  return;
-                }
-              } catch (parseError) {
-                // If parsing fails, fall back to old format
-              }
+      // Try ActivePieces endpoint first (only on weekdays)
+      if (!isWeekend) {
+        fetch('/api/activepieces/tldr')
+          .then(response => {
+            if (!response.ok) {
+              // Fallback to main API if ActivePieces endpoint fails
+              return fetch('/api/tldr-update');
             }
-            // ActivePieces format (old)
-            setTldrData(data.body);
-            setActivePiecesData(null);
-            setError(null);
-          } else {
-            // Standard API format
-            setTldrData(data);
-            setActivePiecesData(null);
-            setError(null);
-          }
-          setLoading(false);
-        })
-        .catch(err => {
-          setError(err instanceof Error ? err.message : 'An error occurred');
-          setLoading(false);
-        });
+            return response;
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to fetch TLDR data');
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Handle different response formats
+            if (data.body) {
+              // Check if we have the new ActivePieces JSON format
+              if (data.body.today && typeof data.body.today.text === 'string') {
+                try {
+                  const parsedData = JSON.parse(data.body.today.text);
+                  if (parsedData.title && parsedData.sentiment && parsedData.highlights && parsedData.big_picture) {
+                    // Convert string arrays to TLDRItem format
+                    const processedData: ActivePiecesData = {
+                      title: parsedData.title,
+                      sentiment: parsedData.sentiment,
+                      highlights: Array.isArray(parsedData.highlights) 
+                        ? parsedData.highlights.map((item: any) => 
+                            typeof item === 'string' 
+                              ? { text: item, highlights: [] }
+                              : item
+                          )
+                        : [],
+                      big_picture: Array.isArray(parsedData.big_picture)
+                        ? parsedData.big_picture.map((item: any) => 
+                            typeof item === 'string'
+                              ? { text: item, highlights: [] }
+                              : item
+                          )
+                        : []
+                    };
+                    
+                    setActivePiecesData(processedData);
+                    setTldrData(null);
+                    setError(null);
+                    setLoading(false);
+                    return;
+                  }
+                } catch (parseError) {
+                  // If parsing fails, fall back to old format
+                }
+              }
+              // ActivePieces format (old)
+              setTldrData(data.body);
+              setActivePiecesData(null);
+              setError(null);
+            } else {
+              // Standard API format
+              setTldrData(data);
+              setActivePiecesData(null);
+              setError(null);
+            }
+            setLoading(false);
+          })
+          .catch(err => {
+            setError(err instanceof Error ? err.message : 'An error occurred');
+            setLoading(false);
+          });
+      } else {
+        // Weekend - no data fetching
+        setTldrData(null);
+        setActivePiecesData(null);
+        setError(null);
+        setLoading(false);
+      }
     };
 
     // Execute immediately
@@ -239,7 +252,7 @@ export default function TLDRWidget() {
                       {renderHighlightedText(item)}
                     </div>
                   ))
-                : <div className={styles.sectionItem}>No highlights available</div>
+                : <div className={styles.sectionItem}>Next data update at 8:00 AM GMT+1</div>
               }
             </div>
           </div>
@@ -261,6 +274,12 @@ export default function TLDRWidget() {
       </div>
     );
   }
+
+  // Check if it's weekend for messaging
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+  const dayName = isWeekend ? (dayOfWeek === 0 ? 'Sunday' : 'Saturday') : '';
 
   // Render with modern style even when no data
   return (
@@ -289,10 +308,12 @@ export default function TLDRWidget() {
             </div>
             <div className={styles.titleContainer}>
               <div className={styles.titleText}>
-                {tldrData?.today ? tldrData.today.text : "No data available yet"}
+                {tldrData?.today ? tldrData.today.text : 
+                 isWeekend ? `Markets are closed on ${dayName}` : "No data available yet"}
               </div>
               <div className={styles.sentimentScore}>
-                {tldrData?.today ? `Updated: ${formatDate(tldrData.today.date)}` : "Waiting for ActivePieces data..."}
+                {tldrData?.today ? `Updated: ${formatDate(tldrData.today.date)}` : 
+                 isWeekend ? "Next market update on Monday" : "Waiting for ActivePieces data..."}
               </div>
             </div>
           </div>
@@ -306,10 +327,21 @@ export default function TLDRWidget() {
               </div>
             ) : (
               <div className={styles.sectionItem}>
-                <p>Waiting for ActivePieces to send the latest market data...</p>
-                <p className={styles.hint}>
-                  Data will appear here automatically when available.
-                </p>
+                {isWeekend ? (
+                  <>
+                    <p>Markets are closed on weekends. No new data will be received until Monday.</p>
+                    <p className={styles.hint}>
+                      Market data is only available Monday through Friday during trading hours.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p>Waiting for ActivePieces to send the latest market data...</p>
+                    <p className={styles.hint}>
+                      Data will appear here automatically when available.
+                    </p>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -332,7 +364,11 @@ export default function TLDRWidget() {
               </div>
             ) : (
               <div className={styles.sectionItem}>
-                <p>Market insights and analysis will appear here when data is available.</p>
+                {isWeekend ? (
+                  <p>Market analysis will resume on Monday when markets reopen.</p>
+                ) : (
+                  <p>Market insights and analysis will appear here when data is available.</p>
+                )}
               </div>
             )}
           </div>
