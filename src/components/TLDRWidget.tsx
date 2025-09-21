@@ -36,6 +36,7 @@ interface ActivePiecesData {
 
 
 export default function TLDRWidget() {
+  console.log('TLDRWidget component mounting...');
   const [tldrData, setTldrData] = useState<TLDRData | null>(null);
   const [activePiecesData, setActivePiecesData] = useState<ActivePiecesData | null>(null);
   const [loading, setLoading] = useState(true);
