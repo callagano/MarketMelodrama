@@ -117,6 +117,7 @@ export default function TLDRWidget() {
           }
         }
         // ActivePieces format (old)
+        console.log('Setting tldrData to:', data.body);
         setTldrData(data.body);
         setActivePiecesData(null);
         setError(null);
@@ -372,6 +373,7 @@ export default function TLDRWidget() {
   };
 
   if (loading) {
+    console.log('Rendering loading state');
     return (
       <div className={styles.widget}>
         <div className={styles.section}>
@@ -477,6 +479,7 @@ export default function TLDRWidget() {
   }
 
   // Render old format or no data
+  console.log('Rendering old format or no data. tldrData:', tldrData);
   return (
       <div className={styles.widget}>
         <div className={styles.header}>
