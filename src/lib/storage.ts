@@ -68,3 +68,6 @@ export class SimpleStorage {
 }
 
 export const storage = SimpleStorage.getInstance();
+
+
+

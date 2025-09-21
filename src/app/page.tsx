@@ -4,9 +4,7 @@ import { useEffect, useState } from 'react';
 import FearGreedCharts from '@/components/charts/FearGreedCharts';
 import TrendingStocks from '@/components/TrendingStocks';
 import HybridCalendar from '@/components/HybridCalendar';
-import TLDRWidget from '@/components/TLDRWidget';
-import TestTLDRWidget from '@/components/TestTLDRWidget';
-import SimpleTest from '@/components/SimpleTest';
+import SimpleTLDRWidget from '@/components/SimpleTLDRWidget';
 import { TimeframeProvider } from '@/context/TimeframeContext';
 import styles from './page.module.css';
 
@@ -67,12 +65,27 @@ export default function Home() {
           </div>
         </div>
         
-        <SimpleTest />
+        <SimpleTLDRWidget />
         
-        {/* Temporarily disable other components to isolate TLDRWidget */}
-        <div className={styles.loadingContainer}>
-          <p className={styles.loadingText}>Other components temporarily disabled for debugging</p>
-        </div>
+        {loading ? (
+          <div className={styles.loadingContainer}>
+            <p className={styles.loadingText}>Loading charts...</p>
+          </div>
+        ) : error ? (
+          <div className={styles.errorContainer}>
+            <p className={styles.errorText}>Error loading charts: {error}</p>
+          </div>
+        ) : data.length > 0 ? (
+          <>
+            <FearGreedCharts data={data} />
+            <TrendingStocks />
+            <HybridCalendar />
+          </>
+        ) : (
+          <div className={styles.noDataCard}>
+            <p className={styles.noDataText}>No chart data available</p>
+          </div>
+        )}
       </main>
     </TimeframeProvider>
   );
