@@ -313,66 +313,15 @@ export default function TLDRWidget() {
               </div>
               <div className={styles.sentimentScore}>
                 {tldrData?.today ? `Updated: ${formatDate(tldrData.today.date)}` : 
-                 isWeekend ? "Next market update on Monday" : "Waiting for ActivePieces data..."}
+                 isWeekend ? "Next market update on Monday at 8:00 AM GMT+1" : "Waiting for data..."}
               </div>
             </div>
           </div>
         </div>
 
-        <div className={styles.section}>
-          <div className={`${styles.sectionContent} ${styles.masonry}`}>
-            {tldrData?.today ? (
-              <div className={styles.sectionItem}>
-                {renderTLDRContent(tldrData.today.text)}
-              </div>
-            ) : (
-              <div className={styles.sectionItem}>
-                {isWeekend ? (
-                  <>
-                    <p>Markets are closed on weekends. No new data will be received until Monday.</p>
-                    <p className={styles.hint}>
-                      Market data is only available Monday through Friday during trading hours.
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p>Waiting the latest market data...</p>
-                    <p className={styles.hint}>
-                      Data will appear here automatically when available.
-                    </p>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
+        
 
-        <div className={styles.section}>
-          <div className={styles.sectionContent}>
-            <h3 className={styles.bigPictureTitle}>Big Picture</h3>
-            {tldrData?.recent && tldrData.recent.length > 1 ? (
-              <div className={styles.sectionItem}>
-                <p>Recent updates will appear here when available.</p>
-                <div className={styles.recentList}>
-                  {tldrData.recent.slice(1).map((update, index) => (
-                    <div key={index} className={styles.recentItem}>
-                      <p className={styles.recentText}>{update.text}</p>
-                      <span className={styles.recentDate}>{formatDate(update.date)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className={styles.sectionItem}>
-                {isWeekend ? (
-                  <p>Market analysis will resume on Monday when markets reopen.</p>
-                ) : (
-                  <p>Market insights and analysis will appear here when data is available.</p>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
+        
       </div>
     </div>
   );
