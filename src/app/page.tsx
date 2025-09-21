@@ -6,6 +6,7 @@ import TrendingStocks from '@/components/TrendingStocks';
 import HybridCalendar from '@/components/HybridCalendar';
 import TLDRWidget from '@/components/TLDRWidget';
 import TestTLDRWidget from '@/components/TestTLDRWidget';
+import SimpleTest from '@/components/SimpleTest';
 import { TimeframeProvider } from '@/context/TimeframeContext';
 import styles from './page.module.css';
 
@@ -66,7 +67,7 @@ export default function Home() {
           </div>
         </div>
         
-        <TestTLDRWidget />
+        <SimpleTest />
         
         {/* Temporarily disable other components to isolate TLDRWidget */}
         <div className={styles.loadingContainer}>
