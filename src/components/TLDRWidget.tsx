@@ -194,6 +194,7 @@ export default function TLDRWidget() {
           text = text.replace(regex, `<span class="${styles.highlight} ${styles[direction]}">$1</span>`);
         });
       });
+    }
     
     // For Big Picture, add line breaks after periods and improve readability
     if (isBigPicture) {
