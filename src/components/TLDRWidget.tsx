@@ -179,6 +179,15 @@ export default function TLDRWidget() {
       });
     }
     
+    // For Big Picture, add line breaks after periods and improve readability
+    if (isBigPicture) {
+      // Split text into sentences and add line breaks
+      text = text
+        .replace(/\.\s+/g, '.<br><br>') // Add double line break after periods
+        .replace(/\n\n+/g, '<br><br>') // Handle existing double line breaks
+        .replace(/<br><br><br>/g, '<br><br>'); // Remove triple line breaks
+    }
+    
     return (
       <div 
         className={isBigPicture ? styles.bigPictureText : styles.highlightText}
