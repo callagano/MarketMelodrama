@@ -119,6 +119,8 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
+    console.log('=== GET TLDR data from Supabase ===');
+    
     // Get the most recent TLDR data from Supabase
     const { data, error } = await supabase
       .from('tldr_data')
@@ -126,18 +128,25 @@ export async function GET() {
       .order('created_at', { ascending: false })
       .limit(1);
 
+    console.log('Supabase query result:', { data, error });
+
     if (error) {
       console.error('Error reading data from Supabase:', error);
       return NextResponse.json(
         { 
           status: 500,
-          body: { error: "Failed to read data from Supabase" }
+          body: { 
+            error: "Failed to read data from Supabase",
+            details: error.message,
+            code: error.code
+          }
         }, 
         { status: 500 }
       );
     }
 
     const latestData = data?.[0] || null;
+    console.log('Latest data:', latestData);
     
     return NextResponse.json({
       status: 200,
