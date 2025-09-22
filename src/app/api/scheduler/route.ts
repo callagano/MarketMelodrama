@@ -13,13 +13,13 @@ const SCHEDULED_TASKS: ScheduledTask[] = [
   {
     name: 'Market Data Refresh',
     endpoint: '/api/cron',
-    schedule: '0 7 * * *',
+    schedule: '0 4 * * *',
     description: 'Updates trending stocks, IPO calendar, economic calendar'
   },
   {
     name: 'Fear & Greed Index Update',
     endpoint: '/api/fear-greed-update',
-    schedule: '0 7 * * 1-5',
+    schedule: '0 4 * * 1-5',
     description: 'Updates Fear & Greed Index data (weekdays only)'
   }
 ];

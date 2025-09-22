@@ -252,7 +252,7 @@ export default function TLDRWidget() {
                       {renderHighlightedText(item)}
                     </div>
                   ))
-                : <div className={styles.sectionItem}>Next data update at 8:00 AM GMT+1</div>
+                : <div className={styles.sectionItem}>Next data update at 6:00 AM GMT+2</div>
               }
             </div>
           </div>
@@ -313,7 +313,7 @@ export default function TLDRWidget() {
               </div>
               <div className={styles.sentimentScore}>
                 {tldrData?.today ? `Updated: ${formatDate(tldrData.today.date)}` : 
-                 isWeekend ? "Next market update on Monday at 8:00 AM GMT+1" : "Waiting for data..."}
+                 isWeekend ? "Next market update on Monday at 6:00 AM GMT+2" : "Waiting for data..."}
               </div>
             </div>
           </div>

@@ -50,11 +50,11 @@ def run_fear_greed_update():
         logging.error(f"Error running Fear & Greed Index update: {str(e)}")
 
 def schedule_daily_update():
-    """Schedule the daily update at 8:00 AM GMT+1"""
-    # Schedule for 8:00 AM GMT+1 (7:00 AM UTC)
-    schedule.every().day.at("07:00").do(run_fear_greed_update)
+    """Schedule the daily update at 6:00 AM GMT+2"""
+    # Schedule for 6:00 AM GMT+2 (4:00 AM UTC)
+    schedule.every().day.at("04:00").do(run_fear_greed_update)
     
-    logging.info("Daily Fear & Greed Index update scheduled for 8:00 AM GMT+1")
+    logging.info("Daily Fear & Greed Index update scheduled for 6:00 AM GMT+2")
     logging.info("Scheduler started. Press Ctrl+C to stop.")
     
     # Keep the script running

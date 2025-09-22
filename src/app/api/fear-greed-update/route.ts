@@ -70,7 +70,7 @@ export async function GET() {
     status: 200,
     message: 'Fear & Greed Index Update API',
     description: 'POST to this endpoint to run the daily Fear & Greed update',
-    schedule: 'Runs automatically at 8:00 AM GMT+1 on weekdays',
+    schedule: 'Runs automatically at 6:00 AM GMT+2 on weekdays',
     endpoint: '/api/fear-greed-update'
   });
 }

@@ -8,8 +8,8 @@ Il sistema di scheduling di Market Melodrama è stato ottimizzato per coordinare
 
 ### **Cron Job Principale**
 - **Endpoint**: `/api/scheduler`
-- **Orario**: Ogni giorno alle 7:00 UTC (8:00 AM GMT+1)
-- **Cron Expression**: `0 7 * * *`
+- **Orario**: Ogni giorno alle 4:00 UTC (6:00 AM GMT+2)
+- **Cron Expression**: `0 4 * * *`
 
 ### **Task Coordinati**
 
@@ -31,7 +31,7 @@ Il sistema di scheduling di Market Melodrama è stato ottimizzato per coordinare
 ## 🔄 Flusso di Esecuzione
 
 ```
-7:00 UTC (8:00 AM GMT+1)
+4:00 UTC (6:00 AM GMT+2)
 ├── Controlla se è weekend
 ├── Se LUN-VEN:
 │   ├── Esegui Market Data Refresh
@@ -85,7 +85,7 @@ GET /api/scheduler
   "crons": [
     {
       "path": "/api/scheduler",
-      "schedule": "0 7 * * *"
+      "schedule": "0 4 * * *"
     }
   ]
 }

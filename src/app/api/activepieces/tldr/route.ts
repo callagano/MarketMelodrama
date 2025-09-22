@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 
 // Define types for better TypeScript support
 interface TLDRUpdate {
@@ -11,23 +13,51 @@ interface TLDRUpdate {
 
 interface TLDRData {
   updates: TLDRUpdate[];
+  lastUpdated: number;
+  version: string;
 }
 
-// Simple in-memory storage (data survives until next Vercel deploy)
-let tldrData: TLDRData = { updates: [] };
-let lastUpdateTime: number = 0;
+const DATA_FILE = path.join(process.cwd(), 'data', 'activepieces-tldr.json');
 
-// Read existing data
+// Ensure data directory exists
+function ensureDataDirectory() {
+  const dataDir = path.dirname(DATA_FILE);
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+}
+
+// Read existing data from file
 function readData(): TLDRData {
-  console.log(`Reading data: ${tldrData.updates.length} updates in memory`);
-  return tldrData;
+  try {
+    if (fs.existsSync(DATA_FILE)) {
+      const data = fs.readFileSync(DATA_FILE, 'utf-8');
+      const parsed = JSON.parse(data);
+      console.log(`Reading data from file: ${parsed.updates?.length || 0} updates`);
+      return parsed;
+    }
+  } catch (error) {
+    console.error('Error reading data file:', error);
+  }
+  console.log('No data file found, returning empty data');
+  return { updates: [], lastUpdated: 0, version: '2.0' };
 }
 
-// Write data (simple in-memory storage)
+// Write data to file
 function writeData(data: TLDRData): void {
-  tldrData = data;
-  lastUpdateTime = Date.now();
-  console.log(`Data written to memory: ${data.updates.length} updates`);
+  try {
+    ensureDataDirectory();
+    const dataWithTimestamp = {
+      ...data,
+      lastUpdated: Date.now(),
+      version: '2.0'
+    };
+    fs.writeFileSync(DATA_FILE, JSON.stringify(dataWithTimestamp, null, 2));
+    console.log(`Data written to file: ${data.updates.length} updates`);
+  } catch (error) {
+    console.error('Error writing data file:', error);
+    throw error;
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -127,25 +157,25 @@ export async function POST(request: NextRequest) {
       console.log(`Added new TLDR for ${today} from ActivePieces`);
     }
 
-    // Data retention: keep today's data (always overridden by new ActivePieces data), others for 7 days
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const cutoffDate = sevenDaysAgo.toISOString().split('T')[0];
+    // Data retention: keep today's data (always overridden by new ActivePieces data), others for 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const cutoffDate = thirtyDaysAgo.toISOString().split('T')[0];
     
     // Filter out old updates but always keep today's update (which gets overridden by new data)
     currentData.updates = currentData.updates.filter((update: TLDRUpdate) => 
       update.date >= cutoffDate || update.date === today
     );
     
-    // Ensure we don't have too many updates (max 50)
-    if (currentData.updates.length > 50) {
-      currentData.updates = currentData.updates.slice(-50);
+    // Ensure we don't have too many updates (max 100 for better history)
+    if (currentData.updates.length > 100) {
+      currentData.updates = currentData.updates.slice(-100);
     }
 
     writeData(currentData);
 
     console.log(`ActivePieces TLDR update received for ${today}: ${processedText.substring(0, 100)}...`);
-    console.log(`Total updates in storage: ${currentData.updates.length}`);
+    console.log(`Total updates in persistent storage: ${currentData.updates.length}`);
     console.log('=== ActivePieces POST request completed successfully ===');
 
     // Return response in ActivePieces expected format
@@ -186,7 +216,7 @@ export async function GET() {
     const recentUpdates = data.updates.filter((update: TLDRUpdate) => update.date !== today).slice(-7);
     
     const now = Date.now();
-    const timeSinceLastUpdate = lastUpdateTime > 0 ? Math.round((now - lastUpdateTime) / 1000 / 60) : 0;
+    const timeSinceLastUpdate = data.lastUpdated > 0 ? Math.round((now - data.lastUpdated) / 1000 / 60) : 0;
     
     return NextResponse.json({
       status: 200,
@@ -196,16 +226,18 @@ export async function GET() {
         recent: recentUpdates,
         total: data.updates.length,
         persistence: {
-          lastUpdated: lastUpdateTime,
+          lastUpdated: data.lastUpdated,
           minutesSinceLastUpdate: timeSinceLastUpdate,
-          behavior: "Data persists in memory until next Vercel deployment (v2)",
-          storage: 'memory'
+          behavior: "Data persists in file system until manually deleted or overwritten",
+          storage: 'file',
+          dataFile: DATA_FILE,
+          version: data.version || '2.0'
         },
         deploymentInfo: {
           hasData: data.updates.length > 0,
           message: data.updates.length === 0 ? 
             "No data available. Data will appear when ActivePieces sends the next update." :
-            "Data is available in memory. New data will override existing data."
+            "Data is available in persistent storage. New data will override existing data for the same date."
         }
       }
     });

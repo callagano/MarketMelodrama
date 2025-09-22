@@ -5,7 +5,7 @@ This directory contains scripts to automatically update the Fear & Greed Index d
 ## Files
 
 - `fngindex.py` - Main script that fetches and processes Fear & Greed data
-- `daily_update.py` - Scheduler script that runs fngindex.py daily at 8:00 AM GMT+1
+- `daily_update.py` - Scheduler script that runs fngindex.py daily at 6:00 AM GMT+2
 - `test_daily_update.py` - Test script to verify the update process works
 - `requirements.txt` - Python dependencies
 - `fear-greed.csv` - Historical Fear & Greed data
@@ -15,9 +15,9 @@ This directory contains scripts to automatically update the Fear & Greed Index d
 
 ### 1. Vercel Cron Jobs (Production)
 The script runs automatically on Vercel:
-- **Schedule**: Monday-Friday at 8:00 AM GMT+1 (7:00 AM UTC)
+- **Schedule**: Monday-Friday at 6:00 AM GMT+2 (4:00 AM UTC)
 - **Endpoint**: `/api/fear-greed-update`
-- **Cron Expression**: `0 7 * * 1-5`
+- **Cron Expression**: `0 4 * * 1-5`
 
 ### 2. Local Development
 Run the scheduler locally:
