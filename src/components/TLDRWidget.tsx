@@ -72,24 +72,39 @@ export default function TLDRWidget() {
                 try {
                   const parsedData = JSON.parse(data.body.today.text);
                   if (parsedData.title && parsedData.sentiment && parsedData.highlights && parsedData.big_picture) {
-                    // Convert string arrays to TLDRItem format
+                    // Process highlights array - each item should have text and highlights
+                    const processedHighlights = Array.isArray(parsedData.highlights) 
+                      ? parsedData.highlights.map((item: any) => {
+                          if (typeof item === 'string') {
+                            return { text: item, highlights: [] };
+                          }
+                          // Ensure highlights array exists and is properly formatted
+                          return {
+                            text: item.text || '',
+                            highlights: Array.isArray(item.highlights) ? item.highlights : []
+                          };
+                        })
+                      : [];
+                    
+                    // Process big_picture array - each item should have text and highlights
+                    const processedBigPicture = Array.isArray(parsedData.big_picture)
+                      ? parsedData.big_picture.map((item: any) => {
+                          if (typeof item === 'string') {
+                            return { text: item, highlights: [] };
+                          }
+                          // Ensure highlights array exists and is properly formatted
+                          return {
+                            text: item.text || '',
+                            highlights: Array.isArray(item.highlights) ? item.highlights : []
+                          };
+                        })
+                      : [];
+                    
                     const processedData: ActivePiecesData = {
                       title: parsedData.title,
                       sentiment: parsedData.sentiment,
-                      highlights: Array.isArray(parsedData.highlights) 
-                        ? parsedData.highlights.map((item: any) => 
-                            typeof item === 'string' 
-                              ? { text: item, highlights: [] }
-                              : item
-                          )
-                        : [],
-                      big_picture: Array.isArray(parsedData.big_picture)
-                        ? parsedData.big_picture.map((item: any) => 
-                            typeof item === 'string'
-                              ? { text: item, highlights: [] }
-                              : item
-                          )
-                        : []
+                      highlights: processedHighlights,
+                      big_picture: processedBigPicture
                     };
                     
                     setActivePiecesData(processedData);
@@ -99,6 +114,7 @@ export default function TLDRWidget() {
                     return;
                   }
                 } catch (parseError) {
+                  console.error('Error parsing ActivePieces data:', parseError);
                   // If parsing fails, fall back to old format
                 }
               }
@@ -149,11 +165,17 @@ export default function TLDRWidget() {
     const highlights = item.highlights && Array.isArray(item.highlights) ? item.highlights : [];
     
     if (highlights.length > 0) {
-      highlights.forEach(highlight => {
+      // Sort highlights by word length (longest first) to avoid partial replacements
+      const sortedHighlights = highlights.sort((a, b) => b.word.length - a.word.length);
+      
+      sortedHighlights.forEach(highlight => {
         const word = highlight.word;
         const direction = highlight.direction || 'neutral';
-        const regex = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
-        text = text.replace(regex, `<span class="${styles.highlight} ${styles[direction]}">${word}</span>`);
+        // Escape special regex characters and create a more flexible regex
+        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        // Use a more flexible regex that handles word boundaries and special characters
+        const regex = new RegExp(`(${escapedWord})`, 'gi');
+        text = text.replace(regex, `<span class="${styles.highlight} ${styles[direction]}">$1</span>`);
       });
     }
     
