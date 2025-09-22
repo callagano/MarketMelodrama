@@ -212,7 +212,6 @@ export async function GET() {
     const { data: supabaseData, error } = await supabase
       .from('tldr_data')
       .select('data')
-      .order('id', { ascending: false })
       .limit(1);
 
     console.log('Supabase query result:', { data: supabaseData, error });
