@@ -173,11 +173,26 @@ export default function TLDRWidget() {
       sortedHighlights.forEach(highlight => {
         const word = highlight.word;
         const direction = highlight.direction || 'neutral';
-        // Escape special regex characters and create a more flexible regex
+        
+        // Create multiple patterns to match the word with and without arrows
+        const patterns = [];
+        
+        // Original word with arrows
         const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        // Use a more flexible regex that handles word boundaries and special characters
-        const regex = new RegExp(`(${escapedWord})`, 'gi');
-        text = text.replace(regex, `<span class="${styles.highlight} ${styles[direction]}">$1</span>`);
+        patterns.push(escapedWord);
+        
+        // Word without arrows (remove ▲ and ▼)
+        const wordWithoutArrows = word.replace(/[▲▼]/g, '').trim();
+        if (wordWithoutArrows && wordWithoutArrows !== word) {
+          const escapedWordNoArrows = wordWithoutArrows.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          patterns.push(escapedWordNoArrows);
+        }
+        
+        // Try each pattern
+        patterns.forEach(pattern => {
+          const regex = new RegExp(`\\b(${pattern})\\b`, 'gi');
+          text = text.replace(regex, `<span class="${styles.highlight} ${styles[direction]}">$1</span>`);
+        });
       });
     
     // For Big Picture, add line breaks after periods and improve readability
