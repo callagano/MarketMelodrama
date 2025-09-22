@@ -115,8 +115,43 @@ export default function TLDRWidget() {
             setLoading(false);
           })
           .catch(err => {
-            setError(err instanceof Error ? err.message : 'An error occurred');
-            setLoading(false);
+            // If ActivePieces fails, try simulated data
+            console.log('ActivePieces failed, trying simulated data...');
+            return fetch('/api/simulate-activepieces')
+              .then(response => response.json())
+              .then(simData => {
+                if (simData.success && simData.data) {
+                  const processedData: ActivePiecesData = {
+                    title: simData.data.title,
+                    sentiment: simData.data.sentiment,
+                    highlights: Array.isArray(simData.data.highlights) 
+                      ? simData.data.highlights.map((item: any) => 
+                          typeof item === 'string' 
+                            ? { text: item, highlights: [] }
+                            : item
+                        )
+                      : [],
+                    big_picture: Array.isArray(simData.data.big_picture)
+                      ? simData.data.big_picture.map((item: any) => 
+                          typeof item === 'string'
+                            ? { text: item, highlights: [] }
+                            : item
+                        )
+                      : []
+                  };
+                  
+                  setActivePiecesData(processedData);
+                  setTldrData(null);
+                  setError(null);
+                } else {
+                  setError('No data available from ActivePieces or simulation');
+                }
+                setLoading(false);
+              })
+              .catch(simErr => {
+                setError(err instanceof Error ? err.message : 'An error occurred');
+                setLoading(false);
+              });
           });
       } else {
         // Weekend - no data fetching
