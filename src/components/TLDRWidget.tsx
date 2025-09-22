@@ -184,10 +184,13 @@ export default function TLDRWidget() {
           const escapedWord = wordWithoutArrow.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
           const regex = new RegExp(`\\b(${escapedWord})\\b`, 'gi');
           
-          // Check if the word already has an arrow in the text
-          text = text.replace(regex, (match) => {
-            // If the match already has an arrow, just highlight it
-            if (match.includes('▲') || match.includes('▼')) {
+          // Check if the word already has an arrow in the text by looking at the context
+          text = text.replace(regex, (match, offset, string) => {
+            // Get the character before the match to check for existing arrow
+            const beforeMatch = string.substring(Math.max(0, offset - 1), offset);
+            
+            // If there's already an arrow before the word, just highlight the word
+            if (beforeMatch === '▲' || beforeMatch === '▼') {
               return `<span class="${styles.highlight} ${styles[direction]}">${match}</span>`;
             }
             // If no arrow, add it
