@@ -48,6 +48,25 @@ export async function POST(request: NextRequest) {
     console.log('ActivePieces request body:', JSON.stringify(body, null, 2));
     console.log('Request headers:', Object.fromEntries(request.headers.entries()));
     
+    // Check if this is a clear data command
+    if (body.action === 'clear_all_data') {
+      console.log('=== Clearing all data as requested ===');
+      tldrData = { updates: [], lastUpdated: 0, version: '3.0' };
+      lastUpdateTime = 0;
+      console.log('All data cleared successfully');
+      
+      return NextResponse.json({ 
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+        body: { 
+          success: true,
+          message: "All data cleared successfully",
+          timestamp: new Date().toISOString(),
+          totalUpdates: 0
+        }
+      });
+    }
+    
     // Extract text from various possible locations in ActivePieces request
     // If the body itself is structured data (has title, sentiment, etc.), use it directly
     let text;
