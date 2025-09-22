@@ -72,30 +72,32 @@ export default function TLDRWidget() {
                 try {
                   const parsedData = JSON.parse(data.body.today.text);
                   if (parsedData.title && parsedData.sentiment && parsedData.highlights && parsedData.big_picture) {
-                    // Process highlights array - each item should have text and highlights
+                    // Process highlights array - each item should have text and highlights/highlightedword
                     const processedHighlights = Array.isArray(parsedData.highlights) 
                       ? parsedData.highlights.map((item: any) => {
                           if (typeof item === 'string') {
                             return { text: item, highlights: [] };
                           }
-                          // Ensure highlights array exists and is properly formatted
+                          // Support both 'highlights' and 'highlightedword' fields
+                          const highlightsField = item.highlights || item.highlightedword;
                           return {
                             text: item.text || '',
-                            highlights: Array.isArray(item.highlights) ? item.highlights : []
+                            highlights: Array.isArray(highlightsField) ? highlightsField : []
                           };
                         })
                       : [];
                     
-                    // Process big_picture array - each item should have text and highlights
+                    // Process big_picture array - each item should have text and highlights/highlightedword
                     const processedBigPicture = Array.isArray(parsedData.big_picture)
                       ? parsedData.big_picture.map((item: any) => {
                           if (typeof item === 'string') {
                             return { text: item, highlights: [] };
                           }
-                          // Ensure highlights array exists and is properly formatted
+                          // Support both 'highlights' and 'highlightedword' fields
+                          const highlightsField = item.highlights || item.highlightedword;
                           return {
                             text: item.text || '',
-                            highlights: Array.isArray(item.highlights) ? item.highlights : []
+                            highlights: Array.isArray(highlightsField) ? highlightsField : []
                           };
                         })
                       : [];
