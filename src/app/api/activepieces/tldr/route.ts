@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase';
 
 // Define types for better TypeScript support
 interface TLDRUpdate {
@@ -205,39 +206,107 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    const data = readData();
-    const today = new Date().toISOString().split('T')[0];
+    console.log('=== Reading TLDR data from Supabase ===');
     
-    // Return today's update if available
-    const todayUpdate = data.updates.find((update: TLDRUpdate) => update.date === today);
+    // Get the most recent TLDR data from Supabase
+    const { data: supabaseData, error } = await supabase
+      .from('tldr_data')
+      .select('data')
+      .order('id', { ascending: false })
+      .limit(1);
+
+    console.log('Supabase query result:', { data: supabaseData, error });
+
+    if (error) {
+      console.error('Error reading data from Supabase:', error);
+      return NextResponse.json(
+        { 
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+          body: { 
+            error: "Failed to read data from Supabase",
+            details: error.message,
+            code: error.code
+          }
+        }, 
+        { status: 500 }
+      );
+    }
+
+    const latestData = supabaseData?.[0]?.data || null;
+    console.log('Latest data from Supabase:', latestData);
     
-    // Get recent updates excluding today's update
-    const recentUpdates = data.updates.filter((update: TLDRUpdate) => update.date !== today).slice(-7);
-    
-    const now = Date.now();
-    const timeSinceLastUpdate = data.lastUpdated > 0 ? Math.round((now - data.lastUpdated) / 1000 / 60) : 0;
-    
+    if (!latestData) {
+      return NextResponse.json({
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+        body: {
+          today: null,
+          recent: [],
+          total: 0,
+          persistence: {
+            lastUpdated: 0,
+            minutesSinceLastUpdate: 0,
+            behavior: "Data persists permanently in Supabase database",
+            storage: 'supabase',
+            version: '5.0',
+            retention: 'permanent',
+            maxUpdates: 'unlimited'
+          },
+          deploymentInfo: {
+            hasData: false,
+            message: "No data available in Supabase. Data will appear when ActivePieces sends the next update."
+          }
+        }
+      });
+    }
+
+    // Parse the JSON data from Supabase
+    let parsedData;
+    try {
+      parsedData = typeof latestData === 'string' ? JSON.parse(latestData) : latestData;
+    } catch (parseError) {
+      console.error('Error parsing data from Supabase:', parseError);
+      return NextResponse.json(
+        { 
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+          body: { 
+            error: "Failed to parse data from Supabase",
+            details: parseError
+          }
+        }, 
+        { status: 500 }
+      );
+    }
+
+    // Convert to the expected format
+    const todayUpdate = {
+      text: JSON.stringify(parsedData),
+      date: new Date().toISOString().split('T')[0],
+      source: 'activepieces',
+      createdAt: new Date().toISOString()
+    };
+
     return NextResponse.json({
       status: 200,
       headers: { "Content-Type": "application/json" },
       body: {
-        today: todayUpdate || null,
-        recent: recentUpdates,
-        total: data.updates.length,
+        today: todayUpdate,
+        recent: [],
+        total: 1,
         persistence: {
-          lastUpdated: data.lastUpdated,
-          minutesSinceLastUpdate: timeSinceLastUpdate,
-          behavior: "Data persists in memory until next Vercel deployment or function timeout (enhanced v4)",
-          storage: 'memory',
-          version: data.version || '4.0',
-          retention: '7 days',
-          maxUpdates: 50
+          lastUpdated: new Date().getTime(),
+          minutesSinceLastUpdate: 0,
+          behavior: "Data persists permanently in Supabase database",
+          storage: 'supabase',
+          version: '5.0',
+          retention: 'permanent',
+          maxUpdates: 'unlimited'
         },
         deploymentInfo: {
-          hasData: data.updates.length > 0,
-          message: data.updates.length === 0 ? 
-            "No data available. Data will appear when ActivePieces sends the next update." :
-            "Data is available in enhanced memory storage. New data will override existing data for the same date."
+          hasData: true,
+          message: "Data is available from Supabase database. Data persists permanently."
         }
       }
     });
