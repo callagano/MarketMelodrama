@@ -185,7 +185,10 @@ export default function TLDRWidget() {
           const regex = new RegExp(`\\b(${escapedWord})\\b`, 'gi');
           
           // Check if the word already has an arrow in the text by looking at the context
-          text = text.replace(regex, (match, offset, string) => {
+          text = text.replace(regex, (match, offset, fullString) => {
+            // Ensure fullString is a string
+            const string = String(fullString || '');
+            
             // Get the character before the match to check for existing arrow
             const beforeMatch = string.substring(Math.max(0, offset - 1), offset);
             
