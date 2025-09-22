@@ -26,10 +26,10 @@ I dati di ActivePieces scomparivano dopo qualche minuto perché il sistema usava
 - ✅ Merge intelligente dei dati
 - ✅ Preservazione dei dati storici
 
-#### **Test Tool** (`src/app/api/test-activepieces/route.ts`)
-- ✅ Endpoint per testare il sistema
-- ✅ Simulazione dati ActivePieces
-- ✅ Verifica funzionamento
+#### **Sistema Pulito**
+- ✅ Solo endpoint ActivePieces principale
+- ✅ Nessun fallback di simulazione
+- ✅ Sistema semplificato e affidabile
 
 ### **3. Struttura Dati**
 
@@ -90,8 +90,10 @@ node test-persistent-storage.js
 
 ### **Test Endpoint**
 ```bash
-# Test invio dati
-curl -X POST https://marketmelodrama.vercel.app/api/test-activepieces
+# Test invio dati ActivePieces
+curl -X POST https://marketmelodrama.vercel.app/api/activepieces/tldr \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Test Update","sentiment":75,"highlights":["Test"],"big_picture":["Test"]}'
 
 # Test lettura dati
 curl https://marketmelodrama.vercel.app/api/activepieces/tldr
