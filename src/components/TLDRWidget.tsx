@@ -182,6 +182,10 @@ export default function TLDRWidget() {
     } else if (isBigPicture) {
       // For Big Picture, if no highlights provided, try to highlight common market terms
       const marketTerms = [
+        { word: '▲ Apple', direction: 'up' },
+        { word: '▲ Microsoft', direction: 'up' },
+        { word: '▼ Amazon', direction: 'down' },
+        { word: '▼ Walmart', direction: 'down' },
         { word: 'Apple', direction: 'up' },
         { word: 'Microsoft', direction: 'up' },
         { word: 'Amazon', direction: 'down' },
@@ -197,7 +201,11 @@ export default function TLDRWidget() {
         { word: 'decline', direction: 'down' },
         { word: 'surge', direction: 'up' },
         { word: 'climb', direction: 'up' },
-        { word: 'lag', direction: 'down' }
+        { word: 'lag', direction: 'down' },
+        { word: 'interest rates', direction: 'down' },
+        { word: 'tech sectors', direction: 'down' },
+        { word: 'safe-haven assets', direction: 'up' },
+        { word: 'economic activity', direction: 'down' }
       ];
       
       // Sort by word length (longest first) to avoid partial replacements
@@ -239,7 +247,7 @@ export default function TLDRWidget() {
     return (
       <div className={styles.widget}>
         <div className={styles.section}>
-          <h2 className="title">Breakfast briefing</h2>
+          <h2 className="title">Breakfast brief</h2>
         </div>
         <div className={styles.content}>
           <div className={styles.loading}>Loading data...</div>
@@ -252,7 +260,7 @@ export default function TLDRWidget() {
     return (
       <div className={styles.widget}>
         <div className={styles.section}>
-          <h2 className="title">Breakfast briefing</h2>
+          <h2 className="title">Breakfast brief</h2>
         </div>
         <div className={styles.content}>
           <div className={styles.error}>
@@ -272,7 +280,7 @@ export default function TLDRWidget() {
       <div className={styles.widget}>
         <div className={styles.content}>
           <div className={styles.section}>
-            <h2 className="title">Breakfast briefing</h2>
+            <h2 className="title">Breakfast brief</h2>
             <p className="subtitle">What happened in the last 24 hours and how <span className="people-highlight">people</span> reacted.</p>
             <div className={`${styles.mainContentBox} ${
               activePiecesData.sentiment >= 70 ? styles.positive :
@@ -348,7 +356,7 @@ export default function TLDRWidget() {
     <div className={styles.widget}>
       <div className={styles.content}>
         <div className={styles.section}>
-          <h2 className="title">Breakfast briefing</h2>
+          <h2 className="title">Breakfast brief</h2>
           <p className="subtitle">What happened in the last 24 hours and how <span className="people-highlight">people</span> reacted.</p>
           <div className={`${styles.mainContentBox} ${styles.neutral}`}>
             <div className={styles.pulseIcon}>
