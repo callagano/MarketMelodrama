@@ -174,37 +174,20 @@ export default function TLDRWidget() {
         const word = highlight.word;
         const direction = highlight.direction || 'neutral';
         
-        // Extract the arrow and the word separately
-        const arrowMatch = word.match(/^([▲▼])\s*(.*)$/);
-        if (arrowMatch) {
-          const arrow = arrowMatch[1]; // ▲ or ▼
-          const wordWithoutArrow = arrowMatch[2]; // word without arrow
-          
-          // Create pattern to match the word without arrow in the text
-          const escapedWord = wordWithoutArrow.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          const regex = new RegExp(`\\b(${escapedWord})\\b`, 'gi');
-          
-          // Check if the word already has an arrow in the text by looking at the context
-          text = text.replace(regex, (match, offset, fullString) => {
-            // Ensure fullString is a string
-            const string = String(fullString || '');
-            
-            // Get the character before the match to check for existing arrow
-            const beforeMatch = string.substring(Math.max(0, offset - 1), offset);
-            
-            // If there's already an arrow before the word, just highlight the word
-            if (beforeMatch === '▲' || beforeMatch === '▼') {
-              return `<span class="${styles.highlight} ${styles[direction]}">${match}</span>`;
-            }
-            // If no arrow, add it
-            return `<span class="${styles.highlight} ${styles[direction]}">${arrow} ${match}</span>`;
-          });
-        } else {
-          // If no arrow, highlight the word as is
-          const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          const regex = new RegExp(`\\b(${escapedWord})\\b`, 'gi');
-          text = text.replace(regex, `<span class="${styles.highlight} ${styles[direction]}">$1</span>`);
+        // Add appropriate arrow based on direction
+        let arrow = '';
+        if (direction === 'up') {
+          arrow = '▲';
+        } else if (direction === 'down') {
+          arrow = '▼';
         }
+        
+        // Create pattern to match the word in the text
+        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`\\b(${escapedWord})\\b`, 'gi');
+        
+        // Replace with highlighted word that includes the appropriate arrow
+        text = text.replace(regex, `<span class="${styles.highlight} ${styles[direction]}">${arrow}${arrow ? ' ' : ''}$1</span>`);
       });
     }
     
