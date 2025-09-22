@@ -184,8 +184,15 @@ export default function TLDRWidget() {
           const escapedWord = wordWithoutArrow.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
           const regex = new RegExp(`\\b(${escapedWord})\\b`, 'gi');
           
-          // Replace with highlighted word that includes the arrow
-          text = text.replace(regex, `<span class="${styles.highlight} ${styles[direction]}">${arrow} $1</span>`);
+          // Check if the word already has an arrow in the text
+          text = text.replace(regex, (match) => {
+            // If the match already has an arrow, just highlight it
+            if (match.includes('▲') || match.includes('▼')) {
+              return `<span class="${styles.highlight} ${styles[direction]}">${match}</span>`;
+            }
+            // If no arrow, add it
+            return `<span class="${styles.highlight} ${styles[direction]}">${arrow} ${match}</span>`;
+          });
         } else {
           // If no arrow, highlight the word as is
           const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
