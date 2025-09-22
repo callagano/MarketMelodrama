@@ -174,25 +174,24 @@ export default function TLDRWidget() {
         const word = highlight.word;
         const direction = highlight.direction || 'neutral';
         
-        // Create multiple patterns to match the word with and without arrows
-        const patterns = [];
-        
-        // Original word with arrows
-        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        patterns.push(escapedWord);
-        
-        // Word without arrows (remove ▲ and ▼)
-        const wordWithoutArrows = word.replace(/[▲▼]/g, '').trim();
-        if (wordWithoutArrows && wordWithoutArrows !== word) {
-          const escapedWordNoArrows = wordWithoutArrows.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          patterns.push(escapedWordNoArrows);
-        }
-        
-        // Try each pattern
-        patterns.forEach(pattern => {
-          const regex = new RegExp(`\\b(${pattern})\\b`, 'gi');
+        // Extract the arrow and the word separately
+        const arrowMatch = word.match(/^([▲▼])\s*(.*)$/);
+        if (arrowMatch) {
+          const arrow = arrowMatch[1]; // ▲ or ▼
+          const wordWithoutArrow = arrowMatch[2]; // word without arrow
+          
+          // Create pattern to match the word without arrow in the text
+          const escapedWord = wordWithoutArrow.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const regex = new RegExp(`\\b(${escapedWord})\\b`, 'gi');
+          
+          // Replace with highlighted word that includes the arrow
+          text = text.replace(regex, `<span class="${styles.highlight} ${styles[direction]}">${arrow} $1</span>`);
+        } else {
+          // If no arrow, highlight the word as is
+          const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const regex = new RegExp(`\\b(${escapedWord})\\b`, 'gi');
           text = text.replace(regex, `<span class="${styles.highlight} ${styles[direction]}">$1</span>`);
-        });
+        }
       });
     }
     
