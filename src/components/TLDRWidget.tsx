@@ -146,14 +146,14 @@ export default function TLDRWidget() {
     }
     
     let text = item.text;
-    const allWords = item.highlights && Array.isArray(item.highlights)
-      ? [...new Set(item.highlights.map(h => h.word))]
-      : [];
+    const highlights = item.highlights && Array.isArray(item.highlights) ? item.highlights : [];
     
-    if (allWords.length > 0) {
-      allWords.forEach(word => {
+    if (highlights.length > 0) {
+      highlights.forEach(highlight => {
+        const word = highlight.word;
+        const direction = highlight.direction || 'neutral';
         const regex = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
-        text = text.replace(regex, `<span class="${styles.highlight}">${word}</span>`);
+        text = text.replace(regex, `<span class="${styles.highlight} ${styles[direction]}">${word}</span>`);
       });
     }
     

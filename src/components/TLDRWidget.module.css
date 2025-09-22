@@ -490,6 +490,20 @@
   border: 1px solid rgba(102, 126, 234, 0.3);
 }
 
+/* Text containers for highlighted content */
+.highlightText {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #e0e0e0;
+}
+
+.bigPictureText {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: #e0e0e0;
+  text-align: left;
+}
+
 
 .recentUpdates {
   border-top: 1px solid #333;
