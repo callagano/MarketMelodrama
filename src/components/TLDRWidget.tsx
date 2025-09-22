@@ -179,6 +179,35 @@ export default function TLDRWidget() {
         const regex = new RegExp(`(${escapedWord})`, 'gi');
         text = text.replace(regex, `<span class="${styles.highlight} ${styles[direction]}">$1</span>`);
       });
+    } else if (isBigPicture) {
+      // For Big Picture, if no highlights provided, try to highlight common market terms
+      const marketTerms = [
+        { word: 'Apple', direction: 'up' },
+        { word: 'Microsoft', direction: 'up' },
+        { word: 'Amazon', direction: 'down' },
+        { word: 'Walmart', direction: 'down' },
+        { word: 'tech stocks', direction: 'up' },
+        { word: 'energy sector', direction: 'up' },
+        { word: 'consumer staples', direction: 'down' },
+        { word: 'oil prices', direction: 'up' },
+        { word: 'earnings', direction: 'up' },
+        { word: 'bullish', direction: 'up' },
+        { word: 'bearish', direction: 'down' },
+        { word: 'rally', direction: 'up' },
+        { word: 'decline', direction: 'down' },
+        { word: 'surge', direction: 'up' },
+        { word: 'climb', direction: 'up' },
+        { word: 'lag', direction: 'down' }
+      ];
+      
+      // Sort by word length (longest first) to avoid partial replacements
+      const sortedTerms = marketTerms.sort((a, b) => b.word.length - a.word.length);
+      
+      sortedTerms.forEach(term => {
+        const escapedWord = term.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`\\b(${escapedWord})\\b`, 'gi');
+        text = text.replace(regex, `<span class="${styles.highlight} ${styles[term.direction]}">$1</span>`);
+      });
     }
     
     // For Big Picture, add line breaks after periods and improve readability
