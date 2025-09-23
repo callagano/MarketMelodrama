@@ -3,7 +3,7 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { format as formatDate } from "date-fns";
 import { useTimeframe } from '@/context/TimeframeContext';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './FearGreedCharts.module.css';
 
@@ -79,6 +79,40 @@ export default function FearGreedCharts({ data }: Props) {
   const [isChartExpanded, setIsChartExpanded] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+  const scrollPositionRef = useRef(0);
+
+  // Block body scroll when modal is open
+  useEffect(() => {
+    if (isInfoOpen) {
+      // Store the current scroll position
+      scrollPositionRef.current = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollPositionRef.current}px`;
+      document.body.style.width = '100%';
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+    } else {
+      // Restore body styles
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      // Restore scroll position after a small delay to ensure styles are applied
+      setTimeout(() => {
+        window.scrollTo(0, scrollPositionRef.current);
+      }, 0);
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+    };
+  }, [isInfoOpen]);
 
   useEffect(() => {
     setHasMounted(true);
@@ -270,9 +304,19 @@ export default function FearGreedCharts({ data }: Props) {
     <div className={styles.chartContainer}>
       <div className={styles.chartCard}>
         <div className={styles.chartHeader}>
-          <h2 className="title">Investor's mood</h2>
+          <div className={styles.titleRow}>
+            <h2 className="title">Investor's mood</h2>
+            <button
+              type="button"
+              className={styles.infoButton}
+              onClick={() => setIsInfoOpen(true)}
+              aria-label="Learn more about Fear & Greed Index"
+            >
+              <span className="material-symbols-outlined">info</span>
+            </button>
+          </div>
           <p className="subtitle">
-            From extreme fear to extreme greed, what emotion is driving <span className="people-highlight">people</span> right now.
+            What emotion is driving <span className="people-highlight">people</span> right now?
           </p>
           {/* Horizontal Slider Chart - moved here */}
           <div className={styles.sliderChartWrapper}>
@@ -419,16 +463,6 @@ export default function FearGreedCharts({ data }: Props) {
             </div>
           </div>
         </div>
-        {/* Learn more link */}
-        <div className={styles.learnMoreRow}>
-          <button
-            type="button"
-            className={`${styles.learnMoreLink} gradient-textlink`}
-            onClick={() => setIsInfoOpen(true)}
-          >
-            Learn more about the fear & greed index
-          </button>
-        </div>
 
         {/* Info Modal rendered via portal to detach from widget */}
         {hasMounted && isInfoOpen && createPortal(
@@ -449,8 +483,6 @@ export default function FearGreedCharts({ data }: Props) {
                 <h4>What is Fear & Greed Index?</h4>
                 <p>
                   The Fear & Greed Index is a way to gauge stock market movements and whether stocks are fairly priced.
-                  The theory is based on the logic that excessive fear tends to drive down share prices, and too much
-                  greed tends to have the opposite effect.
                 </p>
                 <h4>How is Fear & Greed Calculated?</h4>
                 <p>

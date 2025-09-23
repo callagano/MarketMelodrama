@@ -219,11 +219,55 @@ export default function TLDRWidget() {
   if (loading) {
     return (
       <div className={styles.widget}>
-        <div className={styles.section}>
-          <h2 className="title">Breakfast brief</h2>
-        </div>
         <div className={styles.content}>
-          <div className={styles.loading}>Loading data...</div>
+          <div className={styles.section}>
+            <h2 className="title">Breakfast brief</h2>
+            <p className="subtitle">What affected <span className="people-highlight">people</span> most in the last 24 hours?</p>
+          </div>
+          
+          {/* Skeleton for main content box */}
+          <div className={styles.section}>
+            <div className={styles.mainContentBox}>
+              <div className={styles.pulseIcon}>
+                <div className={styles.skeletonPulseIcon}></div>
+              </div>
+              <div className={styles.titleContainer}>
+                <div className={styles.skeletonTitleText}></div>
+                <div className={styles.skeletonSentimentScore}></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Skeleton for highlights section */}
+          <div className={styles.section}>
+            <div className={`${styles.sectionContent} ${styles.masonry}`}>
+              <div className={styles.sectionItem}>
+                <div className={styles.skeletonHighlightItem}></div>
+              </div>
+              <div className={styles.sectionItem}>
+                <div className={styles.skeletonHighlightItem}></div>
+              </div>
+              <div className={styles.sectionItem}>
+                <div className={styles.skeletonHighlightItem}></div>
+              </div>
+              <div className={styles.sectionItem}>
+                <div className={styles.skeletonHighlightItem}></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Skeleton for big picture section */}
+          <div className={styles.section}>
+            <div className={styles.sectionContent}>
+              <h3 className={styles.bigPictureTitle}>Big Picture</h3>
+              <div className={`${styles.sectionItem} ${styles.bigPictureItem}`}>
+                <div className={styles.skeletonBigPictureText}></div>
+                <div className={styles.skeletonBigPictureText}></div>
+                <div className={styles.skeletonBigPictureText}></div>
+                <div className={styles.skeletonBigPictureText}></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -254,7 +298,7 @@ export default function TLDRWidget() {
         <div className={styles.content}>
           <div className={styles.section}>
             <h2 className="title">Breakfast brief</h2>
-            <p className="subtitle">What happened in the last 24 hours and how <span className="people-highlight">people</span> reacted.</p>
+            <p className="subtitle">What affected <span className="people-highlight">people</span> most in the last 24 hours?</p>
             <div className={`${styles.mainContentBox} ${
               activePiecesData.sentiment >= 70 ? styles.positive :
               activePiecesData.sentiment <= 30 ? styles.negative : styles.neutral

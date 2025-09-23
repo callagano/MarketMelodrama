@@ -221,12 +221,52 @@
   max-height: 500px; /* Adjust based on chart height */
 }
 
-/* Learn more link + modal */
-.learnMoreRow {
-  margin-top: 1rem;
+/* Title row with info button */
+.titleRow {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
 }
+
+.infoButton {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  padding: 0.2rem;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  color: #c3daff;
+}
+
+.infoButton .material-symbols-outlined {
+  font-family: 'Material Symbols Outlined' !important;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.2rem;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  color: #c3daff !important;
+}
+
+.infoButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Modal styles */
 
 
 
@@ -238,6 +278,7 @@
   align-items: center;
   justify-content: center;
   z-index: 50;
+  overflow: hidden;
 }
 
 .modal {
@@ -283,7 +324,7 @@
 .modalBody h4 { 
   color: #fff; 
   margin: 0.75rem 0 0.25rem; 
-  font-size: 0.95rem; 
+  font-size: 1rem; 
 }
 
 /* Expansion Panel Styles */
@@ -494,8 +535,12 @@
   overflow: hidden;
 }
 
-/* Mobile responsive for mini chart */
+/* Mobile responsive */
 @media (max-width: 768px) {
+  .chartCard {
+    padding: 1rem;
+  }
+  
   .miniChartWidget {
     padding: 0;
   }

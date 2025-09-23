@@ -89,8 +89,13 @@
   height: 45px;
 }
 
+.row {
+  position: relative;
+  cursor: pointer;
+}
+
 .row:hover {
-  background-color: rgba(255, 255, 255, 0.015);
+  background-color: rgba(195, 218, 255, 0.1);
 }
 
 .rank {
@@ -157,10 +162,7 @@
   transition: color 0.2s ease-in-out;
 }
 
-.stockLink:hover {
-  color: #60a5fa;
-  text-decoration: underline;
-}
+
 
 .symbol {
   font-weight: 700;
@@ -277,6 +279,128 @@
     padding: 0.5rem;
     font-size: 0.75rem;
   }
+}
+
+/* Title row with info button */
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.infoButton {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  margin-bottom: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  color: #c3daff;
+}
+
+.infoButton .material-symbols-outlined {
+  font-family: 'Material Symbols Outlined' !important;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.2rem;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  color: #c3daff !important;
+}
+
+.infoButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Modal styles */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  overflow: hidden;
+}
+
+.modal {
+  width: min(680px, 92vw);
+  background: #1e1e22;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 1rem;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.modalBody {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+.modalBody h4 {
+  margin: 0.75rem 0 0.25rem; 
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.modalBody p {
+  margin: 0;
+  color: #d1d5db;
+  line-height: 1.6;
+  font-size: 0.9rem;
 }
 
 @media (max-width: 375px) {

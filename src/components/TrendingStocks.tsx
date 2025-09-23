@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './TrendingStocks.module.css';
 
 interface TrendingStock {
@@ -21,6 +22,46 @@ export default function TrendingStocks() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('upvotes');
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
+  const scrollPositionRef = useRef(0);
+
+  // Block body scroll when modal is open
+  useEffect(() => {
+    if (isInfoOpen) {
+      // Store the current scroll position
+      scrollPositionRef.current = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollPositionRef.current}px`;
+      document.body.style.width = '100%';
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+    } else {
+      // Restore body styles
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      // Restore scroll position after a small delay to ensure styles are applied
+      setTimeout(() => {
+        window.scrollTo(0, scrollPositionRef.current);
+      }, 0);
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+    };
+  }, [isInfoOpen]);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchTrendingStocks = async () => {
@@ -65,8 +106,18 @@ export default function TrendingStocks() {
     return (
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className="title">Trending stocks</h2>
-          <p className="subtitle">What <span className="people-highlight">people</span>'s talking about, on Reddit over the past 24 hours.</p>
+          <div className={styles.titleRow}>
+            <h2 className="title">Trending stocks</h2>
+            <button
+              type="button"
+              className={styles.infoButton}
+              onClick={() => setIsInfoOpen(true)}
+              aria-label="Learn more about Trending Stocks"
+            >
+              <span className="material-symbols-outlined">info</span>
+            </button>
+          </div>
+          <p className="subtitle">What <span className="people-highlight">people</span> is talking about?</p>
         </div>
         <div className={styles.loading}>Loading trending stocks...</div>
       </div>
@@ -77,8 +128,18 @@ export default function TrendingStocks() {
     return (
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className="title">Trending stocks</h2>
-          <p className="subtitle">What <span className="people-highlight">people</span>'s talking about, on Reddit over the past 24 hours.</p>
+          <div className={styles.titleRow}>
+            <h2 className="title">Trending stocks</h2>
+            <button
+              type="button"
+              className={styles.infoButton}
+              onClick={() => setIsInfoOpen(true)}
+              aria-label="Learn more about Trending Stocks"
+            >
+              <span className="material-symbols-outlined">info</span>
+            </button>
+          </div>
+          <p className="subtitle">What <span className="people-highlight">people</span> is talking about?</p>
         </div>
         <div className={styles.error}>Error: {error}</div>
       </div>
@@ -88,8 +149,18 @@ export default function TrendingStocks() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2 className="title">Trending stocks</h2>
-        <p className="subtitle">What <span className="people-highlight">people</span>'s talking about, on Reddit over the past 24 hours.</p>
+        <div className={styles.titleRow}>
+          <h2 className="title">Trending stocks</h2>
+          <button
+            type="button"
+            className={styles.infoButton}
+            onClick={() => setIsInfoOpen(true)}
+            aria-label="Learn more about Trending Stocks"
+          >
+            <span className="material-symbols-outlined">info</span>
+          </button>
+        </div>
+        <p className="subtitle">What <span className="people-highlight">people</span> is talking about?</p>
       </div>
       
       {/* Tab Navigation */}
@@ -121,7 +192,11 @@ export default function TrendingStocks() {
           </thead>
           <tbody>
             {currentStocks.map((stock) => (
-              <tr key={stock.symbol} className={styles.row}>
+              <tr 
+                key={stock.symbol} 
+                className={styles.row}
+                onClick={() => window.open(`https://www.google.com/finance/quote/${stock.symbol}:nasdaq`, '_blank')}
+              >
                 <td className={styles.rank}>
                   <div className={styles.rankContainer}>
                     <div className={styles.rankNumber}>#{stock.displayRank}</div>
@@ -134,14 +209,7 @@ export default function TrendingStocks() {
                 </td>
                 <td className={styles.stockInfo}>
                   <div className={styles.stockName}>
-                    <a 
-                      href={`https://www.google.com/finance/quote/${stock.symbol}:nasdaq`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={styles.stockLink}
-                    >
-                      {stock.name}
-                    </a>
+                    {stock.name}
                   </div>
                 </td>
                 <td className={styles.symbol}>{stock.symbol}</td>
@@ -159,6 +227,35 @@ export default function TrendingStocks() {
           </tbody>
         </table>
       </div>
+
+      {/* Info Modal rendered via portal to detach from widget */}
+      {hasMounted && isInfoOpen && createPortal(
+        <div className={styles.modalBackdrop} onClick={() => setIsInfoOpen(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <div className={styles.modalHeader}>
+              <h3>About Trending Stocks</h3>
+              <button
+                type="button"
+                className={styles.closeButton}
+                onClick={() => setIsInfoOpen(false)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <h4>What is Trending Stocks?</h4>
+              <p>A ranked list of stocks that are currently popular or seeing a surge in mentions and upvotes on Reddit over the last 24 hours.</p>
+              <h4>How is Trending Stocks ranking calculated?</h4>
+              <p>The "Most relevant" ranking is based on the number of mentions received over the last 24 hours.</p>
+              <p>The "Trending up" ranking is based on the percentage increase received over the last 24 hours.</p>
+              <h4>When is Trending Stocks updated?</h4>
+              <p>Every morning at 5 UTC.</p>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 } 
