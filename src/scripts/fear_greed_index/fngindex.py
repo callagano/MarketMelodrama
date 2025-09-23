@@ -33,13 +33,7 @@ except FileNotFoundError:
 
 fng_data.set_index('Date', inplace=True)
 
-# Fill missing dates
-missing_dates = []
-all_dates = (pd.date_range(fng_data.index[0] if not fng_data.empty else START_DATE, END_DATE, freq='D'))
-for date in all_dates:
-	if date not in fng_data.index:
-		missing_dates.append(date)
-		fng_data.loc[date] = [0]
+# Don't fill missing dates with zeros - only include dates with actual data
 fng_data.sort_index(inplace=True)
 
 # Update with historical data
@@ -57,8 +51,9 @@ if 'fear_and_greed_historical' in recent_data:
         x = datetime.fromtimestamp(x / 1000).strftime('%Y-%m-%d')
         y = int(data_point['y'])
         fng_data.at[x, 'Fear Greed'] = y
-#currently any days that do not have data points from cnn are filled with zeros, uncomment the following line to backfill
-#fng_data['Fear Greed'].replace(to_replace=0, method='bfill')
+# Only include dates with actual data - no zeros or backfill
+# Remove any rows with zero values
+fng_data = fng_data[fng_data['Fear Greed'] != 0]
 
 fng_data.to_pickle('all_fng.pkl')
 fng_data.to_csv('all_fng_csv.csv')

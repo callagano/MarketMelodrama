@@ -1,6 +1,6 @@
 'use client';
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { format as formatDate } from "date-fns";
 import { useTimeframe } from '@/context/TimeframeContext';
 import { useEffect, useState, useRef } from 'react';
@@ -389,7 +389,7 @@ export default function FearGreedCharts({ data }: Props) {
             {/* Line Chart for Fear & Greed Index */}
             <div className={styles.chartWrapper}>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={filteredData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                <LineChart data={filteredData} margin={{ top: 20, right: 5, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
                                     <XAxis 
                         dataKey="date" 
@@ -437,6 +437,7 @@ export default function FearGreedCharts({ data }: Props) {
                     tickLine={false}
                     axisLine={false}
                     width={0}
+                    domain={[0, 100]}
                   />
                   <Tooltip 
                     contentStyle={{ 
@@ -449,6 +450,13 @@ export default function FearGreedCharts({ data }: Props) {
                     }}
                     labelStyle={{ color: '#9ca3af', fontSize: '10px' }}
                     itemStyle={{ fontSize: '12px' }}
+                  />
+                  <ReferenceLine 
+                    y={100} 
+                    stroke="rgba(255, 255, 255, 0.3)" 
+                    strokeDasharray="2 2"
+                    strokeWidth={1}
+                    label={{ value: "Max (100)", position: "topRight", style: { fill: '#9ca3af', fontSize: '10px' } }}
                   />
                   <Line
                     type="monotone"
