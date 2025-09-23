@@ -456,7 +456,7 @@ export default function FearGreedCharts({ data }: Props) {
                     stroke="rgba(255, 255, 255, 0.3)" 
                     strokeDasharray="2 2"
                     strokeWidth={1}
-                    label={{ value: "Max (100)", position: "topRight", style: { fill: '#9ca3af', fontSize: '10px' } }}
+                    label={{ value: "Max (100)", position: "top", style: { fill: '#9ca3af', fontSize: '10px' } }}
                   />
                   <Line
                     type="monotone"
