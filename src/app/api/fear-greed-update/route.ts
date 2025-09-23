@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     console.log(`Running Fear & Greed update from: ${scriptPath}`);
     
     const { stdout, stderr } = await execAsync(
-      `cd ${scriptPath} && python fngindex.py`,
+      `cd ${scriptPath} && source venv/bin/activate && python fngindex.py`,
       { timeout: 300000 } // 5 minute timeout
     );
 
