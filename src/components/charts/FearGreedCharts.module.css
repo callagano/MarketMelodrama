@@ -221,6 +221,71 @@
   max-height: 500px; /* Adjust based on chart height */
 }
 
+/* Learn more link + modal */
+.learnMoreRow {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal {
+  width: min(680px, 92vw);
+  background: #1e1e22;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+
+.modalHeader {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.closeButton:hover { color: #e5e7eb; }
+
+.modalBody {
+  padding: 1rem 1.25rem 1.25rem;
+  color: #d1d5db;
+  font-size: 0.925rem;
+  line-height: 1.65;
+}
+
+.modalBody h4 { 
+  color: #fff; 
+  margin: 0.75rem 0 0.25rem; 
+  font-size: 0.95rem; 
+}
+
 /* Expansion Panel Styles */
 .expansionPanel {
   background-color: #1e1e22;

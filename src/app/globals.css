@@ -66,3 +66,17 @@ body {
   background-clip: text;
   font-weight: 600;
 }
+
+/* Global text link (previous style) */
+.gradient-textlink {
+  color: #767676; /* blue-400 */
+  background-color: transparent;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.gradient-textlink:hover {
+  color: #c68eff; /* blue-300 */
+}

@@ -3,7 +3,8 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { format as formatDate } from "date-fns";
 import { useTimeframe } from '@/context/TimeframeContext';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './FearGreedCharts.module.css';
 
 interface ChartData {
@@ -76,6 +77,12 @@ function MiniLineChart({ data, color }: { data: ChartData[], color: string }) {
 export default function FearGreedCharts({ data }: Props) {
   const { timeframe, setTimeframe } = useTimeframe();
   const [isChartExpanded, setIsChartExpanded] = useState(false);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
   
   // Filter data based on selected timeframe
   const getFilteredData = () => {
@@ -265,7 +272,7 @@ export default function FearGreedCharts({ data }: Props) {
         <div className={styles.chartHeader}>
           <h2 className="title">Investor's mood</h2>
           <p className="subtitle">
-            From extreme fear to extreme greed, how <span className="people-highlight">people</span> are feeling about the markets.
+            From extreme fear to extreme greed, what emotion is driving <span className="people-highlight">people</span> right now.
           </p>
           {/* Horizontal Slider Chart - moved here */}
           <div className={styles.sliderChartWrapper}>
@@ -412,6 +419,54 @@ export default function FearGreedCharts({ data }: Props) {
             </div>
           </div>
         </div>
+        {/* Learn more link */}
+        <div className={styles.learnMoreRow}>
+          <button
+            type="button"
+            className={`${styles.learnMoreLink} gradient-textlink`}
+            onClick={() => setIsInfoOpen(true)}
+          >
+            Learn more about the fear & greed index
+          </button>
+        </div>
+
+        {/* Info Modal rendered via portal to detach from widget */}
+        {hasMounted && isInfoOpen && createPortal(
+          <div className={styles.modalBackdrop} onClick={() => setIsInfoOpen(false)}>
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+              <div className={styles.modalHeader}>
+                <h3>About the Fear & Greed Index</h3>
+                <button
+                  type="button"
+                  className={styles.closeButton}
+                  onClick={() => setIsInfoOpen(false)}
+                  aria-label="Close"
+                >
+                  ×
+                </button>
+              </div>
+              <div className={styles.modalBody}>
+                <h4>What is Fear & Greed Index?</h4>
+                <p>
+                  The Fear & Greed Index is a way to gauge stock market movements and whether stocks are fairly priced.
+                  The theory is based on the logic that excessive fear tends to drive down share prices, and too much
+                  greed tends to have the opposite effect.
+                </p>
+                <h4>How is Fear & Greed Calculated?</h4>
+                <p>
+                  The Fear & Greed Index is a compilation of seven different indicators that measure some aspect of stock
+                  market behavior. They are market momentum, stock price strength, stock price breadth, put and call
+                  options, junk bond demand, market volatility, and safe haven demand. The index tracks how much these
+                  individual indicators deviate from their averages compared to how much they normally diverge. The index
+                  gives each indicator equal weighting in calculating a score from 0 to 100, with 100 representing maximum
+                  greediness and 0 signaling maximum fear.
+                </p>
+                <h4>How often is the Fear & Greed Index calculated?</h4>
+                <p>Every day at 4am UTC</p>
+              </div>
+            </div>
+          </div>, document.body)
+        }
       </div>
     </div>
   );
