@@ -23,31 +23,30 @@ export async function GET() {
 
     console.log('Basic query successful, data:', testData);
 
-    // Test with order by
+    // Test with data column only (no order by since created_at doesn't exist)
     const { data: orderedData, error: orderError } = await supabase
       .from('tldr_data')
-      .select('*')
-      .order('created_at', { ascending: false })
+      .select('data')
       .limit(1);
 
     if (orderError) {
-      console.error('Order by query error:', orderError);
+      console.error('Data query error:', orderError);
       return NextResponse.json({
         success: false,
         error: orderError.message,
         details: orderError,
-        query: 'Order by query failed',
+        query: 'Data query failed',
         basicQuery: testData
       }, { status: 500 });
     }
 
-    console.log('Order by query successful, data:', orderedData);
+    console.log('Data query successful, data:', orderedData);
 
     return NextResponse.json({
       success: true,
       message: 'All queries successful',
       basicQuery: testData,
-      orderedQuery: orderedData,
+      dataQuery: orderedData,
       totalRecords: testData?.length || 0
     });
 

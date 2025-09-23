@@ -8,7 +8,7 @@ export async function GET() {
     // Test with minimal query
     const { data, error } = await supabase
       .from('tldr_data')
-      .select('id, created_at')
+      .select('data')
       .limit(1);
 
     console.log('Simple query result:', { data, error });

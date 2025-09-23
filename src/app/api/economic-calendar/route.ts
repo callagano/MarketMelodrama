@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 // Free economic calendar API endpoints
 const ECONOMIC_CALENDAR_URL = 'https://api.tradingeconomics.com/calendar';
 const EARNINGS_CALENDAR_URL = 'https://api.tradingeconomics.com/earnings';

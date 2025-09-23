@@ -39,6 +39,7 @@ export default function TLDRWidget() {
   const [activePiecesData, setActivePiecesData] = useState<ActivePiecesData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isBigPictureExpanded, setIsBigPictureExpanded] = useState(false);
 
   useEffect(() => {
     // Check if it's weekend (Saturday = 6, Sunday = 0)
@@ -347,14 +348,24 @@ export default function TLDRWidget() {
           <div className={styles.section}>
             <div className={styles.sectionContent}>
               <h3 className={styles.bigPictureTitle}>Big Picture</h3>
-              {activePiecesData.big_picture && Array.isArray(activePiecesData.big_picture)
-                ? activePiecesData.big_picture.map((item, index) => (
-                    <div key={index} className={`${styles.sectionItem} ${styles.bigPictureItem}`}>
-                      {renderHighlightedText(item, true)}
-                    </div>
-                  ))
-                : <div className={styles.sectionItem}>No big picture data available</div>
-              }
+              <div className={styles.bigPictureContainer}>
+                <div className={`${styles.bigPictureContent} ${!isBigPictureExpanded ? styles.collapsed : ''}`}>
+                  {activePiecesData.big_picture && Array.isArray(activePiecesData.big_picture)
+                    ? activePiecesData.big_picture.map((item, index) => (
+                        <div key={index} className={`${styles.sectionItem} ${styles.bigPictureItem}`}>
+                          {renderHighlightedText(item, true)}
+                        </div>
+                      ))
+                    : <div className={styles.sectionItem}>No big picture data available</div>
+                  }
+                </div>
+                <button 
+                  className={styles.readMoreButton}
+                  onClick={() => setIsBigPictureExpanded(!isBigPictureExpanded)}
+                >
+                  {isBigPictureExpanded ? 'Read Less' : 'Read More'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
