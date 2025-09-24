@@ -9,6 +9,7 @@
 
 .header {
   margin-bottom: 1.5rem;
+  position: relative;
 }
 
 
@@ -285,7 +286,8 @@
 .titleRow {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .infoButton {
@@ -294,7 +296,6 @@
   font-size: 1.2rem;
   cursor: pointer;
   padding: 0.25rem;
-  margin-bottom: 0.5rem;
   border-radius: 50%;
   transition: background-color 0.2s ease;
   display: flex;
@@ -303,6 +304,9 @@
   width: 2rem;
   height: 2rem;
   color: #c3daff;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .infoButton .material-symbols-outlined {

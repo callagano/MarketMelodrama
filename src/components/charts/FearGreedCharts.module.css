@@ -225,7 +225,8 @@
 .titleRow {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .infoButton {
@@ -233,7 +234,6 @@
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
-  margin-bottom: 0.5rem;
   padding: 0.2rem;
   border-radius: 50%;
   transition: background-color 0.2s ease;
@@ -243,6 +243,9 @@
   width: 2rem;
   height: 2rem;
   color: #c3daff;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .infoButton .material-symbols-outlined {

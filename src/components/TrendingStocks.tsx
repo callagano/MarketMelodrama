@@ -108,15 +108,15 @@ export default function TrendingStocks() {
         <div className={styles.header}>
           <div className={styles.titleRow}>
             <h2 className="title">Trending stocks</h2>
-            <button
-              type="button"
-              className={styles.infoButton}
-              onClick={() => setIsInfoOpen(true)}
-              aria-label="Learn more about Trending Stocks"
-            >
-              <span className="material-symbols-outlined">info</span>
-            </button>
           </div>
+          <button
+            type="button"
+            className={styles.infoButton}
+            onClick={() => setIsInfoOpen(true)}
+            aria-label="Learn more about Trending Stocks"
+          >
+            <span className="material-symbols-outlined">info</span>
+          </button>
           <p className="subtitle">What <span className="people-highlight">people</span> is talking about?</p>
         </div>
         <div className={styles.loading}>Loading trending stocks...</div>
@@ -130,15 +130,15 @@ export default function TrendingStocks() {
         <div className={styles.header}>
           <div className={styles.titleRow}>
             <h2 className="title">Trending stocks</h2>
-            <button
-              type="button"
-              className={styles.infoButton}
-              onClick={() => setIsInfoOpen(true)}
-              aria-label="Learn more about Trending Stocks"
-            >
-              <span className="material-symbols-outlined">info</span>
-            </button>
           </div>
+          <button
+            type="button"
+            className={styles.infoButton}
+            onClick={() => setIsInfoOpen(true)}
+            aria-label="Learn more about Trending Stocks"
+          >
+            <span className="material-symbols-outlined">info</span>
+          </button>
           <p className="subtitle">What <span className="people-highlight">people</span> is talking about?</p>
         </div>
         <div className={styles.error}>Error: {error}</div>
@@ -151,15 +151,15 @@ export default function TrendingStocks() {
       <div className={styles.header}>
         <div className={styles.titleRow}>
           <h2 className="title">Trending stocks</h2>
-          <button
-            type="button"
-            className={styles.infoButton}
-            onClick={() => setIsInfoOpen(true)}
-            aria-label="Learn more about Trending Stocks"
-          >
-            <span className="material-symbols-outlined">info</span>
-          </button>
         </div>
+        <button
+          type="button"
+          className={styles.infoButton}
+          onClick={() => setIsInfoOpen(true)}
+          aria-label="Learn more about Trending Stocks"
+        >
+          <span className="material-symbols-outlined">info</span>
+        </button>
         <p className="subtitle">What <span className="people-highlight">people</span> is talking about?</p>
       </div>
       

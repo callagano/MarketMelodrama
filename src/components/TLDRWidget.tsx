@@ -183,12 +183,19 @@ export default function TLDRWidget() {
           arrow = '▼';
         }
         
+        // Special handling for "Volatility" - invert colors
+        let colorClass = direction;
+        if (word.toLowerCase() === 'volatility') {
+          // For Volatility: down = green, up = red (inverted logic)
+          colorClass = direction === 'down' ? 'up' : 'down';
+        }
+        
         // Create pattern to match the word in the text
         const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(`\\b(${escapedWord})\\b`, 'gi');
         
         // Replace with highlighted word that includes the appropriate arrow
-        text = text.replace(regex, `<span class="${styles.highlight} ${styles[direction]}">${arrow}${arrow ? ' ' : ''}$1</span>`);
+        text = text.replace(regex, `<span class="${styles.highlight} ${styles[colorClass]}">${arrow}${arrow ? ' ' : ''}$1</span>`);
       });
     }
     

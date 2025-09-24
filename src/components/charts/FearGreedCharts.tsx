@@ -306,15 +306,15 @@ export default function FearGreedCharts({ data }: Props) {
         <div className={styles.chartHeader}>
           <div className={styles.titleRow}>
             <h2 className="title">Investor's mood</h2>
-            <button
-              type="button"
-              className={styles.infoButton}
-              onClick={() => setIsInfoOpen(true)}
-              aria-label="Learn more about Fear & Greed Index"
-            >
-              <span className="material-symbols-outlined">info</span>
-            </button>
           </div>
+          <button
+            type="button"
+            className={styles.infoButton}
+            onClick={() => setIsInfoOpen(true)}
+            aria-label="Learn more about Fear & Greed Index"
+          >
+            <span className="material-symbols-outlined">info</span>
+          </button>
           <p className="subtitle">
             What emotion is driving <span className="people-highlight">people</span> right now?
           </p>
