@@ -183,10 +183,10 @@ export default function TLDRWidget() {
           arrow = '▼';
         }
         
-        // Special handling for "Volatility" - invert colors
+        // Special handling for "Volatility" and "Oil" - invert colors
         let colorClass = direction;
-        if (word.toLowerCase() === 'volatility') {
-          // For Volatility: down = green, up = red (inverted logic)
+        if (word.toLowerCase() === 'volatility' || word.toLowerCase() === 'oil') {
+          // For Volatility and Oil: down = green, up = red (inverted logic)
           colorClass = direction === 'down' ? 'up' : 'down';
         }
         
