@@ -25,8 +25,19 @@ export async function POST(request: NextRequest) {
 
     // Run the Fear & Greed update script
     const scriptPath = process.cwd() + '/src/scripts/fear_greed_index';
+    const venvPath = `${scriptPath}/venv`;
     
     console.log(`Running Fear & Greed update from: ${scriptPath}`);
+    console.log(`Virtual environment path: ${venvPath}`);
+    
+    // Check if virtual environment exists, if not create it
+    const { stdout: checkVenv } = await execAsync(`ls -la ${venvPath}`, { timeout: 5000 }).catch(() => ({ stdout: '' }));
+    
+    if (!checkVenv.includes('bin')) {
+      console.log('Virtual environment not found, creating it...');
+      await execAsync(`cd ${scriptPath} && python3 -m venv venv`, { timeout: 60000 });
+      await execAsync(`cd ${scriptPath} && source venv/bin/activate && pip install -r requirements.txt`, { timeout: 120000 });
+    }
     
     const { stdout, stderr } = await execAsync(
       `cd ${scriptPath} && source venv/bin/activate && python fngindex.py`,

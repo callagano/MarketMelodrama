@@ -4,5 +4,14 @@
       "path": "/api/scheduler",
       "schedule": "0 4 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "src/app/api/fear-greed-update/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/scheduler/route.ts": {
+      "maxDuration": 300
+    }
+  },
+  "buildCommand": "npm run build"
 } 

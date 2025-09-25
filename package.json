@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run setup-python && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "setup-python": "bash scripts/setup-python.sh"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.0.2",

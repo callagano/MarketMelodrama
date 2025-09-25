@@ -1,0 +1,14 @@
+# Ignore Python virtual environment in production
+src/scripts/fear_greed_index/venv/
+src/scripts/scraper_env/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Ignore log files
+*.log
