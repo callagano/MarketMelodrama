@@ -81,7 +81,7 @@ export default function Home() {
           </div>
         ) : data.length > 0 ? (
           <>
-            <FearGreedCharts data={data} lastUpdated={lastUpdated} />
+            <FearGreedCharts data={data} lastUpdated={lastUpdated || undefined} />
             <TrendingStocks />
             <HybridCalendar />
           </>

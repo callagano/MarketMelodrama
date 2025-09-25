@@ -312,7 +312,7 @@ export default function TLDRWidget() {
           <div className={styles.section}>
             <div className={styles.titleRow}>
               <h2 className="title">Breakfast brief</h2>
-              <LastUpdated timestamp={lastUpdated} className={styles.lastUpdated} weekdaysOnly useCronTime />
+              <LastUpdated timestamp={lastUpdated || undefined} className={styles.lastUpdated} weekdaysOnly useCronTime />
             </div>
             <p className="subtitle">What affected <span className="people-highlight">people</span> most in the last 24 hours?</p>
             <div className={`${styles.mainContentBox} ${

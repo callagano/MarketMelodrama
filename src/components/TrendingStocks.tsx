@@ -154,7 +154,7 @@ export default function TrendingStocks() {
       <div className={styles.header}>
         <div className={styles.titleRow}>
           <h2 className="title">Trending stocks</h2>
-          <LastUpdated timestamp={lastUpdated} className={styles.lastUpdated} useCronTime={false} />
+          <LastUpdated timestamp={lastUpdated || undefined} className={styles.lastUpdated} useCronTime={false} />
         </div>
         <button
           type="button"
