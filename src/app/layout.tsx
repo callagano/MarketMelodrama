@@ -19,6 +19,25 @@ export default function RootLayout({
     <html lang="en" className="dark h-full">
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+        <script
+          type="text/javascript"
+          dangerouslySetInnerHTML={{
+            __html: `
+              function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                  pageLanguage: 'en',
+                  includedLanguages: 'en,it',
+                  layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                  autoDisplay: false
+                }, 'google_translate_element');
+              }
+            `
+          }}
+        />
+        <script 
+          type="text/javascript" 
+          src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+        />
       </head>
       <body className={`${inter.className} antialiased h-full bg-slate-900`}>
         {children}

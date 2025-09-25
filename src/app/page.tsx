@@ -5,6 +5,7 @@ import FearGreedCharts from '@/components/charts/FearGreedCharts';
 import TrendingStocks from '@/components/TrendingStocks';
 import HybridCalendar from '@/components/HybridCalendar';
 import TLDRWidget from '@/components/TLDRWidget';
+import LanguageToggle from '@/components/LanguageToggle';
 import { TimeframeProvider } from '@/context/TimeframeContext';
 import styles from './page.module.css';
 
@@ -53,6 +54,7 @@ export default function Home() {
   return (
     <TimeframeProvider>
       <main className={styles.mainContainer}>
+        <LanguageToggle />
         <div className={styles.headerCard}>
           <div className={styles.headerContainer}>
             <img 
@@ -61,8 +63,8 @@ export default function Home() {
               className={styles.logo}
             />
             <div className={styles.textContainer}>
-              <h1 className={styles.title}>Market Melodrama</h1>
-              <p className="subtitle">Markets aren't always rational. <span className="people-highlight">People</span> either.</p>
+              <h1 className={styles.title} data-translate="Market Melodrama">Market Melodrama</h1>
+              <p className="subtitle" data-translate="I mercati non sono sempre razionali. Nemmeno le persone.">Markets aren't always rational. <span className="people-highlight">People</span> either.</p>
             </div>
           </div>
         </div>
