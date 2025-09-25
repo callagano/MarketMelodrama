@@ -7,10 +7,10 @@
   ],
   "functions": {
     "src/app/api/fear-greed-update/route.ts": {
-      "maxDuration": 300
+      "maxDuration": 60
     },
     "src/app/api/scheduler/route.ts": {
-      "maxDuration": 300
+      "maxDuration": 60
     }
   },
   "buildCommand": "npm run build"
