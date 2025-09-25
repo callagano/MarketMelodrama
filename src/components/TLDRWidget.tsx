@@ -293,9 +293,9 @@ export default function TLDRWidget() {
           <h2 className="title">Breakfast brief</h2>
         </div>
         <div className={styles.content}>
-          <div className={styles.error}>
+          <div className={styles.error} data-i18n data-i18n-key="Error">
             Error: {error}
-            <button onClick={() => window.location.reload()} className={styles.retryButton}>
+            <button onClick={() => window.location.reload()} className={styles.retryButton} data-i18n data-i18n-key="Retry">
               Retry
             </button>
           </div>
@@ -314,7 +314,7 @@ export default function TLDRWidget() {
               <h2 className="title">Breakfast brief</h2>
               <LastUpdated timestamp={lastUpdated || undefined} className={styles.lastUpdated} weekdaysOnly useCronTime />
             </div>
-            <p className="subtitle">What affected <span className="people-highlight">people</span> most in the last 24 hours?</p>
+            <p className="subtitle" data-i18n data-i18n-key="What affected people most in the last 24 hours?">What affected <span className="people-highlight">people</span> most in the last 24 hours?</p>
             <div className={`${styles.mainContentBox} ${
               activePiecesData.sentiment >= 70 ? styles.positive :
               activePiecesData.sentiment <= 30 ? styles.negative : styles.neutral
@@ -340,7 +340,7 @@ export default function TLDRWidget() {
                 <div className={styles.titleText}>
                   {activePiecesData.title}
                 </div>
-                <div className={styles.sentimentScore}>
+                <div className={styles.sentimentScore} data-i18n data-i18n-key="Sentiment score">
                   Sentiment score: {activePiecesData.sentiment}/100
                 </div>
               </div>
@@ -355,7 +355,7 @@ export default function TLDRWidget() {
                       {renderHighlightedText(item)}
                     </div>
                   ))
-                : <div className={styles.sectionItem}>Next data update at 6:00 AM GMT+2</div>
+                : <div className={styles.sectionItem} data-i18n data-i18n-key="Next data update at 6:00 AM GMT+2">Next data update at 6:00 AM GMT+2</div>
               }
             </div>
           </div>
@@ -371,12 +371,14 @@ export default function TLDRWidget() {
                           {renderHighlightedText(item, true)}
                         </div>
                       ))
-                    : <div className={styles.sectionItem}>No big picture data available</div>
+                    : <div className={styles.sectionItem} data-i18n data-i18n-key="No big picture data available">No big picture data available</div>
                   }
                 </div>
                 <button 
                   className={styles.readMoreButton}
                   onClick={() => setIsBigPictureExpanded(!isBigPictureExpanded)}
+                  data-i18n
+                  data-i18n-key={isBigPictureExpanded ? 'Read Less' : 'Read More'}
                 >
                   {isBigPictureExpanded ? 'Read Less' : 'Read More'}
                 </button>
@@ -400,7 +402,7 @@ export default function TLDRWidget() {
       <div className={styles.content}>
         <div className={styles.section}>
           <h2 className="title">Breakfast brief</h2>
-          <p className="subtitle">What happened in the last 24 hours and how <span className="people-highlight">people</span> reacted.</p>
+          <p className="subtitle" data-i18n data-i18n-key="What happened in the last 24 hours and how people reacted.">What happened in the last 24 hours and how <span className="people-highlight">people</span> reacted.</p>
           <div className={`${styles.mainContentBox} ${styles.neutral}`}>
             <div className={styles.pulseIcon}>
               <svg 

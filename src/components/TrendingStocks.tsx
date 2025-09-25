@@ -120,9 +120,9 @@ export default function TrendingStocks() {
           >
             <span className="material-symbols-outlined">info</span>
           </button>
-          <p className="subtitle">What <span className="people-highlight">people</span> is talking about?</p>
+          <p className="subtitle" data-i18n data-i18n-key="What people is talking about?">What <span className="people-highlight">people</span> is talking about?</p>
         </div>
-        <div className={styles.loading}>Loading trending stocks...</div>
+        <div className={styles.loading} data-i18n data-i18n-key="Loading trending stocks...">Loading trending stocks...</div>
       </div>
     );
   }
@@ -142,9 +142,9 @@ export default function TrendingStocks() {
           >
             <span className="material-symbols-outlined">info</span>
           </button>
-          <p className="subtitle">What <span className="people-highlight">people</span> is talking about?</p>
+          <p className="subtitle" data-i18n data-i18n-key="What people is talking about?">What <span className="people-highlight">people</span> is talking about?</p>
         </div>
-        <div className={styles.error}>Error: {error}</div>
+        <div className={styles.error} data-i18n data-i18n-key="Error">Error: {error}</div>
       </div>
     );
   }
@@ -153,7 +153,7 @@ export default function TrendingStocks() {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.titleRow}>
-          <h2 className="title">Trending stocks</h2>
+          <h2 className="title" data-i18n data-i18n-key="Trending stocks">Trending stocks</h2>
           <LastUpdated timestamp={lastUpdated || undefined} className={styles.lastUpdated} useCronTime={false} />
         </div>
         <button
@@ -164,7 +164,7 @@ export default function TrendingStocks() {
         >
           <span className="material-symbols-outlined">info</span>
         </button>
-        <p className="subtitle">What <span className="people-highlight">people</span> is talking about?</p>
+        <p className="subtitle" data-i18n data-i18n-key="What people is talking about?">What <span className="people-highlight">people</span> is talking about?</p>
       </div>
       
       {/* Tab Navigation */}
@@ -172,12 +172,16 @@ export default function TrendingStocks() {
         <button
           className={`${styles.tabButton} ${activeTab === 'upvotes' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('upvotes')}
+          data-i18n
+          data-i18n-key="Most relevant"
         >
           Most relevant
         </button>
         <button
           className={`${styles.tabButton} ${activeTab === 'percentage' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('percentage')}
+          data-i18n
+          data-i18n-key="Trending Up"
         >
           Trending Up
         </button>
@@ -187,11 +191,11 @@ export default function TrendingStocks() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Rank</th>
-              <th>Stock</th>
-              <th>Symbol</th>
-              <th>Mentions</th>
-              <th>Upvotes</th>
+              <th data-i18n data-i18n-key="Rank">Rank</th>
+              <th data-i18n data-i18n-key="Stock">Stock</th>
+              <th data-i18n data-i18n-key="Symbol">Symbol</th>
+              <th data-i18n data-i18n-key="Mentions">Mentions</th>
+              <th data-i18n data-i18n-key="Upvotes">Upvotes</th>
             </tr>
           </thead>
           <tbody>

@@ -1,75 +1,130 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './LanguageToggle.module.css';
 
-declare global {
-  interface Window {
-    google: any;
+type Lang = 'EN' | 'IT';
+
+// Simple in-memory cache during session
+const translationCache = new Map<string, string>();
+
+function getElementsToTranslate(): Array<{ el: Element; key: string; original: string }>{
+  const els = Array.from(document.querySelectorAll('[data-i18n]'));
+  return els.map((el) => {
+    const key = (el.getAttribute('data-i18n-key') || (el as HTMLElement).innerText || '').trim();
+    const original = (el as HTMLElement).innerText;
+    return { el, key, original };
+  });
+}
+
+async function translateBatch(texts: string[], targetLang: Lang, sourceLang?: Lang): Promise<string[]> {
+  const res = await fetch('/api/translate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ texts, targetLang, sourceLang })
+  });
+  const json = await res.json();
+  if (!res.ok || !json?.success) {
+    throw new Error(json?.message || 'Translate failed');
   }
+  return json.translations as string[];
 }
 
 export default function LanguageToggle() {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [showFallback, setShowFallback] = useState(false);
+  const [lang, setLang] = useState<Lang>('EN');
+  const [busy, setBusy] = useState(false);
+
+  const nextLang: Lang = useMemo(() => (lang === 'EN' ? 'IT' : 'EN'), [lang]);
 
   useEffect(() => {
-    let attempts = 0;
-    const maxAttempts = 50; // 5 seconds max
-
-    const checkGoogleTranslate = () => {
-      attempts++;
-      
-      if (typeof window !== 'undefined' && window.google && window.google.translate) {
-        setIsLoaded(true);
-      } else if (attempts < maxAttempts) {
-        setTimeout(checkGoogleTranslate, 100);
-      } else {
-        // Show fallback after max attempts
-        setShowFallback(true);
-      }
-    };
-
-    checkGoogleTranslate();
+    // Initialize current language from html[lang]
+    const htmlLang = (document.documentElement.lang || 'en').toUpperCase();
+    if (htmlLang === 'IT') setLang('IT');
   }, []);
 
-  if (showFallback) {
-    return (
-      <div className={styles.languageToggle}>
-        <div className={styles.fallback}>
-          <button 
-            className={styles.fallbackButton}
-            onClick={() => {
-              // Simple language toggle for development
-              const elements = document.querySelectorAll('[data-translate]');
-              elements.forEach(el => {
-                const currentText = el.textContent;
-                const translatedText = el.getAttribute('data-translate');
-                if (translatedText) {
-                  el.textContent = translatedText;
-                  el.setAttribute('data-translate', currentText || '');
-                }
-              });
-            }}
-          >
-            IT/EN
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const handleToggle = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const blocks = getElementsToTranslate();
+      if (blocks.length === 0) {
+        document.documentElement.lang = nextLang.toLowerCase();
+        setLang(nextLang);
+        return;
+      }
 
-  if (!isLoaded) {
-    return (
-      <div className={styles.languageToggle}>
-        <div className={styles.loading}>Loading...</div>
-      </div>
-    );
-  }
+      // Build list, using cache when available
+      const toFetch: string[] = [];
+      const indices: number[] = [];
+      const originalTexts = blocks.map((b) => b.original);
+
+      originalTexts.forEach((t, i) => {
+        const cacheKey = `${nextLang}:${t}`;
+        if (!translationCache.has(cacheKey)) {
+          toFetch.push(t);
+          indices.push(i);
+        }
+      });
+
+      let fetchedTranslations: string[] = [];
+      if (toFetch.length > 0) {
+        fetchedTranslations = await translateBatch(toFetch, nextLang, lang);
+        fetchedTranslations.forEach((translated, j) => {
+          const i = indices[j];
+          const original = originalTexts[i];
+          translationCache.set(`${nextLang}:${original}`, translated);
+        });
+      }
+
+      // Apply translations
+      blocks.forEach((b) => {
+        const translated = translationCache.get(`${nextLang}:${b.original}`);
+        const target = translated || b.original;
+        (b.el as HTMLElement).innerText = target;
+      });
+
+      // Handle dynamic texts that change based on state
+      const dynamicElements = document.querySelectorAll('[data-i18n-key="Read More"], [data-i18n-key="Read Less"]');
+      const dynamicTexts = ['Read More', 'Read Less'];
+      const dynamicToFetch = dynamicTexts.filter(t => !translationCache.has(`${nextLang}:${t}`));
+      
+      if (dynamicToFetch.length > 0) {
+        const dynamicTranslations = await translateBatch(dynamicToFetch, nextLang, lang);
+        dynamicToFetch.forEach((text, i) => {
+          translationCache.set(`${nextLang}:${text}`, dynamicTranslations[i]);
+        });
+      }
+      
+      dynamicElements.forEach((el) => {
+        const key = el.getAttribute('data-i18n-key');
+        if (key) {
+          const translated = translationCache.get(`${nextLang}:${key}`);
+          if (translated) {
+            (el as HTMLElement).innerText = translated;
+          }
+        }
+      });
+
+      // Update document language
+      document.documentElement.lang = nextLang.toLowerCase();
+      setLang(nextLang);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
-    <div className={styles.languageToggle}>
-      <div id="google_translate_element"></div>
-    </div>
+    <button
+      className={`${styles.toggle} ${busy ? styles.busy : ''}`}
+      onClick={handleToggle}
+      aria-label={`Switch to ${nextLang}`}
+      disabled={busy}
+    >
+      {busy ? '…' : nextLang}
+    </button>
   );
 }
+
+

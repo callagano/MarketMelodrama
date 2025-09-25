@@ -80,3 +80,8 @@ body {
 .gradient-textlink:hover {
   color: #c68eff; /* blue-300 */
 }
+
+/* Hide Google Translate banner if it appears */
+.goog-te-banner-frame {
+  display: none !important;
+}

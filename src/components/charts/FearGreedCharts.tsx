@@ -223,16 +223,19 @@ export default function FearGreedCharts({ data, lastUpdated }: Props) {
   const historicals = [
     {
       label: '1 Month Ago',
+      labelKey: '1 Month Ago',
       value: data[monthAgoIdx]?.Fear_Greed_Index,
       change: ((latestValidData.Fear_Greed_Index - data[monthAgoIdx]?.Fear_Greed_Index) / data[monthAgoIdx]?.Fear_Greed_Index) * 100,
     },
     {
       label: '6 Months Ago',
+      labelKey: '6 Months Ago',
       value: data[sixMonthsAgoIdx]?.Fear_Greed_Index,
       change: ((latestValidData.Fear_Greed_Index - data[sixMonthsAgoIdx]?.Fear_Greed_Index) / data[sixMonthsAgoIdx]?.Fear_Greed_Index) * 100,
     },
     {
       label: '1 Year Ago',
+      labelKey: '1 Year Ago',
       value: data[yearAgoIdx]?.Fear_Greed_Index,
       change: ((latestValidData.Fear_Greed_Index - data[yearAgoIdx]?.Fear_Greed_Index) / data[yearAgoIdx]?.Fear_Greed_Index) * 100,
     },
@@ -284,18 +287,24 @@ export default function FearGreedCharts({ data, lastUpdated }: Props) {
       <button 
         className={`${styles.timeframeButton} ${timeframe === '1M' ? styles.active : ''}`}
         onClick={() => setTimeframe('1M')}
+        data-i18n
+        data-i18n-key="1M"
       >
         1M
       </button>
       <button 
         className={`${styles.timeframeButton} ${timeframe === '6M' ? styles.active : ''}`}
         onClick={() => setTimeframe('6M')}
+        data-i18n
+        data-i18n-key="6M"
       >
         6M
       </button>
       <button 
         className={`${styles.timeframeButton} ${timeframe === '3Y' ? styles.active : ''}`}
         onClick={() => setTimeframe('3Y')}
+        data-i18n
+        data-i18n-key="3Y"
       >
         3Y
       </button>
@@ -307,7 +316,7 @@ export default function FearGreedCharts({ data, lastUpdated }: Props) {
       <div className={styles.chartCard}>
         <div className={styles.chartHeader}>
           <div className={styles.titleRow}>
-            <h2 className="title">Investor's mood</h2>
+                <h2 className="title">Investor's mood</h2>
             <LastUpdated timestamp={lastUpdated} className={styles.lastUpdated} weekdaysOnly useCronTime />
           </div>
           <button
@@ -318,7 +327,7 @@ export default function FearGreedCharts({ data, lastUpdated }: Props) {
           >
             <span className="material-symbols-outlined">info</span>
           </button>
-          <p className="subtitle">
+          <p className="subtitle" data-i18n data-i18n-key="What emotion is driving people right now?">
             What emotion is driving <span className="people-highlight">people</span> right now?
           </p>
           {/* Horizontal Slider Chart - moved here */}
@@ -328,9 +337,9 @@ export default function FearGreedCharts({ data, lastUpdated }: Props) {
             </div>
             {/* Labels below the track */}
             <div className={styles.sliderLabels}>
-              <span className={styles.sliderLabel}>Extreme Fear</span>
-              <span className={styles.sliderLabel}>Neutral</span>
-              <span className={styles.sliderLabel}>Extreme Greed</span>
+              <span className={styles.sliderLabel} data-i18n data-i18n-key="Extreme Fear">Extreme Fear</span>
+              <span className={styles.sliderLabel} data-i18n data-i18n-key="Neutral">Neutral</span>
+              <span className={styles.sliderLabel} data-i18n data-i18n-key="Extreme Greed">Extreme Greed</span>
             </div>
             {/* Current Value Indicator */}
             <div 
@@ -365,7 +374,7 @@ export default function FearGreedCharts({ data, lastUpdated }: Props) {
           </div>
           {historicals.map((h) => (
             <div className={styles.historicalCard} key={h.label}>
-              <span className={styles.historicalTitle}>{h.label}</span>
+              <span className={styles.historicalTitle} data-i18n data-i18n-key={h.labelKey}>{h.label}</span>
               <span className={styles.historicalValue}>{h.value ? Math.round(h.value) : '--'}</span>
               <span className={styles.historicalChange} style={{color: h.change >= 0 ? '#10b981' : '#ef4444'}}>
                 {h.change >= 0 ? '+' : ''}{h.value ? Math.round(h.change) : '--'}%
@@ -379,7 +388,7 @@ export default function FearGreedCharts({ data, lastUpdated }: Props) {
             className={styles.chartAccordionButton}
             onClick={() => setIsChartExpanded(!isChartExpanded)}
           >
-            <span>Timeline</span>
+            <span data-i18n data-i18n-key="Timeline">Timeline</span>
             <span className={`${styles.chartAccordionIcon} ${isChartExpanded ? styles.expanded : ''}`}>
               ▼
             </span>
@@ -491,12 +500,12 @@ export default function FearGreedCharts({ data, lastUpdated }: Props) {
                 </button>
               </div>
               <div className={styles.modalBody}>
-                <h4>What is Fear & Greed Index?</h4>
-                <p>
+                <h4 data-i18n data-i18n-key="What is Fear & Greed Index?">What is Fear & Greed Index?</h4>
+                <p data-i18n data-i18n-key="The Fear & Greed Index is a way to gauge stock market movements and whether stocks are fairly priced.">
                   The Fear & Greed Index is a way to gauge stock market movements and whether stocks are fairly priced.
                 </p>
-                <h4>How is Fear & Greed Calculated?</h4>
-                <p>
+                <h4 data-i18n data-i18n-key="How is Fear & Greed Calculated?">How is Fear & Greed Calculated?</h4>
+                <p data-i18n data-i18n-key="The Fear & Greed Index is a compilation of seven different indicators that measure some aspect of stock market behavior. They are market momentum, stock price strength, stock price breadth, put and call options, junk bond demand, market volatility, and safe haven demand. The index tracks how much these individual indicators deviate from their averages compared to how much they normally diverge. The index gives each indicator equal weighting in calculating a score from 0 to 100, with 100 representing maximum greediness and 0 signaling maximum fear.">
                   The Fear & Greed Index is a compilation of seven different indicators that measure some aspect of stock
                   market behavior. They are market momentum, stock price strength, stock price breadth, put and call
                   options, junk bond demand, market volatility, and safe haven demand. The index tracks how much these
@@ -504,8 +513,8 @@ export default function FearGreedCharts({ data, lastUpdated }: Props) {
                   gives each indicator equal weighting in calculating a score from 0 to 100, with 100 representing maximum
                   greediness and 0 signaling maximum fear.
                 </p>
-                <h4>How often is the Fear & Greed Index calculated?</h4>
-                <p>Every day at 4am UTC</p>
+                <h4 data-i18n data-i18n-key="How often is the Fear & Greed Index calculated?">How often is the Fear & Greed Index calculated?</h4>
+                <p data-i18n data-i18n-key="Every day at 4am UTC">Every day at 4am UTC</p>
               </div>
             </div>
           </div>, document.body)

@@ -54,7 +54,6 @@ export default function Home() {
   return (
     <TimeframeProvider>
       <main className={styles.mainContainer}>
-        <LanguageToggle />
         <div className={styles.headerCard}>
           <div className={styles.headerContainer}>
             <img 
@@ -63,8 +62,8 @@ export default function Home() {
               className={styles.logo}
             />
             <div className={styles.textContainer}>
-              <h1 className={styles.title} data-translate="Market Melodrama">Market Melodrama</h1>
-              <p className="subtitle" data-translate="I mercati non sono sempre razionali. Nemmeno le persone.">Markets aren't always rational. <span className="people-highlight">People</span> either.</p>
+              <h1 className={styles.title}>Market Melodrama</h1>
+              <p className="subtitle">Markets aren't always rational. <span className="people-highlight">People</span> either.</p>
             </div>
           </div>
         </div>
@@ -73,11 +72,11 @@ export default function Home() {
         
         {loading ? (
           <div className={styles.loadingContainer}>
-            <p className={styles.loadingText}>Loading charts...</p>
+            <p className={styles.loadingText} data-i18n data-i18n-key="Loading charts...">Loading charts...</p>
           </div>
         ) : error ? (
           <div className={styles.errorContainer}>
-            <p className={styles.errorText}>Error loading charts: {error}</p>
+            <p className={styles.errorText} data-i18n data-i18n-key="Error loading charts">Error loading charts: {error}</p>
           </div>
         ) : data.length > 0 ? (
           <>
@@ -87,16 +86,17 @@ export default function Home() {
           </>
         ) : (
           <div className={styles.noDataCard}>
-            <p className={styles.noDataText}>No chart data available</p>
+            <p className={styles.noDataText} data-i18n data-i18n-key="No chart data available">No chart data available</p>
           </div>
         )}
         
         {/* Disclaimer */}
         <div className={styles.disclaimer}>
-          <p className={styles.disclaimerText}>
+          <p className={styles.disclaimerText} data-i18n data-i18n-key="Marketmelodrama.vercel.app is for educational and entertainment purposes only. It is based on real market data but is not investment advice. Content is generated using AI language models that can be unpredictable. Market insights may be inaccurate or misleading. Creator assumes no liability whatsoever for any decisions made based on this information. Do not use for investment decisions.">
             Marketmelodrama.vercel.app is for educational and entertainment purposes only. It is based on real market data but is not investment advice. Content is generated using AI language models that can be unpredictable. Market insights may be inaccurate or misleading. Creator assumes no liability whatsoever for any decisions made based on this information. Do not use for investment decisions.
           </p>
         </div>
+        <LanguageToggle />
       </main>
     </TimeframeProvider>
   );

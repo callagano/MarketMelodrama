@@ -120,18 +120,22 @@ export default function HybridCalendar() {
       <CardContent className={styles.cardContent}>
         <div className={styles.header}>
           <h2 className="title">Market calendar</h2>
-          <p className="subtitle">What's on the <span className="people-highlight">people</span>'s agenda?</p>
+          <p className="subtitle" data-i18n data-i18n-key="What's on the people's agenda?">What's on the <span className="people-highlight">people</span>'s agenda?</p>
         </div>
         <div className={styles.tabContainer}>
           <button
             className={`${styles.tabButton} ${activeTab === 'economic' ? styles.active : ''}`}
             onClick={() => setActiveTab('economic')}
+            data-i18n
+            data-i18n-key="Economic Events"
           >
             Economic Events
           </button>
           <button
             className={`${styles.tabButton} ${activeTab === 'ipo' ? styles.active : ''}`}
             onClick={() => setActiveTab('ipo')}
+            data-i18n
+            data-i18n-key="Next IPOs"
           >
             Next IPOs
           </button>
@@ -148,21 +152,21 @@ export default function HybridCalendar() {
             <div className={styles.tableContainer}>
               {loading ? (
                 <div className={styles.loadingContainer}>
-                  <p className={styles.loadingText}>Loading IPO data...</p>
+                  <p className={styles.loadingText} data-i18n data-i18n-key="Loading IPO data...">Loading IPO data...</p>
                 </div>
               ) : error ? (
                 <div className={styles.errorContainer}>
-                  <p className={styles.errorText}>Error: {error}</p>
+                  <p className={styles.errorText} data-i18n data-i18n-key="Error">Error: {error}</p>
                 </div>
               ) : (
                 <>
                   <div className={styles.tableHeader}>
-                    <div className={styles.dateHeader}>Date</div>
-                    <div className={styles.symbolHeader}>Symbol</div>
-                    <div className={styles.companyHeader}>Company</div>
-                    <div className={styles.exchangeHeader}>Exchange</div>
-                    <div className={styles.priceHeader}>Price Range</div>
-                    <div className={styles.sharesHeader}>Shares</div>
+                    <div className={styles.dateHeader} data-i18n data-i18n-key="Date">Date</div>
+                    <div className={styles.symbolHeader} data-i18n data-i18n-key="Symbol">Symbol</div>
+                    <div className={styles.companyHeader} data-i18n data-i18n-key="Company">Company</div>
+                    <div className={styles.exchangeHeader} data-i18n data-i18n-key="Exchange">Exchange</div>
+                    <div className={styles.priceHeader} data-i18n data-i18n-key="Price Range">Price Range</div>
+                    <div className={styles.sharesHeader} data-i18n data-i18n-key="Shares">Shares</div>
                   </div>
                   <div className={styles.tableBody}>
                     {ipoData.map((ipo) => (
