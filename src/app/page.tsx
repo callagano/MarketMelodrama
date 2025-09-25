@@ -20,6 +20,7 @@ export default function Home() {
   const [data, setData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,8 +37,9 @@ export default function Home() {
         }
         
         const jsonData = await response.json();
-        console.log('FearGreedCharts data received:', jsonData.length, 'items');
-        setData(jsonData);
+        console.log('FearGreedCharts data received:', jsonData.data?.length || jsonData.length, 'items');
+        setData(jsonData.data || jsonData);
+        setLastUpdated(jsonData.lastUpdated || null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -77,7 +79,7 @@ export default function Home() {
           </div>
         ) : data.length > 0 ? (
           <>
-            <FearGreedCharts data={data} />
+            <FearGreedCharts data={data} lastUpdated={lastUpdated} />
             <TrendingStocks />
             <HybridCalendar />
           </>

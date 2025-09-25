@@ -90,7 +90,11 @@ export async function GET() {
   try {
     // Fetch fear and greed index data
     const data = await fetchFearGreedData();
-    return NextResponse.json(data);
+    return NextResponse.json({
+      data: data,
+      lastUpdated: new Date().toISOString(),
+      source: 'fear-greed-index'
+    });
   } catch (error) {
     console.error('Error:', error);
     return NextResponse.json(

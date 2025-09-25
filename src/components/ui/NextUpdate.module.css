@@ -1,0 +1,46 @@
+.nextUpdate {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  color: #6b7280;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.nextUpdate:hover {
+  opacity: 1;
+}
+
+.label {
+  font-weight: 400;
+  color: #4b5563;
+}
+
+.time {
+  font-weight: 500;
+  color: #6b7280;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+  .nextUpdate {
+    color: #4b5563;
+  }
+  
+  .label {
+    color: #374151;
+  }
+  
+  .time {
+    color: #4b5563;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .nextUpdate {
+    font-size: 0.65rem;
+  }
+}

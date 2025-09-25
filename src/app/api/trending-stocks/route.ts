@@ -79,7 +79,11 @@ export async function GET() {
         };
       });
 
-    return NextResponse.json(trendingStocks, {
+    return NextResponse.json({
+      data: trendingStocks,
+      lastUpdated: new Date().toISOString(),
+      source: 'apewisdom.io'
+    }, {
       headers: {
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
         'Last-Modified': new Date().toUTCString(),

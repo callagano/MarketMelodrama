@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import LastUpdated from './ui/LastUpdated';
 import styles from './TrendingStocks.module.css';
 
 interface TrendingStock {
@@ -24,6 +25,7 @@ export default function TrendingStocks() {
   const [activeTab, setActiveTab] = useState<TabType>('upvotes');
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const scrollPositionRef = useRef(0);
 
   // Block body scroll when modal is open
@@ -74,7 +76,8 @@ export default function TrendingStocks() {
         }
         
         const data = await response.json();
-        setStocks(data);
+        setStocks(data.data || data);
+        setLastUpdated(data.lastUpdated || null);
         setLoading(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch trending stocks');
@@ -151,6 +154,7 @@ export default function TrendingStocks() {
       <div className={styles.header}>
         <div className={styles.titleRow}>
           <h2 className="title">Trending stocks</h2>
+          <LastUpdated timestamp={lastUpdated} className={styles.lastUpdated} useCronTime={false} />
         </div>
         <button
           type="button"

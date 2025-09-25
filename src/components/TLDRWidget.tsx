@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import LastUpdated from './ui/LastUpdated';
 import styles from './TLDRWidget.module.css';
 
 interface TLDRUpdate {
@@ -40,6 +41,7 @@ export default function TLDRWidget() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isBigPictureExpanded, setIsBigPictureExpanded] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if it's weekend (Saturday = 6, Sunday = 0)
@@ -113,6 +115,7 @@ export default function TLDRWidget() {
                     setActivePiecesData(processedData);
                     setTldrData(null);
                     setError(null);
+                    setLastUpdated(data.timestamp || new Date().toISOString());
                     setLoading(false);
                     return;
                   }
@@ -125,11 +128,13 @@ export default function TLDRWidget() {
               setTldrData(data.body);
               setActivePiecesData(null);
               setError(null);
+              setLastUpdated(data.timestamp || new Date().toISOString());
             } else {
               // Standard API format
               setTldrData(data);
               setActivePiecesData(null);
               setError(null);
+              setLastUpdated(data.timestamp || new Date().toISOString());
             }
             setLoading(false);
           })
@@ -305,7 +310,10 @@ export default function TLDRWidget() {
       <div className={styles.widget}>
         <div className={styles.content}>
           <div className={styles.section}>
-            <h2 className="title">Breakfast brief</h2>
+            <div className={styles.titleRow}>
+              <h2 className="title">Breakfast brief</h2>
+              <LastUpdated timestamp={lastUpdated} className={styles.lastUpdated} weekdaysOnly useCronTime />
+            </div>
             <p className="subtitle">What affected <span className="people-highlight">people</span> most in the last 24 hours?</p>
             <div className={`${styles.mainContentBox} ${
               activePiecesData.sentiment >= 70 ? styles.positive :

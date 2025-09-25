@@ -47,6 +47,18 @@
   padding: 1.5rem 1.5rem 1.5rem 1.5rem;
 }
 
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 0rem; /* reserve space for absolute info button if present */
+}
+
+.lastUpdated {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
 /* Main Content Box - Dynamic Border */
 .mainContentBox {
   display: flex;

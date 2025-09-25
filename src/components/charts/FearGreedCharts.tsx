@@ -5,6 +5,7 @@ import { format as formatDate } from "date-fns";
 import { useTimeframe } from '@/context/TimeframeContext';
 import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import LastUpdated from '../ui/LastUpdated';
 import styles from './FearGreedCharts.module.css';
 
 interface ChartData {
@@ -14,6 +15,7 @@ interface ChartData {
 
 interface Props {
   data: ChartData[];
+  lastUpdated?: string;
 }
 
 // Mini Line Chart Component
@@ -74,7 +76,7 @@ function MiniLineChart({ data, color }: { data: ChartData[], color: string }) {
   );
 }
 
-export default function FearGreedCharts({ data }: Props) {
+export default function FearGreedCharts({ data, lastUpdated }: Props) {
   const { timeframe, setTimeframe } = useTimeframe();
   const [isChartExpanded, setIsChartExpanded] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
@@ -306,6 +308,7 @@ export default function FearGreedCharts({ data }: Props) {
         <div className={styles.chartHeader}>
           <div className={styles.titleRow}>
             <h2 className="title">Investor's mood</h2>
+            <LastUpdated timestamp={lastUpdated} className={styles.lastUpdated} weekdaysOnly useCronTime />
           </div>
           <button
             type="button"

@@ -18,8 +18,8 @@ export async function GET() {
     
     // Calculate next run times
     const nextRun = new Date(now);
-    nextRun.setUTCHours(7, 0, 0, 0);
-    if (now.getUTCHours() >= 7) {
+    nextRun.setUTCHours(4, 0, 0, 0);
+    if (now.getUTCHours() >= 4) {
       nextRun.setUTCDate(nextRun.getUTCDate() + 1);
     }
     
@@ -27,7 +27,7 @@ export async function GET() {
       {
         name: 'Market Data Refresh',
         endpoint: '/api/cron',
-        schedule: '0 7 * * *',
+        schedule: '0 4 * * *',
         description: 'Updates trending stocks, IPO calendar, economic calendar',
         nextRun: nextRun.toISOString(),
         status: 'active'
@@ -35,7 +35,7 @@ export async function GET() {
       {
         name: 'Fear & Greed Index Update',
         endpoint: '/api/fear-greed-update',
-        schedule: '0 7 * * 1-5',
+        schedule: '0 4 * * 1-5',
         description: 'Updates Fear & Greed Index data (weekdays only)',
         nextRun: isWeekend ? 
           new Date(nextRun.getTime() + (8 - dayOfWeek) * 24 * 60 * 60 * 1000).toISOString() :
