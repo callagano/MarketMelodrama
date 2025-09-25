@@ -14,7 +14,7 @@ function getElementsToTranslate(): Array<{ el: Element; key: string; original: s
     const key = (el.getAttribute('data-i18n-key') || (el as HTMLElement).innerText || '').trim();
     const original = (el as HTMLElement).innerText;
     return { el, key, original };
-  });
+  }).filter(block => block.original && block.original.length > 0); // Filter out empty elements
 }
 
 async function translateBatch(texts: string[], targetLang: Lang, sourceLang?: Lang): Promise<string[]> {
@@ -46,6 +46,9 @@ export default function LanguageToggle() {
     if (busy) return;
     setBusy(true);
     try {
+      // Wait a bit for any dynamic content to load
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const blocks = getElementsToTranslate();
       if (blocks.length === 0) {
         document.documentElement.lang = nextLang.toLowerCase();
@@ -80,7 +83,16 @@ export default function LanguageToggle() {
       blocks.forEach((b) => {
         const translated = translationCache.get(`${nextLang}:${b.original}`);
         const target = translated || b.original;
-        (b.el as HTMLElement).innerText = target;
+        
+        // Check if the element uses dangerouslySetInnerHTML (like TLDR highlights)
+        if (b.el.hasAttribute('data-i18n-key') && b.el.getAttribute('data-i18n-key') === b.original) {
+          // For elements with data-i18n-key, update the key attribute and innerHTML
+          b.el.setAttribute('data-i18n-key', target);
+          (b.el as HTMLElement).innerHTML = (b.el as HTMLElement).innerHTML.replace(b.original, target);
+        } else {
+          // For regular text elements
+          (b.el as HTMLElement).innerText = target;
+        }
       });
 
       // Handle dynamic texts that change based on state

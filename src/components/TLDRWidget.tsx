@@ -216,6 +216,8 @@ export default function TLDRWidget() {
     return (
       <div 
         className={isBigPicture ? styles.bigPictureText : styles.highlightText}
+        data-i18n
+        data-i18n-key={item.text}
         dangerouslySetInnerHTML={{ __html: text }}
       />
     );
@@ -224,7 +226,7 @@ export default function TLDRWidget() {
   const renderTLDRContent = (text: string) => {
     return (
       <div className={styles.tldrContent}>
-        <p>{text}</p>
+        <p data-i18n data-i18n-key={text}>{text}</p>
       </div>
     );
   };
@@ -337,7 +339,7 @@ export default function TLDRWidget() {
                 </svg>
               </div>
               <div className={styles.titleContainer}>
-                <div className={styles.titleText}>
+                <div className={styles.titleText} data-i18n data-i18n-key={activePiecesData.title}>
                   {activePiecesData.title}
                 </div>
                 <div className={styles.sentimentScore} data-i18n data-i18n-key="Sentiment score">
