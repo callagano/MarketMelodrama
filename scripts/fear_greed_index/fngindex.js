@@ -33,14 +33,24 @@ function makeRequest(url) {
       }
     }, (res) => {
       let data = '';
+      
+      // Check for HTTP errors
+      if (res.statusCode < 200 || res.statusCode >= 300) {
+        reject(new Error(`HTTP ${res.statusCode}: ${res.statusMessage}`));
+        return;
+      }
+      
       res.on('data', (chunk) => {
         data += chunk;
       });
       res.on('end', () => {
         try {
-          resolve(JSON.parse(data));
+          const jsonData = JSON.parse(data);
+          resolve(jsonData);
         } catch (e) {
-          reject(e);
+          console.error('JSON parse error:', e.message);
+          console.error('Response data:', data.substring(0, 200) + '...');
+          reject(new Error(`Invalid JSON response: ${e.message}`));
         }
       });
     }).on('error', (err) => {
