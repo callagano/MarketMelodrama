@@ -20,7 +20,7 @@ const SCHEDULED_TASKS: ScheduledTask[] = [
     name: 'Fear & Greed Index Update',
     endpoint: '/api/fear-greed-update',
     schedule: '0 4 * * 1-5',
-    description: 'Updates Fear & Greed Index data (weekdays only)'
+    description: 'Handled by GitHub Actions (weekdays only)'
   }
 ];
 

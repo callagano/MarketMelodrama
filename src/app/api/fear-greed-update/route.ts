@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import path from 'path';
-
-const execAsync = promisify(exec);
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('=== Fear & Greed Index Daily Update Started ===');
+    console.log('=== Fear & Greed Index Update Check ===');
     
     // Check if it's a weekday (Monday = 1, Friday = 5)
     const today = new Date();
@@ -24,40 +19,25 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Run the Fear & Greed update script using Node.js
-    const scriptPath = path.join(process.cwd(), 'scripts', 'fear_greed_index');
-    
-    console.log(`Running Fear & Greed update from: ${scriptPath}`);
-    
-    const { stdout, stderr } = await execAsync(
-      `cd "${scriptPath}" && node fngindex.js`,
-      { timeout: 300000 } // 5 minute timeout
-    );
-
-    if (stderr) {
-      console.error('Fear & Greed update stderr:', stderr);
-    }
-
-    console.log('Fear & Greed update stdout:', stdout);
-    console.log('=== Fear & Greed Index Daily Update Completed ===');
+    console.log('Fear & Greed Index update is handled by GitHub Actions');
+    console.log('Check the Actions tab in GitHub for update status');
 
     return NextResponse.json({
       status: 200,
-      message: 'Fear & Greed Index updated successfully',
-      output: stdout,
-      error: stderr || null,
+      message: 'Fear & Greed Index update is handled by GitHub Actions',
+      note: 'Data is updated automatically via GitHub Actions workflow',
       timestamp: new Date().toISOString(),
       dayOfWeek: dayOfWeek,
       isWeekend: false
     });
 
   } catch (error) {
-    console.error('Error running Fear & Greed update:', error);
+    console.error('Error in Fear & Greed update check:', error);
     
     return NextResponse.json(
       {
         status: 500,
-        message: 'Failed to update Fear & Greed Index',
+        message: 'Failed to check Fear & Greed Index update',
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString()
       },

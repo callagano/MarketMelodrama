@@ -1,0 +1,60 @@
+name: Fear & Greed Index Daily Update
+
+on:
+  schedule:
+    # Run every day at 4:00 UTC (6:00 AM GMT+2)
+    - cron: '0 4 * * 1-5'  # Monday to Friday only
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  update-fear-greed:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        cd src/scripts/fear_greed_index
+        pip install -r requirements.txt
+    
+    - name: Run Fear & Greed update
+      run: |
+        cd src/scripts/fear_greed_index
+        python fngindex.py
+    
+    - name: Check for changes
+      id: verify-changed-files
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+        else
+          echo "changed=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Commit and push changes
+      if: steps.verify-changed-files.outputs.changed == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git commit -m "🤖 Auto-update Fear & Greed Index data - $(date '+%Y-%m-%d %H:%M:%S')"
+        git push
+    
+    - name: Trigger Vercel deployment
+      if: steps.verify-changed-files.outputs.changed == 'true'
+      run: |
+        echo "Data updated, Vercel will automatically redeploy"
+    
+    - name: No changes detected
+      if: steps.verify-changed-files.outputs.changed == 'false'
+      run: |
+        echo "No new data to update"
