@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import path from 'path';
 
 const execAsync = promisify(exec);
 
@@ -24,12 +25,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Run the Fear & Greed update script using Node.js
-    const scriptPath = process.cwd() + '/src/scripts/fear_greed_index';
+    const scriptPath = path.join(process.cwd(), 'src', 'scripts', 'fear_greed_index');
     
     console.log(`Running Fear & Greed update from: ${scriptPath}`);
     
     const { stdout, stderr } = await execAsync(
-      `cd ${scriptPath} && node fngindex.js`,
+      `cd "${scriptPath}" && node fngindex.js`,
       { timeout: 300000 } // 5 minute timeout
     );
 
