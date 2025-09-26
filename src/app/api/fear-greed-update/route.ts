@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Run the Fear & Greed update script using Node.js
-    const scriptPath = path.join(process.cwd(), 'src', 'scripts', 'fear_greed_index');
+    const scriptPath = path.join(process.cwd(), 'scripts', 'fear_greed_index');
     
     console.log(`Running Fear & Greed update from: ${scriptPath}`);
     
